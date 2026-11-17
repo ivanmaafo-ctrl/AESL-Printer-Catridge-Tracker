@@ -1,0 +1,6 @@
+{
+  "name": "PrintFlow - Printer Cartridge Branch Inventory & Logistics",
+  "description": "Track printer cartridges delivered to branches, monitor on-site usage, track central warehouse inventory, and receive automated low-stock reorder alerts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

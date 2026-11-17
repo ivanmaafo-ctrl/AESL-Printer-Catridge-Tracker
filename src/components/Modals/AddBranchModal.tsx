@@ -1,0 +1,320 @@
+import React, { useState } from 'react';
+import { useInventory } from '../../context/InventoryContext';
+import { X, Building2, Plus, Trash2 } from 'lucide-react';
+import { PrinterDevice } from '../../types/inventory';
+
+interface AddBranchModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const AddBranchModal: React.FC<AddBranchModalProps> = ({
+  isOpen,
+  onClose,
+}) => {
+  const { addBranch, cartridges } = useInventory();
+
+  const [code, setCode] = useState('');
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState<'Headquarters' | 'Regional Branch'>('Regional Branch');
+  const [city, setCity] = useState('');
+  const [address, setAddress] = useState('');
+  const [managerName, setManagerName] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [email, setEmail] = useState('');
+
+  // Printers configured for this branch
+  const [printers, setPrinters] = useState<PrinterDevice[]>([
+    {
+      id: `pr-${Date.now()}-1`,
+      name: 'Main Office Printer',
+      model: 'HP LaserJet Pro M404n',
+      location: 'Front Reception',
+      cartridgeSkuId: cartridges[0]?.id || '',
+    },
+  ]);
+
+  if (!isOpen) return null;
+
+  const handleAddPrinter = () => {
+    setPrinters((prev) => [
+      ...prev,
+      {
+        id: `pr-${Date.now()}-${prev.length + 1}`,
+        name: `Printer #${prev.length + 1}`,
+        model: 'Standard Workgroup Printer',
+        location: 'Branch Floor',
+        cartridgeSkuId: cartridges[0]?.id || '',
+      },
+    ]);
+  };
+
+  const handleRemovePrinter = (id: string) => {
+    setPrinters((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  const handleUpdatePrinter = (id: string, field: keyof PrinterDevice, val: string) => {
+    setPrinters((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, [field]: val } : p))
+    );
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !code.trim()) return;
+
+    addBranch({
+      code: code.trim(),
+      name: name.trim(),
+      category,
+      city: city.trim(),
+      address: address.trim(),
+      managerName: managerName.trim() || 'Branch Lead',
+      contactPhone: contactPhone.trim(),
+      email: email.trim(),
+      printers,
+    });
+
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden transition-all animate-in fade-in zoom-in-95 duration-150">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50 shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-slate-900 leading-tight">
+                Add New Company Branch
+              </h2>
+              <p className="text-xs text-slate-500">
+                Register a branch to receive and consume cartridges
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Scrollable Form Body */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Branch / Office Code <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="e.g. BR-BOL or HQ-HR"
+                required
+                className="w-full px-3 py-2 text-sm font-mono bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Classification / Category <span className="text-rose-500">*</span>
+              </label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value as any)}
+                className="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold"
+              >
+                <option value="Headquarters">🏢 Headquarters (Anointed House)</option>
+                <option value="Regional Branch">📍 Regional Branch (Across Ghana)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Location / Office Name <span className="text-rose-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Bolgatanga Branch or HR Office"
+              required
+              className="w-full px-3 py-2 text-sm font-bold bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                City
+              </label>
+              <input
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="e.g. Brooklyn"
+                className="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Branch Manager
+              </label>
+              <input
+                type="text"
+                value={managerName}
+                onChange={(e) => setManagerName(e.target.value)}
+                placeholder="e.g. Amanda Cole"
+                className="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Full Physical Address
+            </label>
+            <input
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="e.g. 500 Atlantic Ave, Brooklyn, NY 11217"
+              className="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Contact Phone
+              </label>
+              <input
+                type="text"
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                placeholder="+1 (718) 555-0199"
+                className="w-full px-3 py-2 text-sm font-mono bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Branch Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="uptown@company.com"
+                className="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Configured Printers */}
+          <div className="pt-2 border-t border-slate-200">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-bold text-slate-800">
+                Printers Deployed at this Branch ({printers.length})
+              </label>
+              <button
+                type="button"
+                onClick={handleAddPrinter}
+                className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Printer</span>
+              </button>
+            </div>
+
+            <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+              {printers.map((printer, idx) => (
+                <div
+                  key={printer.id}
+                  className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70 text-xs space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-slate-700">Printer #{idx + 1}</span>
+                    {printers.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemovePrinter(printer.id)}
+                        className="text-slate-400 hover:text-rose-600 p-1 rounded"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      placeholder="Name / Station"
+                      value={printer.name}
+                      onChange={(e) => handleUpdatePrinter(printer.id, 'name', e.target.value)}
+                      className="px-2 py-1 bg-white border border-slate-300 rounded"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Printer Model"
+                      value={printer.model}
+                      onChange={(e) => handleUpdatePrinter(printer.id, 'model', e.target.value)}
+                      className="px-2 py-1 bg-white border border-slate-300 rounded"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      placeholder="Room / Location"
+                      value={printer.location}
+                      onChange={(e) => handleUpdatePrinter(printer.id, 'location', e.target.value)}
+                      className="px-2 py-1 bg-white border border-slate-300 rounded"
+                    />
+                    <select
+                      value={printer.cartridgeSkuId}
+                      onChange={(e) => handleUpdatePrinter(printer.id, 'cartridgeSkuId', e.target.value)}
+                      className="px-2 py-1 bg-white border border-slate-300 rounded"
+                    >
+                      {cartridges.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.model}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer buttons */}
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-xs"
+            >
+              Save Branch
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
