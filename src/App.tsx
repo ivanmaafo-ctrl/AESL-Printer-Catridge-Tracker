@@ -18,6 +18,7 @@ import { RestockModal } from './components/Modals/RestockModal';
 import { LogUsageModal } from './components/Modals/LogUsageModal';
 import { AddCartridgeModal } from './components/Modals/AddCartridgeModal';
 import { AddBranchModal } from './components/Modals/AddBranchModal';
+import { WalkthroughModal } from './components/Modals/WalkthroughModal';
 
 const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
@@ -35,6 +36,7 @@ const AppContent: React.FC = () => {
 
   const [addCartridgeModalOpen, setAddCartridgeModalOpen] = useState(false);
   const [addBranchModalOpen, setAddBranchModalOpen] = useState(false);
+  const [walkthroughModalOpen, setWalkthroughModalOpen] = useState(false);
 
   // Modal openers
   const handleOpenDispatch = (cartridgeId?: string, branchId?: string) => {
@@ -62,6 +64,7 @@ const AppContent: React.FC = () => {
         onOpenDispatch={() => handleOpenDispatch()}
         onOpenRestock={() => handleOpenRestock()}
         onOpenLogUsage={() => handleOpenLogUsage()}
+        onOpenGuide={() => setWalkthroughModalOpen(true)}
       />
 
       {/* Main Content Area offset by fixed desktop sidebar */}
@@ -176,6 +179,12 @@ const AppContent: React.FC = () => {
       <AddBranchModal
         isOpen={addBranchModalOpen}
         onClose={() => setAddBranchModalOpen(false)}
+      />
+
+      <WalkthroughModal
+        isOpen={walkthroughModalOpen}
+        onClose={() => setWalkthroughModalOpen(false)}
+        onNavigateTab={(tab) => setActiveTab(tab)}
       />
 
     </div>

@@ -19,6 +19,7 @@ import {
   ChevronRight,
   User,
   FileSpreadsheet,
+  BookOpen,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -27,6 +28,7 @@ interface SidebarProps {
   onOpenDispatch: () => void;
   onOpenRestock: () => void;
   onOpenLogUsage: () => void;
+  onOpenGuide: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -35,6 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenDispatch,
   onOpenRestock,
   onOpenLogUsage,
+  onOpenGuide,
 }) => {
   const { cartridges, branches, dispatches, usages, lowStockAlerts, criticalCount } = useInventory();
   const { isAuthenticated, currentUser, isSuperAdmin, logout } = useAdminAuth();
@@ -261,6 +264,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </button>
               );
             })}
+
+            <button
+              onClick={() => {
+                onOpenGuide();
+                setMobileMenuOpen(false);
+              }}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800/80 hover:text-white transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <BookOpen className="w-4 h-4 shrink-0 text-emerald-400" />
+                <span className="truncate">Beginner Guide</span>
+              </div>
+              <span className="text-[10px] font-mono text-slate-400">Tour</span>
+            </button>
           </nav>
         </div>
 
