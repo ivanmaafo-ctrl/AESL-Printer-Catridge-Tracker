@@ -170,6 +170,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
           <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
         </button>
+
+        {/* Prominent Beginner Guide Button */}
+        <button
+          onClick={() => {
+            onOpenGuide();
+            setMobileMenuOpen(false);
+          }}
+          className="w-full mt-2 flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-200 border border-emerald-500/40 transition cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-emerald-400" />
+            <span>Beginner Guide</span>
+          </div>
+          <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/25 text-emerald-200">
+            7 Steps
+          </span>
+        </button>
       </div>
 
       {/* 3. Navigation Links */}
@@ -370,6 +387,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Quick Guide on mobile header */}
+          <button
+            onClick={onOpenGuide}
+            className="p-2 text-emerald-200 bg-emerald-600/25 border border-emerald-500/40 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
+            title="Open Beginner Guide"
+          >
+            <BookOpen className="w-4 h-4 text-emerald-400" />
+            <span className="hidden sm:inline">Guide</span>
+          </button>
+
           {/* Quick Dispatch on mobile header */}
           <button
             onClick={onOpenDispatch}

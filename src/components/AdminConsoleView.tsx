@@ -830,7 +830,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
             <div>
               <span className="font-bold text-xs text-slate-800 block">Database Reset & Official AESL Locations</span>
               <span className="text-[11px] text-slate-400">
-                Reload the 24 official AESL locations (19 regional branches + 5 headquarters offices), or start fresh.
+                Reload the 26 official AESL locations (20 regional branches + 6 headquarters offices), or start fresh.
               </span>
             </div>
 
@@ -846,7 +846,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                     onClick={() => setConfirmAction('branches')}
                     className="px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors"
                   >
-                    Restore 24 AESL Locations
+                    Restore 26 AESL Locations
                   </button>
 
                   <button
@@ -865,12 +865,12 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                 </>
               ) : confirmAction === 'branches' ? (
                 <div className="flex items-center gap-2 bg-blue-50 p-1.5 rounded-lg border border-blue-200">
-                  <span className="text-xs text-blue-900 font-semibold px-1">Restore all 24 AESL locations?</span>
+                  <span className="text-xs text-blue-900 font-semibold px-1">Restore all 26 AESL locations?</span>
                   <button
                     onClick={() => {
                       loadAESLBranches();
                       setConfirmAction(null);
-                      showToast('success', 'Official AESL 24 locations restored successfully.');
+                      showToast('success', 'Official AESL 26 locations restored successfully.');
                     }}
                     className="px-2.5 py-1 bg-blue-600 text-white rounded text-xs font-semibold hover:bg-blue-700"
                   >

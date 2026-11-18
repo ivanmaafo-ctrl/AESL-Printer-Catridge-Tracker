@@ -113,7 +113,7 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
             </span>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            19 regional branches across Ghana & 5 headquarters offices at Anointed House
+            20 regional branches across Ghana & 6 headquarters offices at Anointed House
           </p>
         </div>
 
@@ -121,13 +121,13 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
           <button
             onClick={() => {
               loadAESLBranches();
-              showToast('Official AESL 24 locations restored successfully.');
+              showToast('Official AESL 26 locations restored successfully.');
             }}
-            title="Reload official Anointed Engineering Services locations (19 Branches + 5 HQ Offices)"
+            title="Reload official Anointed Engineering Services locations (20 Branches + 6 HQ Offices)"
             className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors shadow-xs"
           >
             <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
-            <span>Reload AESL 24 Locations</span>
+            <span>Reload AESL 26 Locations</span>
           </button>
 
           <button

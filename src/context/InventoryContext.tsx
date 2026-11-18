@@ -122,13 +122,27 @@ const STORAGE_KEYS = {
   USAGES: 'aesl_printflow_clean_v1_usages',
   RESTOCKS: 'aesl_printflow_clean_v1_restocks',
   ADMIN_MODE: 'aesl_printflow_clean_v1_admin',
+  SYNC_V3_EXV: 'aesl_printflow_sync_v3_exv_adenta',
 };
 
 export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const needsV3Sync = (() => {
+    try {
+      return localStorage.getItem(STORAGE_KEYS.SYNC_V3_EXV) !== 'done';
+    } catch {
+      return false;
+    }
+  })();
+
   const [cartridges, setCartridges] = useState<CartridgeSKU[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.CARTRIDGES);
-      return saved ? JSON.parse(saved) : INITIAL_CARTRIDGES;
+      const base: CartridgeSKU[] = saved ? JSON.parse(saved) : INITIAL_CARTRIDGES;
+      if (!needsV3Sync || !Array.isArray(base)) return base;
+
+      const existingSkus = new Set(base.map((c) => c.sku.toUpperCase()));
+      const missing = INITIAL_CARTRIDGES.filter((c) => !existingSkus.has(c.sku.toUpperCase()));
+      return missing.length > 0 ? [...base, ...missing] : base;
     } catch {
       return INITIAL_CARTRIDGES;
     }
@@ -138,9 +152,12 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.BRANCHES);
       if (saved) {
-        const parsed = JSON.parse(saved);
+        const parsed: Branch[] = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          if (!needsV3Sync) return parsed;
+          const existingIds = new Set(parsed.map((b) => b.id));
+          const missing = INITIAL_BRANCHES.filter((b) => !existingIds.has(b.id));
+          return missing.length > 0 ? [...parsed, ...missing] : parsed;
         }
       }
       return INITIAL_BRANCHES;
@@ -152,11 +169,26 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [dispatches, setDispatches] = useState<DispatchRecord[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.DISPATCHES);
-      return saved ? JSON.parse(saved) : INITIAL_DISPATCHES;
+      const base: DispatchRecord[] = saved ? JSON.parse(saved) : INITIAL_DISPATCHES;
+      if (!needsV3Sync || !Array.isArray(base)) return base;
+
+      const existingIds = new Set(base.map((d) => d.id));
+      const missing = INITIAL_DISPATCHES.filter((d) => !existingIds.has(d.id));
+      return missing.length > 0 ? [...missing, ...base] : base;
     } catch {
       return INITIAL_DISPATCHES;
     }
   });
+
+  useEffect(() => {
+    if (needsV3Sync) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.SYNC_V3_EXV, 'done');
+      } catch {
+        // ignore storage errors
+      }
+    }
+  }, [needsV3Sync]);
 
   const [usages, setUsages] = useState<UsageRecord[]>(() => {
     try {

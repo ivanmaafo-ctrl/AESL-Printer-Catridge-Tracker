@@ -88,6 +88,7 @@ const AppContent: React.FC = () => {
               onOpenDispatch={() => handleOpenDispatch()}
               onOpenRestock={(cId) => handleOpenRestock(cId)}
               onOpenLogUsage={() => handleOpenLogUsage()}
+              onOpenGuide={() => setWalkthroughModalOpen(true)}
             />
           )}
 

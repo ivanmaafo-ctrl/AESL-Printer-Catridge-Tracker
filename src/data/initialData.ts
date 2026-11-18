@@ -137,13 +137,96 @@ export const INITIAL_CARTRIDGES: CartridgeSKU[] = [
     pageYield: 1300,
     reorderPackSize: 4,
   },
+  {
+    id: 'cart-exv14',
+    sku: 'EXV14',
+    model: 'Canon C-EXV14 Black',
+    specification: 'Canon imageRUNNER Black Toner Cartridge',
+    brand: 'Canon',
+    type: 'Toner',
+    color: 'Black',
+    compatiblePrinters: [
+      'Canon imageRUNNER 2016',
+      'Canon imageRUNNER 2018',
+      'Canon imageRUNNER 2020',
+      'Canon imageRUNNER 2022',
+      'Canon imageRUNNER 2025',
+      'Canon imageRUNNER 2030',
+    ],
+    centralStock: 4,
+    minThreshold: 50,
+    unitCost: 0,
+    supplier: 'Primary IT Supplies',
+    pageYield: 8300,
+    reorderPackSize: 2,
+    notes: 'Used at ATTI office.',
+  },
+  {
+    id: 'cart-exv60',
+    sku: 'EXV60',
+    model: 'Canon C-EXV60 Black',
+    specification: 'Canon imageRUNNER 2425 Black Toner Cartridge',
+    brand: 'Canon',
+    type: 'Toner',
+    color: 'Black',
+    compatiblePrinters: [
+      'Canon imageRUNNER 2425',
+      'Canon imageRUNNER 2425i',
+    ],
+    centralStock: 23,
+    minThreshold: 50,
+    unitCost: 0,
+    supplier: 'Primary IT Supplies',
+    pageYield: 10200,
+    reorderPackSize: 2,
+    notes: '24 initial units; 1 unit dispatched to Workshop (23 remaining in office).',
+  },
+  {
+    id: 'cart-exv63',
+    sku: 'EXV63',
+    model: 'Canon C-EXV63 Black',
+    specification: 'Canon imageRUNNER 2625/2630 Black Toner Cartridge',
+    brand: 'Canon',
+    type: 'Toner',
+    color: 'Black',
+    compatiblePrinters: [
+      'Canon imageRUNNER 2625i',
+      'Canon imageRUNNER 2630i',
+      'Canon imageRUNNER 2635i',
+      'Canon imageRUNNER 2645i',
+    ],
+    centralStock: 3,
+    minThreshold: 50,
+    unitCost: 0,
+    supplier: 'Primary IT Supplies',
+    pageYield: 30000,
+    reorderPackSize: 2,
+    notes: 'Used at Marketing office.',
+  },
 ];
 
-// Pre-configured with all 24 Anointed Engineering Services locations:
-// (19 Regional Branches across Ghana + 5 Headquarters Offices at Anointed House)
+// Pre-configured with all 26 Anointed Engineering Services locations:
+// (20 Regional Branches across Ghana incl. Adenta + 6 Headquarters Offices at Anointed House incl. Workshop)
 export const INITIAL_BRANCHES: Branch[] = AESL_LOCATIONS;
 
-export const INITIAL_DISPATCHES: DispatchRecord[] = [];
+export const INITIAL_DISPATCHES: DispatchRecord[] = [
+  {
+    id: 'dsp-exv60-workshop',
+    dispatchCode: 'DSP-2026-WKS-01',
+    branchId: 'hq-workshop',
+    branchName: 'Workshop',
+    cartridgeId: 'cart-exv60',
+    cartridgeModel: 'Canon C-EXV60 Black',
+    cartridgeColor: 'Black',
+    quantity: 1,
+    dispatchDate: '2026-11-18',
+    carrier: 'Internal Stores Transfer',
+    trackingNumber: 'AESL-WKS-001',
+    dispatchedBy: 'AESL IT Stores',
+    status: 'In Transit',
+    notes: 'Dispatched 1 × EXV60 toner to Workshop (23 remaining in office).',
+  },
+];
 
 export const INITIAL_USAGES: UsageRecord[] = [];
 

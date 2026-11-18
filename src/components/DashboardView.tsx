@@ -14,6 +14,8 @@ import {
   Clock,
   Printer,
   FileSpreadsheet,
+  BookOpen,
+  X,
 } from 'lucide-react';
 import { ActiveTab } from './Navbar';
 
@@ -22,6 +24,7 @@ interface DashboardViewProps {
   onOpenDispatch: () => void;
   onOpenRestock: (cartridgeId?: string) => void;
   onOpenLogUsage: () => void;
+  onOpenGuide: () => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
@@ -29,6 +32,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onOpenDispatch,
   onOpenRestock,
   onOpenLogUsage,
+  onOpenGuide,
 }) => {
   const {
     cartridges,
@@ -55,6 +59,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const recentUsages = usages.slice(0, 5);
 
   const [dashboardBranchFilter, setDashboardBranchFilter] = useState<'all' | 'Headquarters' | 'Regional Branch'>('all');
+  const [hideGuideBanner, setHideGuideBanner] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('aesl_printflow_hide_guide_banner') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleDismissGuideBanner = () => {
+    setHideGuideBanner(true);
+    try {
+      localStorage.setItem('aesl_printflow_hide_guide_banner', 'true');
+    } catch {
+      // ignore storage errors
+    }
+  };
 
   const displayedBranches = useMemo(() => {
     return branches.filter((b) => {
@@ -119,8 +139,52 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <FileSpreadsheet className="w-4 h-4 text-amber-600" />
             <span>Report</span>
           </button>
+
+          <button
+            onClick={onOpenGuide}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-emerald-900 bg-emerald-50 border border-emerald-300 rounded-lg hover:bg-emerald-100 transition-colors shadow-xs cursor-pointer"
+          >
+            <BookOpen className="w-4 h-4 text-emerald-700" />
+            <span>Beginner Guide</span>
+          </button>
         </div>
       </div>
+
+      {/* Prominent Beginner Walkthrough Banner */}
+      {!hideGuideBanner && (
+        <div className="bg-emerald-50/90 border border-emerald-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
+              <BookOpen className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-slate-900">
+                New to PrintFlow? Take the 7-Step Beginner Walkthrough
+              </h2>
+              <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                Learn how to check warehouse stock, dispatch toners to any of the 26 AESL branches, log printer swaps, handle 50-gauge alerts, and export custom reports.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+            <button
+              onClick={onOpenGuide}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-xs cursor-pointer whitespace-nowrap"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Start Beginner Guide</span>
+            </button>
+            <button
+              onClick={handleDismissGuideBanner}
+              title="Dismiss welcome banner (you can still open Beginner Guide from the sidebar)"
+              className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-emerald-100 rounded-lg transition cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* KPI Cards Grid - Clean single-elevation surfaces with tabular numerals */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

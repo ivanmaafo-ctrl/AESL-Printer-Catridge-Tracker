@@ -36,7 +36,7 @@ interface GuideStep {
 const GUIDE_STEPS: GuideStep[] = [
   {
     title: '1. Understanding the Dashboard',
-    subtitle: 'Your live snapshot of warehouse stock & 24 AESL locations',
+    subtitle: 'Your live snapshot of warehouse stock & 26 AESL locations',
     icon: Activity,
     tab: 'dashboard',
     tabLabel: 'Go to Overview',

@@ -102,6 +102,26 @@ export const AESL_LOCATIONS: Branch[] = [
       },
     ],
   },
+  {
+    id: 'hq-workshop',
+    code: 'HQ-WKS',
+    name: 'Workshop',
+    category: 'Headquarters',
+    city: 'Accra - Anointed House',
+    address: 'Anointed House Headquarters, Technical Workshop',
+    managerName: 'Workshop Supervisor',
+    contactPhone: '+233 30 200 1106',
+    email: 'workshop@anointedengineering.com',
+    printers: [
+      {
+        id: 'pr-hq-wks-1',
+        name: 'Workshop Multifunction Printer',
+        model: 'Canon imageRUNNER 2425',
+        location: 'Workshop Floor',
+        cartridgeSkuId: 'cart-exv60',
+      },
+    ],
+  },
 
   // --- REGIONAL BRANCHES ACROSS GHANA ---
   {
@@ -481,6 +501,26 @@ export const AESL_LOCATIONS: Branch[] = [
         model: 'HP LaserJet Pro M404n',
         location: 'Front Counter Area',
         cartridgeSkuId: '',
+      },
+    ],
+  },
+  {
+    id: 'br-adenta',
+    code: 'BR-ADN',
+    name: 'Adenta Branch',
+    category: 'Regional Branch',
+    city: 'Adenta',
+    address: 'Adenta Branch Office, Greater Accra',
+    managerName: 'Adenta Branch Supervisor',
+    contactPhone: '+233 30 254 0120',
+    email: 'adenta@anointedengineering.com',
+    printers: [
+      {
+        id: 'pr-br-adn-1',
+        name: 'Adenta Branch Printer',
+        model: 'HP Laser 107 / MFP 135',
+        location: 'Branch Operations Desk',
+        cartridgeSkuId: 'cart-1107a',
       },
     ],
   },

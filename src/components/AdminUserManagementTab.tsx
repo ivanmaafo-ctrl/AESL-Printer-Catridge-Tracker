@@ -413,7 +413,7 @@ export const AdminUserManagementTab: React.FC = () => {
                 <td className="px-4 py-2.5 text-center text-emerald-600 font-bold">✓ Full Access</td>
               </tr>
               <tr>
-                <td className="px-4 py-2.5 font-medium text-slate-800">Offices & 24 Branches Information Management</td>
+                <td className="px-4 py-2.5 font-medium text-slate-800">Offices & 26 Branches Information Management</td>
                 <td className="px-4 py-2.5 text-center text-emerald-600 font-bold">✓ Full Access</td>
                 <td className="px-4 py-2.5 text-center text-emerald-600 font-bold">✓ Full Access</td>
               </tr>
@@ -428,7 +428,7 @@ export const AdminUserManagementTab: React.FC = () => {
                 <td className="px-4 py-2.5 text-center text-slate-400 font-mono">✕ Restricted</td>
               </tr>
               <tr>
-                <td className="px-4 py-2.5 font-medium text-slate-800">Reload Official 24 AESL Regional & HQ Locations</td>
+                <td className="px-4 py-2.5 font-medium text-slate-800">Reload Official 26 AESL Regional & HQ Locations</td>
                 <td className="px-4 py-2.5 text-center text-emerald-600 font-bold">✓ Full Access</td>
                 <td className="px-4 py-2.5 text-center text-slate-400 font-mono">✕ Restricted</td>
               </tr>
