@@ -122,7 +122,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
   const displayError = accessDeniedReason || errorMessage;
 
   const content = needsVerification && firebaseUser ? (
-    <div className="max-w-md mx-auto w-full py-8 px-4">
+    <div className="max-w-md mx-auto w-full my-auto py-8 px-4">
       <div className="text-center mb-6">
         <BrandLogo className="w-18 h-18 mx-auto mb-3 drop-shadow-sm" />
         <div className="flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-slate-400">
@@ -182,8 +182,8 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
       </div>
     </div>
   ) : (
-    <div className="max-w-md mx-auto w-full py-8 sm:py-12 px-4">
-      <div className="text-center mb-7">
+    <div className="max-w-md mx-auto w-full my-auto py-6 sm:py-10 px-4">
+      <div className="text-center mb-6">
         <BrandLogo className="w-18 h-18 mx-auto mb-3 drop-shadow-sm" />
         <div className="flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-slate-400">
           <span className="font-semibold text-blue-800 dark:text-sky-400">Authorized IT Staff Portal</span>
@@ -394,7 +394,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#06090F] text-[#0B0F17] dark:text-slate-100 font-sans flex flex-col justify-center relative isolate">
+    <div className="min-h-screen bg-white dark:bg-[#06090F] text-[#0B0F17] dark:text-slate-100 font-sans flex flex-col relative isolate overflow-y-auto">
       <div
         aria-hidden="true"
         className="hidden dark:block fixed inset-0 -z-10 overflow-hidden pointer-events-none"

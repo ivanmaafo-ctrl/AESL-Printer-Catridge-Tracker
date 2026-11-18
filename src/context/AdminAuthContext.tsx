@@ -90,6 +90,12 @@ function mapFirebaseAuthError(err: any): string {
       return 'Email/Password sign-in needs to be enabled in Firebase Console → Authentication → Sign-in method.';
     case 'auth/popup-closed-by-user':
       return 'Google sign-in window was closed before completing.';
+    case 'auth/popup-blocked':
+      return 'Pop-up was blocked by your browser. Please allow pop-ups for this site and try again.';
+    case 'auth/unauthorized-domain': {
+      const host = typeof window !== 'undefined' ? window.location.hostname : 'this domain';
+      return `This website domain (${host}) needs to be added in Firebase Console → Authentication → Settings → Authorized domains before Google Sign-In can run here.`;
+    }
     case 'auth/network-request-failed':
       return 'Network error while reaching Firebase. Check your internet connection.';
     default:
