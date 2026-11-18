@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { InventoryProvider } from './context/InventoryContext';
-import { AdminAuthProvider } from './context/AdminAuthContext';
+import { InventoryProvider, useInventory } from './context/InventoryContext';
+import { AdminAuthProvider, useAdminAuth } from './context/AdminAuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Sidebar } from './components/Sidebar';
 import { ActiveTab } from './components/Navbar';
 import { DashboardView } from './components/DashboardView';
@@ -12,6 +13,7 @@ import { UsageView } from './components/UsageView';
 import { ReorderCenterView } from './components/ReorderCenterView';
 import { ReportsView } from './components/ReportsView';
 import { AdminConsoleView } from './components/AdminConsoleView';
+import { AdminLoginView } from './components/AdminLoginView';
 import { BrandLogo, BrandLoaderScreen } from './components/BrandLogo';
 
 import { DispatchModal } from './components/Modals/DispatchModal';
@@ -22,11 +24,14 @@ import { AddBranchModal } from './components/Modals/AddBranchModal';
 import { WalkthroughModal } from './components/Modals/WalkthroughModal';
 
 const AppContent: React.FC = () => {
+  const { authReady, isAuthenticated } = useAdminAuth();
+  const { inventoryLoading } = useInventory();
+
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [isBooting, setIsBooting] = useState(true);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setIsBooting(false), 550);
+    const timer = window.setTimeout(() => setIsBooting(false), 500);
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -62,9 +67,22 @@ const AppContent: React.FC = () => {
     setLogUsageModalOpen(true);
   };
 
+  // Show branded AESL loading icon while Firebase session initializes
+  if (isBooting || !authReady) {
+    return <BrandLoaderScreen label="Verifying AESL Fleet Session..." />;
+  }
+
+  // Full-App Login Gate: only signed-in, verified AESL IT team members can enter
+  if (!isAuthenticated) {
+    return <AdminLoginView fullScreen />;
+  }
+
+  if (inventoryLoading) {
+    return <BrandLoaderScreen label="Syncing Live AESL Warehouse & 27 Branches..." />;
+  }
+
   return (
     <div className="min-h-screen bg-white dark:bg-[#06090F] text-[#0B0F17] dark:text-slate-100 font-sans flex flex-col relative isolate">
-      {isBooting && <BrandLoaderScreen />}
       {/* Moving Dark Mode Atmospheric Color Gradient Layer */}
       <div
         aria-hidden="true"
@@ -166,7 +184,7 @@ const AppContent: React.FC = () => {
               <span>IT Department · Multi-Branch Printer Cartridge Logistics</span>
             </div>
             <div>
-              <span>Central IT Warehouse & Site Operations Portal</span>
+              <span>Cloud-Synced IT Warehouse & Site Operations Portal</span>
             </div>
           </div>
         </footer>
@@ -207,19 +225,20 @@ const AppContent: React.FC = () => {
         onClose={() => setWalkthroughModalOpen(false)}
         onNavigateTab={(tab) => setActiveTab(tab)}
       />
-
     </div>
   );
 };
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AdminAuthProvider>
-        <InventoryProvider>
-          <AppContent />
-        </InventoryProvider>
-      </AdminAuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AdminAuthProvider>
+          <InventoryProvider>
+            <AppContent />
+          </InventoryProvider>
+        </AdminAuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }

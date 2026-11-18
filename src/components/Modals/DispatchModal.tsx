@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useInventory } from '../../context/InventoryContext';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 import { X, Truck, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface DispatchModalProps {
@@ -16,16 +17,24 @@ export const DispatchModal: React.FC<DispatchModalProps> = ({
   preselectedBranchId,
 }) => {
   const { cartridges, branches, dispatchCartridges } = useInventory();
+  const { currentUser } = useAdminAuth();
 
+  const defaultActor = currentUser?.displayName || currentUser?.email || 'AESL IT Staff';
   const [branchId, setBranchId] = useState(preselectedBranchId || (branches[0]?.id || ''));
   const [cartridgeId, setCartridgeId] = useState(preselectedCartridgeId || (cartridges[0]?.id || ''));
   const [quantity, setQuantity] = useState<number>(1);
   const [carrier, setCarrier] = useState('AESL Logistics Vehicle');
   const [trackingNumber, setTrackingNumber] = useState('');
-  const [dispatchedBy, setDispatchedBy] = useState('Kwame Asante (AESL IT Stores Lead)');
+  const [dispatchedBy, setDispatchedBy] = useState(defaultActor);
   const [notes, setNotes] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen && defaultActor) {
+      setDispatchedBy((prev) => prev || defaultActor);
+    }
+  }, [isOpen, defaultActor]);
 
   if (!isOpen) return null;
 

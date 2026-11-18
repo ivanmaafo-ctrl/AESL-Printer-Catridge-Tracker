@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useInventory } from '../../context/InventoryContext';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 import { X, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface LogUsageModalProps {
@@ -16,12 +17,14 @@ export const LogUsageModal: React.FC<LogUsageModalProps> = ({
   preselectedCartridgeId,
 }) => {
   const { branches, cartridges, logUsage, getBranchStockDetails } = useInventory();
+  const { currentUser } = useAdminAuth();
 
+  const defaultActor = currentUser?.displayName || currentUser?.email || 'AESL IT Support Officer';
   const [branchId, setBranchId] = useState(preselectedBranchId || (branches[0]?.id || ''));
   const [printerName, setPrinterName] = useState('');
   const [cartridgeId, setCartridgeId] = useState(preselectedCartridgeId || (cartridges[0]?.id || ''));
   const [quantity, setQuantity] = useState<number>(1);
-  const [installedBy, setInstalledBy] = useState('AESL IT Support Officer');
+  const [installedBy, setInstalledBy] = useState(defaultActor);
   const [reason, setReason] = useState<any>('Depleted');
   const [estimatedPages, setEstimatedPages] = useState<string>('');
   const [notes, setNotes] = useState('');

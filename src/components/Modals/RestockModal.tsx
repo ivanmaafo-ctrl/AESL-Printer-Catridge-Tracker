@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useInventory } from '../../context/InventoryContext';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 import { X, Plus, PackageCheck } from 'lucide-react';
 
 interface RestockModalProps {
@@ -14,13 +15,15 @@ export const RestockModal: React.FC<RestockModalProps> = ({
   preselectedCartridgeId,
 }) => {
   const { cartridges, topUpRestock } = useInventory();
+  const { currentUser } = useAdminAuth();
 
+  const defaultActor = currentUser?.displayName || currentUser?.email || 'AESL IT Staff';
   const [cartridgeId, setCartridgeId] = useState(preselectedCartridgeId || (cartridges[0]?.id || ''));
   const [quantity, setQuantity] = useState<number>(5);
   const [poNumber, setPoNumber] = useState(`PO-AESL-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`);
   const [supplier, setSupplier] = useState('');
   const [unitCost, setUnitCost] = useState<number>(0);
-  const [receivedBy, setReceivedBy] = useState('Kwame Asante (AESL IT Stores Lead)');
+  const [receivedBy, setReceivedBy] = useState(defaultActor);
   const [notes, setNotes] = useState('');
   const [success, setSuccess] = useState(false);
 

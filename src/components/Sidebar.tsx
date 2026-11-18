@@ -43,7 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenGuide,
 }) => {
   const { cartridges, branches, dispatches, usages, lowStockAlerts, criticalCount } = useInventory();
-  const { isAuthenticated, currentUser, isSuperAdmin, logout } = useAdminAuth();
+  const { isAuthenticated, currentUser, isSuperAdmin, isAdmin, logout } = useAdminAuth();
   const { isDark, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -74,7 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Master Admin',
       icon: isSuperAdmin ? ShieldCheck : Shield,
       isAuth: isAuthenticated,
-      role: isSuperAdmin ? 'Super Admin' : 'Admin',
+      role: isSuperAdmin ? 'Super Admin' : isAdmin ? 'Admin' : 'Staff',
     },
   ];
 
@@ -282,9 +282,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {item.id === 'admin' && (
                     item.isAuth ? (
                       <span className={`text-[10px] font-mono font-semibold ${
-                        isSuperAdmin ? 'text-amber-700 dark:text-amber-400' : 'text-blue-700 dark:text-sky-400'
+                        isSuperAdmin
+                          ? 'text-amber-700 dark:text-amber-400'
+                          : isAdmin
+                          ? 'text-blue-700 dark:text-sky-400'
+                          : 'text-slate-500 dark:text-slate-400'
                       }`}>
-                        {isSuperAdmin ? 'Super' : 'Admin'}
+                        {isSuperAdmin ? 'Super' : isAdmin ? 'Admin' : 'Staff'}
                       </span>
                     ) : (
                       <Lock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
@@ -330,14 +334,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {currentUser.displayName}
                 </span>
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono block truncate">
-                  @{currentUser.username} · {isSuperAdmin ? 'Super Admin' : 'Admin'}
+                  {currentUser.email || currentUser.username} · {isSuperAdmin ? 'Super Admin' : isAdmin ? 'Admin' : 'IT Staff'}
                 </span>
               </div>
             </div>
 
             <button
               onClick={logout}
-              title="Sign out of Admin Portal"
+              title="Sign out of AESL Portal"
               className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition shrink-0 cursor-pointer"
             >
               <LogOut className="w-4 h-4" />

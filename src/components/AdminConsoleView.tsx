@@ -40,6 +40,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
     currentUser,
     isAuthenticated,
     isSuperAdmin,
+    isAdmin,
     logout,
     users,
   } = useAdminAuth();
@@ -73,6 +74,38 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
 
   if (!isAuthenticated) {
     return <AdminLoginView />;
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="max-w-xl mx-auto my-8 bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-3xl border border-slate-200/80 dark:border-white/10 p-8 text-center space-y-4">
+        <div className="w-12 h-12 mx-auto rounded-2xl bg-[#EFF6FF] dark:bg-blue-500/15 text-blue-700 dark:text-sky-400 flex items-center justify-center">
+          <Lock className="w-6 h-6" />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold text-[#0B0F17] dark:text-white">
+            Administrator Clearance Required
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
+            You are signed in as <strong>{currentUser?.displayName}</strong> (<span className="font-mono">{currentUser?.email}</span>) with <strong>IT Staff</strong> clearance.
+            You can view live inventory, dispatch toner to branches, log printer swaps, top up stock, and print reports from the main navigation.
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+            Ask the AESL Super Admin (<span className="font-mono">maafok830@gmail.com</span>) to upgrade your role if you need Master Console access.
+          </p>
+        </div>
+        <div className="pt-2 flex items-center justify-center gap-2">
+          <button
+            type="button"
+            onClick={logout}
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-500/15 hover:bg-rose-100 dark:hover:bg-rose-500/25 border border-rose-200 dark:border-rose-500/30 rounded-full transition cursor-pointer"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const getDraft = (cart: CartridgeSKU) => {
@@ -205,13 +238,13 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
 
           <div className="flex items-center gap-2.5 self-start lg:self-auto flex-wrap">
             <div className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/90 dark:bg-white/10 border border-slate-200/80 dark:border-white/15 text-xs">
-              <span className="font-bold text-[#0B0F17] dark:text-white">{currentUser?.displayName || currentUser?.username}</span>
-              <span className="text-[11px] text-slate-400 font-mono">(@{currentUser?.username})</span>
+              <span className="font-bold text-[#0B0F17] dark:text-white">{currentUser?.displayName}</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">({currentUser?.email || currentUser?.username})</span>
               <button
                 type="button"
                 onClick={logout}
                 className="ml-1 inline-flex items-center gap-1 px-2.5 py-0.5 bg-slate-100 dark:bg-white/10 hover:bg-rose-50 dark:hover:bg-rose-500/20 text-slate-700 dark:text-slate-200 hover:text-rose-700 dark:hover:text-rose-300 rounded-full text-[11px] font-semibold transition cursor-pointer"
-                title="Sign out of Admin Portal"
+                title="Sign out of AESL Portal"
               >
                 <LogOut className="w-3 h-3" />
                 <span>Sign Out</span>
@@ -238,7 +271,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
             <button
               onClick={() => {
                 if (!isSuperAdmin) {
-                  showToast('error', 'Restoring database from backup requires Super Admin (IvanTheDon) clearance.');
+                  showToast('error', 'Restoring database from backup requires Super Admin clearance.');
                   return;
                 }
                 fileInputRef.current?.click();
@@ -271,7 +304,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
             { id: 'branches', label: `Offices & Branches (${branches.length})`, icon: Building2 },
             { id: 'backup', label: 'Backup & Portability', icon: FileCode },
             { id: 'netlify', label: 'Netlify Hosting', icon: Globe },
-            { id: 'users', label: `Admin Accounts (${users.length})`, icon: Users },
+            { id: 'users', label: `IT Team & Access (${users.length})`, icon: Users },
           ].map((tab) => {
             const Icon = tab.icon;
             const active = activeAdminTab === tab.id;
@@ -767,7 +800,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
               {!isSuperAdmin ? (
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/25 rounded-xl text-xs text-amber-900 dark:text-amber-300">
                   <Lock className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
-                  <span>Clearing data or reloading locations requires <strong>IvanTheDon (Super Admin)</strong>.</span>
+                  <span>Clearing data or reloading locations requires <strong>Super Admin (maafok830@gmail.com)</strong>.</span>
                 </div>
               ) : confirmAction === null ? (
                 <>
@@ -908,9 +941,9 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
             </div>
           </div>
 
-          <div className="p-3.5 bg-[#EFF6FF] dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl text-xs text-blue-950 dark:text-sky-200 flex items-center gap-2 font-medium">
-            <CheckCircle2 className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
-            <span>Whenever you push changes or updates to your GitHub main branch, Netlify will automatically build and publish your app for free.</span>
+          <div className="p-3.5 bg-[#EFF6FF] dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl text-xs text-blue-950 dark:text-sky-200 flex items-start gap-2 font-medium">
+            <CheckCircle2 className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0 mt-0.5" />
+            <span>After Netlify publishes your live URL (e.g. <code className="font-mono text-[11px]">your-site.netlify.app</code>), add that domain inside Firebase Console → <strong>Authentication → Settings → Authorized domains</strong> so team logins work immediately.</span>
           </div>
         </div>
       )}

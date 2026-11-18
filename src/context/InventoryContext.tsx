@@ -1,4 +1,18 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from 'react';
+import {
+  collection,
+  doc,
+  query,
+  where,
+  onSnapshot,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  writeBatch,
+  serverTimestamp,
+  getDocs,
+  Timestamp,
+} from 'firebase/firestore';
 import {
   CartridgeSKU,
   Branch,
@@ -12,8 +26,6 @@ import {
   INITIAL_CARTRIDGES,
   INITIAL_BRANCHES,
   INITIAL_DISPATCHES,
-  INITIAL_USAGES,
-  INITIAL_RESTOCKS,
 } from '../data/initialData';
 import { AESL_LOCATIONS } from '../data/aeslLocations';
 import {
@@ -23,6 +35,8 @@ import {
   SAMPLE_TEMPLATE_USAGES,
   SAMPLE_TEMPLATE_RESTOCKS,
 } from '../data/sampleTemplate';
+import { auth, db, OperationType, handleFirestoreError, clampStr } from '../firebase';
+import { useAdminAuth } from './AdminAuthContext';
 
 export interface BranchInventoryItem {
   cartridgeId: string;
@@ -40,6 +54,7 @@ interface InventoryContextType {
   dispatches: DispatchRecord[];
   usages: UsageRecord[];
   restocks: RestockRecord[];
+  inventoryLoading: boolean;
 
   // Admin Mode
   adminMode: boolean;
@@ -50,8 +65,8 @@ interface InventoryContextType {
   lowStockAlerts: LowStockAlert[];
   criticalCount: number;
   warningCount: number;
-  totalCentralStockUnits: number; // In Office / Central Warehouse stock
-  totalDispatchedUnits: number;   // Sent out to other offices & branches
+  totalCentralStockUnits: number;
+  totalDispatchedUnits: number;
   totalUsedUnits: number;
 
   // Actions
@@ -98,7 +113,7 @@ interface InventoryContextType {
   updateBranch: (id: string, updates: Partial<Branch>) => void;
   deleteBranch: (id: string) => void;
 
-  // Unrestricted Master Admin Controls
+  // Master Admin Controls
   directUpdateStock: (cartridgeId: string, inOfficeStock: number, minThreshold?: number) => void;
   directAdjustBranchDispatched: (dispatchId: string, quantity: number, status: DispatchStatus) => void;
   deleteDispatch: (dispatchId: string) => void;
@@ -115,143 +130,180 @@ interface InventoryContextType {
 
 const InventoryContext = createContext<InventoryContextType | undefined>(undefined);
 
-const STORAGE_KEYS = {
-  CARTRIDGES: 'aesl_printflow_v2_cartridges',
-  BRANCHES: 'aesl_printflow_v2_branches',
-  DISPATCHES: 'aesl_printflow_clean_v1_dispatches',
-  USAGES: 'aesl_printflow_clean_v1_usages',
-  RESTOCKS: 'aesl_printflow_clean_v1_restocks',
-  ADMIN_MODE: 'aesl_printflow_clean_v1_admin',
-  SYNC_V3_EXV: 'aesl_printflow_sync_v3_exv_adenta',
-  SYNC_V4_GAUGE15_1500A: 'aesl_printflow_sync_v4_gauge15_1500a',
-  SYNC_V5_SAKAMAN: 'aesl_printflow_sync_v5_sakaman',
-};
+const ADMIN_MODE_KEY = 'aesl_printflow_clean_v1_admin';
+
+function sanitizeId(raw: string, fallbackPrefix: string): string {
+  const cleaned = raw.replace(/[^a-zA-Z0-9_-]/g, '-').slice(0, 120);
+  return cleaned.length > 0 ? cleaned : `${fallbackPrefix}-${Date.now()}`;
+}
+
+function buildCartridgeDoc(
+  cart: CartridgeSKU,
+  uid: string,
+  createdAtVal?: unknown
+): Record<string, unknown> {
+  return {
+    id: sanitizeId(cart.id, 'cart'),
+    orgId: 'aesl',
+    sku: clampStr(cart.sku || 'SKU', 40) || 'SKU',
+    model: clampStr(cart.model || 'Cartridge Model', 160) || 'Cartridge Model',
+    specification: clampStr(cart.specification || '', 160),
+    brand: clampStr(cart.brand || 'HP', 60) || 'HP',
+    type: cart.type || 'Toner',
+    color: cart.color || 'Black',
+    compatiblePrinters: Array.isArray(cart.compatiblePrinters)
+      ? cart.compatiblePrinters.map((p) => clampStr(p, 120)).filter(Boolean).slice(0, 25)
+      : [],
+    centralStock: Math.min(100000, Math.max(0, Number(cart.centralStock) || 0)),
+    minThreshold: Math.min(10000, Math.max(0, Number(cart.minThreshold ?? 15))),
+    unitCost: Math.min(1000000, Math.max(0, Number(cart.unitCost) || 0)),
+    supplier: clampStr(cart.supplier || 'Primary IT Supplies', 120),
+    pageYield: Math.min(500000, Math.max(0, Number(cart.pageYield) || 0)),
+    reorderPackSize: Math.min(10000, Math.max(1, Number(cart.reorderPackSize) || 5)),
+    isBestSeller: Boolean(cart.isBestSeller),
+    notes: clampStr(cart.notes || '', 500),
+    updatedByUid: uid,
+    createdAt: createdAtVal || serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+}
+
+function buildBranchDoc(
+  branch: Branch,
+  uid: string,
+  createdAtVal?: unknown
+): Record<string, unknown> {
+  return {
+    id: sanitizeId(branch.id, 'branch'),
+    orgId: 'aesl',
+    code: clampStr(branch.code || 'BR', 32) || 'BR',
+    name: clampStr(branch.name || 'Branch Office', 120) || 'Branch Office',
+    category: branch.category === 'Headquarters' ? 'Headquarters' : 'Regional Branch',
+    city: clampStr(branch.city || '', 100),
+    address: clampStr(branch.address || '', 240),
+    managerName: clampStr(branch.managerName || '', 120),
+    contactPhone: clampStr(branch.contactPhone || '', 40),
+    email: clampStr(branch.email || '', 160),
+    printers: Array.isArray(branch.printers)
+      ? branch.printers.slice(0, 30).map((p) => ({
+          id: sanitizeId(p.id || `pr-${Date.now()}`, 'pr'),
+          name: clampStr(p.name || 'Office Printer', 120),
+          model: clampStr(p.model || 'LaserJet', 120),
+          location: clampStr(p.location || 'Office', 120),
+          cartridgeSkuId: clampStr(p.cartridgeSkuId || '', 128),
+        }))
+      : [],
+    updatedByUid: uid,
+    createdAt: createdAtVal || serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+}
+
+function buildDispatchDoc(
+  dsp: DispatchRecord,
+  uid: string,
+  createdAtVal?: unknown
+): Record<string, unknown> {
+  const payload: Record<string, unknown> = {
+    id: sanitizeId(dsp.id, 'dsp'),
+    orgId: 'aesl',
+    dispatchCode: clampStr(dsp.dispatchCode || `DSP-${Date.now()}`, 64) || 'DSP',
+    branchId: sanitizeId(dsp.branchId, 'branch'),
+    branchName: clampStr(dsp.branchName || 'Branch', 120) || 'Branch',
+    cartridgeId: sanitizeId(dsp.cartridgeId, 'cart'),
+    cartridgeModel: clampStr(dsp.cartridgeModel || 'Cartridge', 160) || 'Cartridge',
+    cartridgeColor: dsp.cartridgeColor || 'Black',
+    quantity: Math.min(10000, Math.max(1, Number(dsp.quantity) || 1)),
+    dispatchDate: clampStr(dsp.dispatchDate || new Date().toISOString().split('T')[0], 40),
+    carrier: clampStr(dsp.carrier || 'Internal Courier', 120) || 'Internal Courier',
+    trackingNumber: clampStr(dsp.trackingNumber || '', 120),
+    dispatchedBy: clampStr(dsp.dispatchedBy || 'AESL IT Team', 120) || 'AESL IT Team',
+    status: dsp.status || 'In Transit',
+    notes: clampStr(dsp.notes || '', 500),
+    createdByUid: uid,
+    createdAt: createdAtVal || serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+  if (dsp.receivedBy) payload.receivedBy = clampStr(dsp.receivedBy, 120);
+  if (dsp.receivedDate) payload.receivedDate = clampStr(dsp.receivedDate, 40);
+  return payload;
+}
+
+function buildUsageDoc(
+  usg: UsageRecord,
+  uid: string,
+  createdAtVal?: unknown
+): Record<string, unknown> {
+  const payload: Record<string, unknown> = {
+    id: sanitizeId(usg.id, 'usg'),
+    orgId: 'aesl',
+    usageCode: clampStr(usg.usageCode || `USG-${Date.now()}`, 64) || 'USG',
+    branchId: sanitizeId(usg.branchId, 'branch'),
+    branchName: clampStr(usg.branchName || 'Branch', 120) || 'Branch',
+    cartridgeId: sanitizeId(usg.cartridgeId, 'cart'),
+    cartridgeModel: clampStr(usg.cartridgeModel || 'Cartridge', 160) || 'Cartridge',
+    cartridgeColor: usg.cartridgeColor || 'Black',
+    printerName: clampStr(usg.printerName || 'Printer', 120) || 'Printer',
+    quantity: Math.min(1000, Math.max(1, Number(usg.quantity) || 1)),
+    installedDate: clampStr(usg.installedDate || new Date().toISOString().split('T')[0], 40),
+    installedBy: clampStr(usg.installedBy || 'AESL IT Team', 120) || 'AESL IT Team',
+    reason: usg.reason || 'Depleted',
+    notes: clampStr(usg.notes || '', 500),
+    createdByUid: uid,
+    createdAt: createdAtVal || serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+  if (typeof usg.estimatedPagesPrinted === 'number') {
+    payload.estimatedPagesPrinted = Math.min(10000000, Math.max(0, usg.estimatedPagesPrinted));
+  }
+  return payload;
+}
+
+function buildRestockDoc(
+  rst: RestockRecord,
+  uid: string,
+  createdAtVal?: unknown
+): Record<string, unknown> {
+  return {
+    id: sanitizeId(rst.id, 'rst'),
+    orgId: 'aesl',
+    poNumber: clampStr(rst.poNumber || `PO-${Date.now()}`, 64) || 'PO',
+    cartridgeId: sanitizeId(rst.cartridgeId, 'cart'),
+    cartridgeModel: clampStr(rst.cartridgeModel || 'Cartridge', 160) || 'Cartridge',
+    quantityReceived: Math.min(100000, Math.max(1, Number(rst.quantityReceived) || 1)),
+    unitCost: Math.min(1000000, Math.max(0, Number(rst.unitCost) || 0)),
+    supplier: clampStr(rst.supplier || 'Preferred Supplier', 120) || 'Preferred Supplier',
+    receivedDate: clampStr(rst.receivedDate || new Date().toISOString().split('T')[0], 40),
+    receivedBy: clampStr(rst.receivedBy || 'AESL IT Team', 120) || 'AESL IT Team',
+    notes: clampStr(rst.notes || '', 500),
+    createdByUid: uid,
+    createdAt: createdAtVal || serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+}
+
+function toIsoDateOrder(val: unknown): number {
+  if (val instanceof Timestamp) return val.toMillis();
+  if (typeof val === 'string') return Date.parse(val) || 0;
+  return 0;
+}
 
 export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const needsV3Sync = (() => {
-    try {
-      return localStorage.getItem(STORAGE_KEYS.SYNC_V3_EXV) !== 'done';
-    } catch {
-      return false;
-    }
-  })();
+  const { authReady, isAuthenticated, currentUser } = useAdminAuth();
 
-  const needsV4Sync = (() => {
-    try {
-      return localStorage.getItem(STORAGE_KEYS.SYNC_V4_GAUGE15_1500A) !== 'done';
-    } catch {
-      return false;
-    }
-  })();
+  const [cartridges, setCartridges] = useState<CartridgeSKU[]>([]);
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [dispatches, setDispatches] = useState<DispatchRecord[]>([]);
+  const [usages, setUsages] = useState<UsageRecord[]>([]);
+  const [restocks, setRestocks] = useState<RestockRecord[]>([]);
+  const [inventoryLoading, setInventoryLoading] = useState<boolean>(true);
 
-  const needsV5Sync = (() => {
-    try {
-      return localStorage.getItem(STORAGE_KEYS.SYNC_V5_SAKAMAN) !== 'done';
-    } catch {
-      return false;
-    }
-  })();
+  const createdAtCacheRef = useRef<Record<string, unknown>>({});
+  const seededRef = useRef<boolean>(false);
 
-  const [cartridges, setCartridges] = useState<CartridgeSKU[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.CARTRIDGES);
-      const base: CartridgeSKU[] = saved ? JSON.parse(saved) : INITIAL_CARTRIDGES;
-      if (!Array.isArray(base)) return INITIAL_CARTRIDGES;
-
-      let updated = base;
-      if (needsV4Sync) {
-        // Reduce universal 50-unit gauge to 15 across existing saved SKUs
-        updated = updated.map((c) =>
-          c.minThreshold === 50 || c.minThreshold === undefined
-            ? { ...c, minThreshold: 15 }
-            : c
-        );
-      }
-
-      if (needsV3Sync || needsV4Sync) {
-        const existingSkus = new Set(updated.map((c) => c.sku.toUpperCase()));
-        const missing = INITIAL_CARTRIDGES.filter((c) => !existingSkus.has(c.sku.toUpperCase()));
-        if (missing.length > 0) {
-          updated = [...updated, ...missing];
-        }
-      }
-
-      return updated;
-    } catch {
-      return INITIAL_CARTRIDGES;
-    }
-  });
-
-  const [branches, setBranches] = useState<Branch[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.BRANCHES);
-      if (saved) {
-        const parsed: Branch[] = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          if (!needsV3Sync && !needsV5Sync) return parsed;
-          const existingIds = new Set(parsed.map((b) => b.id));
-          const missing = INITIAL_BRANCHES.filter((b) => !existingIds.has(b.id));
-          return missing.length > 0 ? [...parsed, ...missing] : parsed;
-        }
-      }
-      return INITIAL_BRANCHES;
-    } catch {
-      return INITIAL_BRANCHES;
-    }
-  });
-
-  const [dispatches, setDispatches] = useState<DispatchRecord[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.DISPATCHES);
-      const base: DispatchRecord[] = saved ? JSON.parse(saved) : INITIAL_DISPATCHES;
-      if (!needsV3Sync || !Array.isArray(base)) return base;
-
-      const existingIds = new Set(base.map((d) => d.id));
-      const missing = INITIAL_DISPATCHES.filter((d) => !existingIds.has(d.id));
-      return missing.length > 0 ? [...missing, ...base] : base;
-    } catch {
-      return INITIAL_DISPATCHES;
-    }
-  });
-
-  useEffect(() => {
-    try {
-      if (needsV3Sync) {
-        localStorage.setItem(STORAGE_KEYS.SYNC_V3_EXV, 'done');
-      }
-      if (needsV4Sync) {
-        localStorage.setItem(STORAGE_KEYS.SYNC_V4_GAUGE15_1500A, 'done');
-      }
-      if (needsV5Sync) {
-        localStorage.setItem(STORAGE_KEYS.SYNC_V5_SAKAMAN, 'done');
-      }
-    } catch {
-      // ignore storage errors
-    }
-  }, [needsV3Sync, needsV4Sync, needsV5Sync]);
-
-  const [usages, setUsages] = useState<UsageRecord[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.USAGES);
-      return saved ? JSON.parse(saved) : INITIAL_USAGES;
-    } catch {
-      return INITIAL_USAGES;
-    }
-  });
-
-  const [restocks, setRestocks] = useState<RestockRecord[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.RESTOCKS);
-      return saved ? JSON.parse(saved) : INITIAL_RESTOCKS;
-    } catch {
-      return INITIAL_RESTOCKS;
-    }
-  });
-
-  // Default to unrestricted admin mode
   const [adminMode, setAdminModeState] = useState<boolean>(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEYS.ADMIN_MODE);
+      const saved = localStorage.getItem(ADMIN_MODE_KEY);
       return saved !== null ? JSON.parse(saved) : true;
     } catch {
       return true;
@@ -262,7 +314,7 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setAdminModeState((prev) => {
       const next = !prev;
       try {
-        localStorage.setItem(STORAGE_KEYS.ADMIN_MODE, JSON.stringify(next));
+        localStorage.setItem(ADMIN_MODE_KEY, JSON.stringify(next));
       } catch (e) {
         console.error(e);
       }
@@ -273,54 +325,234 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const setAdminMode = (enabled: boolean) => {
     setAdminModeState(enabled);
     try {
-      localStorage.setItem(STORAGE_KEYS.ADMIN_MODE, JSON.stringify(enabled));
+      localStorage.setItem(ADMIN_MODE_KEY, JSON.stringify(enabled));
     } catch (e) {
       console.error(e);
     }
   };
 
-  // Sync to local storage
+  // Seed initial AESL warehouse catalog & 27 branches if Firestore is empty
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.CARTRIDGES, JSON.stringify(cartridges));
-    } catch (e) {
-      console.error('Storage write error', e);
+    if (!authReady || !isAuthenticated || !auth.currentUser) {
+      setInventoryLoading(false);
+      return;
     }
-  }, [cartridges]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.BRANCHES, JSON.stringify(branches));
-    } catch (e) {
-      console.error('Storage write error', e);
-    }
-  }, [branches]);
+    const uid = auth.currentUser.uid;
+    setInventoryLoading(true);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.DISPATCHES, JSON.stringify(dispatches));
-    } catch (e) {
-      console.error('Storage write error', e);
-    }
-  }, [dispatches]);
+    const seedIfEmpty = async () => {
+      if (seededRef.current) return;
+      seededRef.current = true;
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.USAGES, JSON.stringify(usages));
-    } catch (e) {
-      console.error('Storage write error', e);
-    }
-  }, [usages]);
+      try {
+        const cartSnap = await getDocs(query(collection(db, 'cartridges'), where('orgId', '==', 'aesl')));
+        const branchSnap = await getDocs(query(collection(db, 'branches'), where('orgId', '==', 'aesl')));
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.RESTOCKS, JSON.stringify(restocks));
-    } catch (e) {
-      console.error('Storage write error', e);
-    }
-  }, [restocks]);
+        if (cartSnap.empty && branchSnap.empty) {
+          const batch1 = writeBatch(db);
+          INITIAL_CARTRIDGES.forEach((c) => {
+            batch1.set(doc(db, 'cartridges', sanitizeId(c.id, 'cart')), buildCartridgeDoc(c, uid));
+          });
+          INITIAL_BRANCHES.forEach((b) => {
+            batch1.set(doc(db, 'branches', sanitizeId(b.id, 'branch')), buildBranchDoc(b, uid));
+          });
+          await batch1.commit();
 
-  // Low stock calculation: triggers whenever stock drops below threshold (default 15)
+          // Seed initial dispatch after branches & cartridges exist so relational rules pass
+          const batch2 = writeBatch(db);
+          INITIAL_DISPATCHES.forEach((d) => {
+            batch2.set(doc(db, 'dispatches', sanitizeId(d.id, 'dsp')), buildDispatchDoc(d, uid));
+          });
+          await batch2.commit();
+        }
+      } catch (err) {
+        console.warn('Initial seed check skipped or handled:', err);
+      }
+    };
+
+    void seedIfEmpty();
+
+    const qCart = query(collection(db, 'cartridges'), where('orgId', '==', 'aesl'));
+    const qBranch = query(collection(db, 'branches'), where('orgId', '==', 'aesl'));
+    const qDispatch = query(collection(db, 'dispatches'), where('orgId', '==', 'aesl'));
+    const qUsage = query(collection(db, 'usages'), where('orgId', '==', 'aesl'));
+    const qRestock = query(collection(db, 'restocks'), where('orgId', '==', 'aesl'));
+
+    const unsubCart = onSnapshot(
+      qCart,
+      (snap) => {
+        const items: CartridgeSKU[] = snap.docs.map((d) => {
+          const data = d.data() as any;
+          createdAtCacheRef.current[`cartridges/${d.id}`] = data.createdAt;
+          return {
+            id: d.id,
+            sku: data.sku || '',
+            model: data.model || '',
+            specification: data.specification || '',
+            brand: data.brand || '',
+            type: data.type || 'Toner',
+            color: data.color || 'Black',
+            compatiblePrinters: Array.isArray(data.compatiblePrinters) ? data.compatiblePrinters : [],
+            centralStock: Number(data.centralStock) || 0,
+            minThreshold: data.minThreshold !== undefined ? Number(data.minThreshold) : 15,
+            unitCost: Number(data.unitCost) || 0,
+            supplier: data.supplier || '',
+            pageYield: Number(data.pageYield) || 0,
+            reorderPackSize: Number(data.reorderPackSize) || 5,
+            isBestSeller: Boolean(data.isBestSeller),
+            notes: data.notes || '',
+          };
+        });
+        items.sort((a, b) => a.sku.localeCompare(b.sku));
+        setCartridges(items);
+        setInventoryLoading(false);
+      },
+      (err) => {
+        handleFirestoreError(err, OperationType.LIST, 'cartridges');
+      }
+    );
+
+    const unsubBranch = onSnapshot(
+      qBranch,
+      (snap) => {
+        const items: Branch[] = snap.docs.map((d) => {
+          const data = d.data() as any;
+          createdAtCacheRef.current[`branches/${d.id}`] = data.createdAt;
+          return {
+            id: d.id,
+            code: data.code || '',
+            name: data.name || '',
+            category: data.category || 'Regional Branch',
+            city: data.city || '',
+            address: data.address || '',
+            managerName: data.managerName || '',
+            contactPhone: data.contactPhone || '',
+            email: data.email || '',
+            printers: Array.isArray(data.printers) ? data.printers : [],
+          };
+        });
+        items.sort((a, b) => {
+          if (a.category === 'Headquarters' && b.category !== 'Headquarters') return -1;
+          if (b.category === 'Headquarters' && a.category !== 'Headquarters') return 1;
+          return a.name.localeCompare(b.name);
+        });
+        setBranches(items);
+      },
+      (err) => {
+        handleFirestoreError(err, OperationType.LIST, 'branches');
+      }
+    );
+
+    const unsubDispatch = onSnapshot(
+      qDispatch,
+      (snap) => {
+        const items: DispatchRecord[] = snap.docs
+          .map((d) => {
+            const data = d.data() as any;
+            createdAtCacheRef.current[`dispatches/${d.id}`] = data.createdAt;
+            return {
+              id: d.id,
+              dispatchCode: data.dispatchCode || '',
+              branchId: data.branchId || '',
+              branchName: data.branchName || '',
+              cartridgeId: data.cartridgeId || '',
+              cartridgeModel: data.cartridgeModel || '',
+              cartridgeColor: data.cartridgeColor || 'Black',
+              quantity: Number(data.quantity) || 1,
+              dispatchDate: data.dispatchDate || '',
+              carrier: data.carrier || '',
+              trackingNumber: data.trackingNumber || '',
+              dispatchedBy: data.dispatchedBy || '',
+              receivedBy: data.receivedBy,
+              receivedDate: data.receivedDate,
+              status: data.status || 'In Transit',
+              notes: data.notes || '',
+              _ts: toIsoDateOrder(data.createdAt),
+            };
+          })
+          .sort((a, b) => b._ts - a._ts)
+          .map(({ _ts, ...rest }) => rest);
+        setDispatches(items);
+      },
+      (err) => {
+        handleFirestoreError(err, OperationType.LIST, 'dispatches');
+      }
+    );
+
+    const unsubUsage = onSnapshot(
+      qUsage,
+      (snap) => {
+        const items: UsageRecord[] = snap.docs
+          .map((d) => {
+            const data = d.data() as any;
+            createdAtCacheRef.current[`usages/${d.id}`] = data.createdAt;
+            return {
+              id: d.id,
+              usageCode: data.usageCode || '',
+              branchId: data.branchId || '',
+              branchName: data.branchName || '',
+              cartridgeId: data.cartridgeId || '',
+              cartridgeModel: data.cartridgeModel || '',
+              cartridgeColor: data.cartridgeColor || 'Black',
+              printerName: data.printerName || '',
+              quantity: Number(data.quantity) || 1,
+              installedDate: data.installedDate || '',
+              installedBy: data.installedBy || '',
+              reason: data.reason || 'Depleted',
+              estimatedPagesPrinted: data.estimatedPagesPrinted,
+              notes: data.notes || '',
+              _ts: toIsoDateOrder(data.createdAt),
+            };
+          })
+          .sort((a, b) => b._ts - a._ts)
+          .map(({ _ts, ...rest }) => rest);
+        setUsages(items);
+      },
+      (err) => {
+        handleFirestoreError(err, OperationType.LIST, 'usages');
+      }
+    );
+
+    const unsubRestock = onSnapshot(
+      qRestock,
+      (snap) => {
+        const items: RestockRecord[] = snap.docs
+          .map((d) => {
+            const data = d.data() as any;
+            createdAtCacheRef.current[`restocks/${d.id}`] = data.createdAt;
+            return {
+              id: d.id,
+              poNumber: data.poNumber || '',
+              cartridgeId: data.cartridgeId || '',
+              cartridgeModel: data.cartridgeModel || '',
+              quantityReceived: Number(data.quantityReceived) || 1,
+              unitCost: Number(data.unitCost) || 0,
+              supplier: data.supplier || '',
+              receivedDate: data.receivedDate || '',
+              receivedBy: data.receivedBy || '',
+              notes: data.notes || '',
+              _ts: toIsoDateOrder(data.createdAt),
+            };
+          })
+          .sort((a, b) => b._ts - a._ts)
+          .map(({ _ts, ...rest }) => rest);
+        setRestocks(items);
+      },
+      (err) => {
+        handleFirestoreError(err, OperationType.LIST, 'restocks');
+      }
+    );
+
+    return () => {
+      unsubCart();
+      unsubBranch();
+      unsubDispatch();
+      unsubUsage();
+      unsubRestock();
+    };
+  }, [authReady, isAuthenticated]);
+
   const lowStockAlerts = useMemo<LowStockAlert[]>(() => {
     const alerts: LowStockAlert[] = [];
     cartridges.forEach((cart) => {
@@ -328,7 +560,6 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (cart.centralStock < threshold) {
         const deficit = Math.max(0, threshold - cart.centralStock);
         const packMultiple = cart.reorderPackSize || 1;
-        // round suggested up to multiple of pack size to bring back above threshold
         const suggestedReorder = Math.max(packMultiple, Math.ceil(deficit / packMultiple) * packMultiple);
         const criticalCutoff = Math.max(1, Math.floor(threshold / 3));
 
@@ -343,7 +574,6 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     });
 
-    // Sort: critical first, then out-of-stock / best sellers, then lowest stock
     return alerts.sort((a, b) => {
       if (a.severity === 'CRITICAL' && b.severity !== 'CRITICAL') return -1;
       if (b.severity === 'CRITICAL' && a.severity !== 'CRITICAL') return 1;
@@ -363,13 +593,11 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     [lowStockAlerts]
   );
 
-  // In Office stock total
   const totalCentralStockUnits = useMemo(
     () => cartridges.reduce((sum, c) => sum + (Number(c.centralStock) || 0), 0),
     [cartridges]
   );
 
-  // Sent out to other offices & branches total
   const totalDispatchedUnits = useMemo(
     () => dispatches.reduce((sum, d) => sum + (Number(d.quantity) || 0), 0),
     [dispatches]
@@ -380,14 +608,12 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     [usages]
   );
 
-  // Calculate how many of a specific cartridge SKU were sent out across all branches/offices
   const getSentOutCountForCartridge = (cartridgeId: string): number => {
     return dispatches
       .filter((d) => d.cartridgeId === cartridgeId)
       .reduce((sum, d) => sum + (Number(d.quantity) || 0), 0);
   };
 
-  // Helper to compute on-site stock breakdown per branch
   const getBranchStockDetails = (branchId: string): BranchInventoryItem[] => {
     const map = new Map<string, BranchInventoryItem>();
 
@@ -431,7 +657,6 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         item.totalUsed += u.quantity;
       });
 
-    // Compute on-hand: delivered minus used (never negative)
     map.forEach((item) => {
       item.onHandCount = Math.max(0, item.totalReceived - item.totalUsed);
     });
@@ -439,7 +664,11 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return Array.from(map.values());
   };
 
-  // Dispatch cartridges to a branch
+  const getActorName = (fallback?: string) => {
+    if (fallback && fallback.trim()) return fallback.trim();
+    return currentUser?.displayName || currentUser?.email || 'AESL IT Staff';
+  };
+
   const dispatchCartridges = (data: {
     branchId: string;
     cartridgeId: string;
@@ -449,6 +678,9 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     dispatchedBy: string;
     notes?: string;
   }) => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return { success: false, message: 'Sign in required.' };
+
     const targetCartridge = cartridges.find((c) => c.id === data.cartridgeId);
     if (!targetCartridge) {
       return { success: false, message: 'Cartridge SKU not found.' };
@@ -462,23 +694,16 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
 
     const branch = branches.find((b) => b.id === data.branchId);
-    const branchName = branch ? branch.name : 'Unknown Branch';
+    if (!branch) {
+      return { success: false, message: 'Destination branch not found.' };
+    }
 
-    // Decrement central office inventory
-    setCartridges((prev) =>
-      prev.map((c) =>
-        c.id === data.cartridgeId
-          ? { ...c, centralStock: c.centralStock - data.quantity }
-          : c
-      )
-    );
-
-    // Create dispatch record
+    const dispatchId = `dsp-${Date.now()}`;
     const newDispatch: DispatchRecord = {
-      id: `dsp-${Date.now()}`,
+      id: dispatchId,
       dispatchCode: `DSP-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
-      branchId: data.branchId,
-      branchName,
+      branchId: branch.id,
+      branchName: branch.name,
       cartridgeId: targetCartridge.id,
       cartridgeModel: targetCartridge.model,
       cartridgeColor: targetCartridge.color,
@@ -486,36 +711,38 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       dispatchDate: new Date().toISOString().split('T')[0],
       carrier: data.carrier,
       trackingNumber: data.trackingNumber || `TRK-${Date.now().toString().slice(-6)}`,
-      dispatchedBy: data.dispatchedBy,
+      dispatchedBy: getActorName(data.dispatchedBy),
       status: 'In Transit',
       notes: data.notes || '',
     };
 
-    setDispatches((prev) => [newDispatch, ...prev]);
+    const batch = writeBatch(db);
+    batch.update(doc(db, 'cartridges', targetCartridge.id), {
+      centralStock: Math.max(0, targetCartridge.centralStock - data.quantity),
+      updatedByUid: uid,
+      updatedAt: serverTimestamp(),
+    });
+    batch.set(doc(db, 'dispatches', dispatchId), buildDispatchDoc(newDispatch, uid));
+
+    batch.commit().catch((err) => handleFirestoreError(err, OperationType.WRITE, `dispatches/${dispatchId}`));
 
     return {
       success: true,
-      message: `Successfully dispatched ${data.quantity} units to ${branchName}.`,
+      message: `Successfully dispatched ${data.quantity} units to ${branch.name}.`,
     };
   };
 
-  // Mark dispatch as received / delivered
   const markDispatchDelivered = (dispatchId: string, receivedBy: string) => {
-    setDispatches((prev) =>
-      prev.map((d) =>
-        d.id === dispatchId
-          ? {
-              ...d,
-              status: 'Delivered',
-              receivedBy: receivedBy || 'Branch Staff',
-              receivedDate: new Date().toISOString().split('T')[0],
-            }
-          : d
-      )
-    );
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    updateDoc(doc(db, 'dispatches', dispatchId), {
+      status: 'Delivered',
+      receivedBy: clampStr(receivedBy || getActorName(), 120) || 'Branch Staff',
+      receivedDate: new Date().toISOString().split('T')[0],
+      updatedAt: serverTimestamp(),
+    }).catch((err) => handleFirestoreError(err, OperationType.UPDATE, `dispatches/${dispatchId}`));
   };
 
-  // Log cartridge consumption / installation at a branch
   const logUsage = (data: {
     branchId: string;
     cartridgeId: string;
@@ -526,27 +753,36 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     estimatedPagesPrinted?: number;
     notes?: string;
   }) => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return { success: false, message: 'Sign in required.' };
+
     const branch = branches.find((b) => b.id === data.branchId);
     const cartridge = cartridges.find((c) => c.id === data.cartridgeId);
+    if (!branch || !cartridge) {
+      return { success: false, message: 'Branch or cartridge SKU not found.' };
+    }
 
+    const usageId = `usg-${Date.now()}`;
     const newUsage: UsageRecord = {
-      id: `usg-${Date.now()}`,
+      id: usageId,
       usageCode: `USG-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
-      branchId: data.branchId,
-      branchName: branch ? branch.name : 'Branch',
-      cartridgeId: data.cartridgeId,
-      cartridgeModel: cartridge ? cartridge.model : 'Printer Cartridge',
-      cartridgeColor: cartridge ? cartridge.color : 'Black',
+      branchId: branch.id,
+      branchName: branch.name,
+      cartridgeId: cartridge.id,
+      cartridgeModel: cartridge.model,
+      cartridgeColor: cartridge.color,
       printerName: data.printerName,
       quantity: data.quantity,
       installedDate: new Date().toISOString().split('T')[0],
-      installedBy: data.installedBy,
+      installedBy: getActorName(data.installedBy),
       reason: data.reason,
       estimatedPagesPrinted: data.estimatedPagesPrinted,
       notes: data.notes || '',
     };
 
-    setUsages((prev) => [newUsage, ...prev]);
+    setDoc(doc(db, 'usages', usageId), buildUsageDoc(newUsage, uid)).catch((err) =>
+      handleFirestoreError(err, OperationType.CREATE, `usages/${usageId}`)
+    );
 
     return {
       success: true,
@@ -554,7 +790,6 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     };
   };
 
-  // Restock / top up warehouse inventory
   const topUpRestock = (data: {
     cartridgeId: string;
     quantityReceived: number;
@@ -564,127 +799,160 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     receivedBy: string;
     notes?: string;
   }) => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
     const target = cartridges.find((c) => c.id === data.cartridgeId);
     if (!target) return;
 
-    setCartridges((prev) =>
-      prev.map((c) =>
-        c.id === data.cartridgeId
-          ? { ...c, centralStock: c.centralStock + data.quantityReceived }
-          : c
-      )
-    );
-
+    const restockId = `rst-${Date.now()}`;
     const newRecord: RestockRecord = {
-      id: `rst-${Date.now()}`,
+      id: restockId,
       poNumber: data.poNumber || `PO-AESL-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
       cartridgeId: target.id,
       cartridgeModel: target.model,
       quantityReceived: data.quantityReceived,
       unitCost: data.unitCost || target.unitCost,
-      supplier: data.supplier || target.supplier,
+      supplier: data.supplier || target.supplier || 'Preferred Supplier',
       receivedDate: new Date().toISOString().split('T')[0],
-      receivedBy: data.receivedBy,
+      receivedBy: getActorName(data.receivedBy),
       notes: data.notes || '',
     };
 
-    setRestocks((prev) => [newRecord, ...prev]);
+    const batch = writeBatch(db);
+    batch.update(doc(db, 'cartridges', target.id), {
+      centralStock: target.centralStock + data.quantityReceived,
+      updatedByUid: uid,
+      updatedAt: serverTimestamp(),
+    });
+    batch.set(doc(db, 'restocks', restockId), buildRestockDoc(newRecord, uid));
+    batch.commit().catch((err) => handleFirestoreError(err, OperationType.WRITE, `restocks/${restockId}`));
   };
 
-  // Batch replenishment for all alert items
   const batchTopUpAlerts = (items: Array<{ cartridgeId: string; quantity: number }>, poNumber: string) => {
+    const uid = auth.currentUser?.uid;
+    if (!uid || items.length === 0) return;
     const today = new Date().toISOString().split('T')[0];
 
-    setCartridges((prev) => {
-      const map = new Map(items.map((i) => [i.cartridgeId, i.quantity]));
-      return prev.map((c) => {
-        if (map.has(c.id)) {
-          return { ...c, centralStock: c.centralStock + (map.get(c.id) || 0) };
-        }
-        return c;
-      });
-    });
-
-    const newRestocks: RestockRecord[] = items.map((item, idx) => {
+    const batch = writeBatch(db);
+    items.forEach((item, idx) => {
       const cart = cartridges.find((c) => c.id === item.cartridgeId);
-      return {
-        id: `rst-${Date.now()}-${idx}`,
+      if (!cart) return;
+
+      batch.update(doc(db, 'cartridges', cart.id), {
+        centralStock: cart.centralStock + item.quantity,
+        updatedByUid: uid,
+        updatedAt: serverTimestamp(),
+      });
+
+      const restockId = `rst-${Date.now()}-${idx}`;
+      const rec: RestockRecord = {
+        id: restockId,
         poNumber: poNumber || `PO-AESL-BATCH-${Date.now().toString().slice(-4)}`,
         cartridgeId: item.cartridgeId,
-        cartridgeModel: cart ? cart.model : 'Cartridge',
+        cartridgeModel: cart.model,
         quantityReceived: item.quantity,
-        unitCost: cart ? cart.unitCost : 50,
-        supplier: cart ? cart.supplier : 'Preferred Supplier',
+        unitCost: cart.unitCost || 0,
+        supplier: cart.supplier || 'Preferred Supplier',
         receivedDate: today,
-        receivedBy: 'AESL IT Stores Lead',
+        receivedBy: getActorName(),
         notes: 'Replenished via automated low-stock reorder wizard.',
       };
+      batch.set(doc(db, 'restocks', restockId), buildRestockDoc(rec, uid));
     });
 
-    setRestocks((prev) => [...newRestocks, ...prev]);
+    batch.commit().catch((err) => handleFirestoreError(err, OperationType.WRITE, 'restocks/batch'));
   };
 
-  // Add / Edit / Delete Cartridge SKU
   const addCartridge = (cartridge: Omit<CartridgeSKU, 'id'>) => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    const newId = `cart-${Date.now()}`;
     const newCart: CartridgeSKU = {
       ...cartridge,
-      minThreshold: cartridge.minThreshold !== undefined ? cartridge.minThreshold : 15, // default 15 gauge!
-      id: `cart-${Date.now()}`,
+      minThreshold: cartridge.minThreshold !== undefined ? cartridge.minThreshold : 15,
+      id: newId,
     };
-    setCartridges((prev) => [...prev, newCart]);
+    setDoc(doc(db, 'cartridges', newId), buildCartridgeDoc(newCart, uid)).catch((err) =>
+      handleFirestoreError(err, OperationType.CREATE, `cartridges/${newId}`)
+    );
   };
 
   const updateCartridge = (id: string, updates: Partial<CartridgeSKU>) => {
-    setCartridges((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    const current = cartridges.find((c) => c.id === id);
+    if (!current) return;
+    const merged: CartridgeSKU = { ...current, ...updates, id };
+    const createdAtVal = createdAtCacheRef.current[`cartridges/${id}`] || serverTimestamp();
+    setDoc(doc(db, 'cartridges', id), buildCartridgeDoc(merged, uid, createdAtVal)).catch((err) =>
+      handleFirestoreError(err, OperationType.UPDATE, `cartridges/${id}`)
+    );
   };
 
   const deleteCartridge = (id: string) => {
-    setCartridges((prev) => prev.filter((c) => c.id !== id));
+    deleteDoc(doc(db, 'cartridges', id)).catch((err) =>
+      handleFirestoreError(err, OperationType.DELETE, `cartridges/${id}`)
+    );
   };
 
-  // Add / Edit / Delete Branch
   const addBranch = (branch: Omit<Branch, 'id'>) => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    const newId = `branch-${Date.now()}`;
     const newBranch: Branch = {
       ...branch,
-      id: `branch-${Date.now()}`,
+      id: newId,
     };
-    setBranches((prev) => [...prev, newBranch]);
+    setDoc(doc(db, 'branches', newId), buildBranchDoc(newBranch, uid)).catch((err) =>
+      handleFirestoreError(err, OperationType.CREATE, `branches/${newId}`)
+    );
   };
 
   const updateBranch = (id: string, updates: Partial<Branch>) => {
-    setBranches((prev) => prev.map((b) => (b.id === id ? { ...b, ...updates } : b)));
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    const current = branches.find((b) => b.id === id);
+    if (!current) return;
+    const merged: Branch = { ...current, ...updates, id };
+    const createdAtVal = createdAtCacheRef.current[`branches/${id}`] || serverTimestamp();
+    setDoc(doc(db, 'branches', id), buildBranchDoc(merged, uid, createdAtVal)).catch((err) =>
+      handleFirestoreError(err, OperationType.UPDATE, `branches/${id}`)
+    );
   };
 
   const deleteBranch = (id: string) => {
-    setBranches((prev) => prev.filter((b) => b.id !== id));
+    deleteDoc(doc(db, 'branches', id)).catch((err) =>
+      handleFirestoreError(err, OperationType.DELETE, `branches/${id}`)
+    );
   };
 
-  // 150% Unrestricted Admin Powers
   const directUpdateStock = (cartridgeId: string, inOfficeStock: number, minThreshold?: number) => {
-    setCartridges((prev) =>
-      prev.map((c) =>
-        c.id === cartridgeId
-          ? {
-              ...c,
-              centralStock: Math.max(0, inOfficeStock),
-              minThreshold: minThreshold !== undefined ? Math.max(1, minThreshold) : c.minThreshold,
-            }
-          : c
-      )
-    );
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    const target = cartridges.find((c) => c.id === cartridgeId);
+    if (!target) return;
+    updateDoc(doc(db, 'cartridges', cartridgeId), {
+      centralStock: Math.max(0, inOfficeStock),
+      minThreshold: minThreshold !== undefined ? Math.max(1, minThreshold) : target.minThreshold,
+      updatedByUid: uid,
+      updatedAt: serverTimestamp(),
+    }).catch((err) => handleFirestoreError(err, OperationType.UPDATE, `cartridges/${cartridgeId}`));
   };
 
   const directAdjustBranchDispatched = (dispatchId: string, quantity: number, status: DispatchStatus) => {
-    setDispatches((prev) =>
-      prev.map((d) => (d.id === dispatchId ? { ...d, quantity, status } : d))
-    );
+    updateDoc(doc(db, 'dispatches', dispatchId), {
+      quantity: Math.max(1, quantity),
+      status,
+      updatedAt: serverTimestamp(),
+    }).catch((err) => handleFirestoreError(err, OperationType.UPDATE, `dispatches/${dispatchId}`));
   };
 
   const deleteDispatch = (dispatchId: string) => {
-    setDispatches((prev) => prev.filter((d) => d.id !== dispatchId));
+    deleteDoc(doc(db, 'dispatches', dispatchId)).catch((err) =>
+      handleFirestoreError(err, OperationType.DELETE, `dispatches/${dispatchId}`)
+    );
   };
 
-  // Export full JSON database for backup/hosting migration
   const exportDatabaseJSON = () => {
     const backup = {
       company: 'Anointed Engineering Services Limited',
@@ -700,68 +968,132 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return JSON.stringify(backup, null, 2);
   };
 
-  // Import JSON database
   const importDatabaseJSON = (jsonString: string) => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return { success: false, message: 'Authentication required.' };
     try {
       const data = JSON.parse(jsonString);
       if (!Array.isArray(data.cartridges) || !Array.isArray(data.branches)) {
         return { success: false, message: 'Invalid backup file: cartridges or branches arrays missing.' };
       }
-      setCartridges(data.cartridges || []);
-      setBranches(data.branches || []);
-      setDispatches(data.dispatches || []);
-      setUsages(data.usages || []);
-      setRestocks(data.restocks || []);
+
+      const runRestore = async () => {
+        const batch1 = writeBatch(db);
+        (data.cartridges as CartridgeSKU[]).forEach((c) => {
+          batch1.set(doc(db, 'cartridges', sanitizeId(c.id, 'cart')), buildCartridgeDoc(c, uid));
+        });
+        (data.branches as Branch[]).forEach((b) => {
+          batch1.set(doc(db, 'branches', sanitizeId(b.id, 'branch')), buildBranchDoc(b, uid));
+        });
+        await batch1.commit();
+
+        const batch2 = writeBatch(db);
+        (data.dispatches || []).forEach((d: DispatchRecord) => {
+          batch2.set(doc(db, 'dispatches', sanitizeId(d.id, 'dsp')), buildDispatchDoc(d, uid));
+        });
+        (data.usages || []).forEach((u: UsageRecord) => {
+          batch2.set(doc(db, 'usages', sanitizeId(u.id, 'usg')), buildUsageDoc(u, uid));
+        });
+        (data.restocks || []).forEach((r: RestockRecord) => {
+          batch2.set(doc(db, 'restocks', sanitizeId(r.id, 'rst')), buildRestockDoc(r, uid));
+        });
+        await batch2.commit();
+      };
+
+      runRestore().catch((err) => handleFirestoreError(err, OperationType.WRITE, 'backup/restore'));
+
       return {
         success: true,
-        message: `Import successful: Restored ${data.cartridges.length} cartridge SKUs and ${data.branches.length} branches/offices.`,
+        message: `Import successful: Restoring ${data.cartridges.length} cartridge SKUs and ${data.branches.length} branches/offices to shared cloud database.`,
       };
     } catch (e: any) {
       return { success: false, message: `Failed to parse JSON file: ${e.message}` };
     }
   };
 
+  const wipeCollection = async (colName: string) => {
+    const snap = await getDocs(query(collection(db, colName), where('orgId', '==', 'aesl')));
+    if (snap.empty) return;
+    const batch = writeBatch(db);
+    snap.docs.forEach((d) => batch.delete(d.ref));
+    await batch.commit();
+  };
+
   const resetToDefaultData = () => {
-    setCartridges(INITIAL_CARTRIDGES);
-    setBranches(INITIAL_BRANCHES);
-    setDispatches(INITIAL_DISPATCHES);
-    setUsages(INITIAL_USAGES);
-    setRestocks(INITIAL_RESTOCKS);
-    localStorage.removeItem(STORAGE_KEYS.CARTRIDGES);
-    localStorage.removeItem(STORAGE_KEYS.BRANCHES);
-    localStorage.removeItem(STORAGE_KEYS.DISPATCHES);
-    localStorage.removeItem(STORAGE_KEYS.USAGES);
-    localStorage.removeItem(STORAGE_KEYS.RESTOCKS);
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    const run = async () => {
+      await Promise.all([
+        wipeCollection('dispatches'),
+        wipeCollection('usages'),
+        wipeCollection('restocks'),
+      ]);
+      const batch1 = writeBatch(db);
+      INITIAL_CARTRIDGES.forEach((c) => {
+        batch1.set(doc(db, 'cartridges', sanitizeId(c.id, 'cart')), buildCartridgeDoc(c, uid));
+      });
+      INITIAL_BRANCHES.forEach((b) => {
+        batch1.set(doc(db, 'branches', sanitizeId(b.id, 'branch')), buildBranchDoc(b, uid));
+      });
+      await batch1.commit();
+
+      const batch2 = writeBatch(db);
+      INITIAL_DISPATCHES.forEach((d) => {
+        batch2.set(doc(db, 'dispatches', sanitizeId(d.id, 'dsp')), buildDispatchDoc(d, uid));
+      });
+      await batch2.commit();
+    };
+    run().catch((err) => handleFirestoreError(err, OperationType.WRITE, 'resetToDefaultData'));
   };
 
   const clearAllData = () => {
-    setCartridges([]);
-    setBranches([]);
-    setDispatches([]);
-    setUsages([]);
-    setRestocks([]);
-    localStorage.removeItem(STORAGE_KEYS.CARTRIDGES);
-    localStorage.removeItem(STORAGE_KEYS.BRANCHES);
-    localStorage.removeItem(STORAGE_KEYS.DISPATCHES);
-    localStorage.removeItem(STORAGE_KEYS.USAGES);
-    localStorage.removeItem(STORAGE_KEYS.RESTOCKS);
+    const run = async () => {
+      await Promise.all([
+        wipeCollection('dispatches'),
+        wipeCollection('usages'),
+        wipeCollection('restocks'),
+      ]);
+      await Promise.all([wipeCollection('cartridges'), wipeCollection('branches')]);
+    };
+    run().catch((err) => handleFirestoreError(err, OperationType.DELETE, 'clearAllData'));
   };
 
   const loadSampleTemplateData = () => {
-    setCartridges(SAMPLE_TEMPLATE_CARTRIDGES);
-    setBranches(SAMPLE_TEMPLATE_BRANCHES);
-    setDispatches(SAMPLE_TEMPLATE_DISPATCHES);
-    setUsages(SAMPLE_TEMPLATE_USAGES);
-    setRestocks(SAMPLE_TEMPLATE_RESTOCKS);
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    const run = async () => {
+      const batch1 = writeBatch(db);
+      SAMPLE_TEMPLATE_CARTRIDGES.forEach((c) => {
+        batch1.set(doc(db, 'cartridges', sanitizeId(c.id, 'cart')), buildCartridgeDoc(c, uid));
+      });
+      SAMPLE_TEMPLATE_BRANCHES.forEach((b) => {
+        batch1.set(doc(db, 'branches', sanitizeId(b.id, 'branch')), buildBranchDoc(b, uid));
+      });
+      await batch1.commit();
+
+      const batch2 = writeBatch(db);
+      SAMPLE_TEMPLATE_DISPATCHES.forEach((d) => {
+        batch2.set(doc(db, 'dispatches', sanitizeId(d.id, 'dsp')), buildDispatchDoc(d, uid));
+      });
+      SAMPLE_TEMPLATE_USAGES.forEach((u) => {
+        batch2.set(doc(db, 'usages', sanitizeId(u.id, 'usg')), buildUsageDoc(u, uid));
+      });
+      SAMPLE_TEMPLATE_RESTOCKS.forEach((r) => {
+        batch2.set(doc(db, 'restocks', sanitizeId(r.id, 'rst')), buildRestockDoc(r, uid));
+      });
+      await batch2.commit();
+    };
+    run().catch((err) => handleFirestoreError(err, OperationType.WRITE, 'loadSampleTemplateData'));
   };
 
   const loadAESLBranches = () => {
-    setBranches(AESL_LOCATIONS);
-    try {
-      localStorage.setItem(STORAGE_KEYS.BRANCHES, JSON.stringify(AESL_LOCATIONS));
-    } catch (e) {
-      console.error(e);
-    }
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    const batch = writeBatch(db);
+    AESL_LOCATIONS.forEach((b) => {
+      batch.set(doc(db, 'branches', sanitizeId(b.id, 'branch')), buildBranchDoc(b, uid));
+    });
+    batch.commit().catch((err) => handleFirestoreError(err, OperationType.WRITE, 'branches/aesl'));
   };
 
   return (
@@ -772,6 +1104,7 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         dispatches,
         usages,
         restocks,
+        inventoryLoading,
         adminMode,
         toggleAdminMode,
         setAdminMode,

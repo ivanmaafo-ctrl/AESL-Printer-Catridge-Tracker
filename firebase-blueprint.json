@@ -1,0 +1,219 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authorized AESL IT team member profile and access role (no PII).",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "role": { "type": "string", "enum": ["SUPER_ADMIN", "ADMIN", "STAFF"] },
+        "department": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "status": { "type": "string", "enum": ["active", "disabled"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "displayName", "role", "department", "status", "createdAt", "updatedAt"]
+    },
+    "UserPrivateInfo": {
+      "title": "UserPrivateInfo",
+      "description": "Isolated PII document for an authorized AESL user (email and last login).",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "format": "email", "minLength": 3, "maxLength": 160 },
+        "lastLogin": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "lastLogin"]
+    },
+    "AdminRole": {
+      "title": "AdminRole",
+      "description": "Server-verified Super Admin marker document.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "role": { "type": "string", "enum": ["SUPER_ADMIN"] },
+        "grantedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "role", "grantedAt"]
+    },
+    "StaffInvite": {
+      "title": "StaffInvite",
+      "description": "Pre-approved AESL IT team work email invite and assigned role.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email", "minLength": 3, "maxLength": 160 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "role": { "type": "string", "enum": ["SUPER_ADMIN", "ADMIN", "STAFF"] },
+        "active": { "type": "boolean" },
+        "createdByUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "displayName", "role", "active", "createdByUid", "createdAt"]
+    },
+    "CartridgeSKU": {
+      "title": "CartridgeSKU",
+      "description": "Central warehouse toner, ink, or drum unit SKU tracked against a 15-unit gauge.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "orgId": { "type": "string", "enum": ["aesl"] },
+        "sku": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "model": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "specification": { "type": "string", "maxLength": 160 },
+        "brand": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "type": { "type": "string", "enum": ["Toner", "Ink Tank", "Ink Cartridge", "Drum Unit", "Maintenance Box"] },
+        "color": { "type": "string", "enum": ["Black", "Cyan", "Magenta", "Yellow", "Tri-Color", "Drum Unit", "Waste Box"] },
+        "compatiblePrinters": { "type": "array" },
+        "centralStock": { "type": "number" },
+        "minThreshold": { "type": "number" },
+        "unitCost": { "type": "number" },
+        "supplier": { "type": "string", "maxLength": 120 },
+        "pageYield": { "type": "number" },
+        "reorderPackSize": { "type": "number" },
+        "isBestSeller": { "type": "boolean" },
+        "notes": { "type": "string", "maxLength": 500 },
+        "updatedByUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "orgId", "sku", "model", "brand", "type", "color", "compatiblePrinters", "centralStock", "minThreshold", "unitCost", "supplier", "pageYield", "reorderPackSize", "updatedByUid", "createdAt", "updatedAt"]
+    },
+    "Branch": {
+      "title": "Branch",
+      "description": "Anointed Engineering Services office, workshop, or regional branch location.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "orgId": { "type": "string", "enum": ["aesl"] },
+        "code": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "category": { "type": "string", "enum": ["Headquarters", "Regional Branch"] },
+        "city": { "type": "string", "maxLength": 100 },
+        "address": { "type": "string", "maxLength": 240 },
+        "managerName": { "type": "string", "maxLength": 120 },
+        "contactPhone": { "type": "string", "maxLength": 40 },
+        "email": { "type": "string", "maxLength": 160 },
+        "printers": { "type": "array" },
+        "updatedByUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "orgId", "code", "name", "category", "city", "address", "managerName", "contactPhone", "email", "printers", "updatedByUid", "createdAt", "updatedAt"]
+    },
+    "DispatchRecord": {
+      "title": "DispatchRecord",
+      "description": "Cartridge shipment dispatched from central office to an AESL location.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "orgId": { "type": "string", "enum": ["aesl"] },
+        "dispatchCode": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "branchId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "branchName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "cartridgeId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "cartridgeModel": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "cartridgeColor": { "type": "string", "enum": ["Black", "Cyan", "Magenta", "Yellow", "Tri-Color", "Drum Unit", "Waste Box"] },
+        "quantity": { "type": "number" },
+        "dispatchDate": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "carrier": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "trackingNumber": { "type": "string", "maxLength": 120 },
+        "dispatchedBy": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "receivedBy": { "type": "string", "maxLength": 120 },
+        "receivedDate": { "type": "string", "maxLength": 40 },
+        "status": { "type": "string", "enum": ["Pending", "In Transit", "Delivered"] },
+        "notes": { "type": "string", "maxLength": 500 },
+        "createdByUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "orgId", "dispatchCode", "branchId", "branchName", "cartridgeId", "cartridgeModel", "cartridgeColor", "quantity", "dispatchDate", "carrier", "trackingNumber", "dispatchedBy", "status", "createdByUid", "createdAt", "updatedAt"]
+    },
+    "UsageRecord": {
+      "title": "UsageRecord",
+      "description": "Cartridge installation / swap log recorded at a branch printer.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "orgId": { "type": "string", "enum": ["aesl"] },
+        "usageCode": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "branchId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "branchName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "cartridgeId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "cartridgeModel": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "cartridgeColor": { "type": "string", "enum": ["Black", "Cyan", "Magenta", "Yellow", "Tri-Color", "Drum Unit", "Waste Box"] },
+        "printerName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "quantity": { "type": "number" },
+        "installedDate": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "installedBy": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "reason": { "type": "string", "enum": ["Depleted", "Streaks or Print Defect", "Routine Scheduled Swap", "Printer Service"] },
+        "estimatedPagesPrinted": { "type": "number" },
+        "notes": { "type": "string", "maxLength": 500 },
+        "createdByUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "orgId", "usageCode", "branchId", "branchName", "cartridgeId", "cartridgeModel", "cartridgeColor", "printerName", "quantity", "installedDate", "installedBy", "reason", "createdByUid", "createdAt", "updatedAt"]
+    },
+    "RestockRecord": {
+      "title": "RestockRecord",
+      "description": "Supplier purchase order restock received into central office inventory.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "orgId": { "type": "string", "enum": ["aesl"] },
+        "poNumber": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "cartridgeId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "cartridgeModel": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "quantityReceived": { "type": "number" },
+        "unitCost": { "type": "number" },
+        "supplier": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "receivedDate": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "receivedBy": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "notes": { "type": "string", "maxLength": 500 },
+        "createdByUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "orgId", "poNumber", "cartridgeId", "cartridgeModel", "quantityReceived", "unitCost", "supplier", "receivedDate", "receivedBy", "createdByUid", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Authorized IT user profile and role assignment."
+    },
+    "/users/{userId}/private/{docId}": {
+      "schema": { "$ref": "#/entities/UserPrivateInfo" },
+      "description": "Isolated PII document containing work email and last login timestamp."
+    },
+    "/admins/{userId}": {
+      "schema": { "$ref": "#/entities/AdminRole" },
+      "description": "Super Admin role verification document."
+    },
+    "/staffInvites/{inviteId}": {
+      "schema": { "$ref": "#/entities/StaffInvite" },
+      "description": "Invite-only allowlist of authorized AESL IT team emails."
+    },
+    "/cartridges/{cartridgeId}": {
+      "schema": { "$ref": "#/entities/CartridgeSKU" },
+      "description": "Shared AESL warehouse cartridge SKUs."
+    },
+    "/branches/{branchId}": {
+      "schema": { "$ref": "#/entities/Branch" },
+      "description": "All AESL HQ offices, workshops, and regional branches."
+    },
+    "/dispatches/{dispatchId}": {
+      "schema": { "$ref": "#/entities/DispatchRecord" },
+      "description": "Cartridge dispatches from HQ to branches."
+    },
+    "/usages/{usageId}": {
+      "schema": { "$ref": "#/entities/UsageRecord" },
+      "description": "Printer cartridge installation and swap logs."
+    },
+    "/restocks/{restockId}": {
+      "schema": { "$ref": "#/entities/RestockRecord" },
+      "description": "Central warehouse PO restock receipts."
+    }
+  }
+}

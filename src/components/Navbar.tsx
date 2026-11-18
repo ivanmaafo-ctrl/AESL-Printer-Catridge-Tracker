@@ -35,7 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenLogUsage,
 }) => {
   const { lowStockAlerts, criticalCount } = useInventory();
-  const { isAuthenticated, currentUser, isSuperAdmin, logout } = useAdminAuth();
+  const { isAuthenticated, currentUser, isSuperAdmin, isAdmin, logout } = useAdminAuth();
 
   const navItems: Array<{ id: ActiveTab; label: string; icon: React.ComponentType<{ className?: string }> }> = [
     { id: 'dashboard', label: 'Overview', icon: Activity },
@@ -96,9 +96,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {isAdminTab && (
                     isAuthenticated ? (
                       <span className={`ml-1 px-1.5 py-0.2 text-[10px] font-mono font-bold rounded ${
-                        isSuperAdmin ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-blue-100 text-blue-800'
+                        isSuperAdmin
+                          ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                          : isAdmin
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-slate-100 text-slate-700'
                       }`}>
-                        {isSuperAdmin ? 'Super' : 'Admin'}
+                        {isSuperAdmin ? 'Super' : isAdmin ? 'Admin' : 'Staff'}
                       </span>
                     ) : (
                       <Lock className="w-3 h-3 text-slate-400 ml-0.5" />
@@ -149,10 +153,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                       ? 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100'
                       : 'bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100'
                   }`}
-                  title={`Logged in as ${currentUser?.displayName} (@${currentUser?.username})`}
+                  title={`Logged in as ${currentUser?.displayName} (${currentUser?.email || currentUser?.username})`}
                 >
-                  <span className={`w-1.5 h-1.5 rounded-full ${isSuperAdmin ? 'bg-amber-500' : 'bg-blue-600'} animate-pulse`} />
-                  <span className="font-mono text-[11px] truncate max-w-[85px]">{currentUser?.username}</span>
+                  <span className="font-mono text-[11px] truncate max-w-[115px]">
+                    {currentUser?.displayName || currentUser?.email}
+                  </span>
                 </button>
                 <button
                   onClick={logout}
