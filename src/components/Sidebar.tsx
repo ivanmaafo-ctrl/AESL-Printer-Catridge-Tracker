@@ -222,7 +222,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => handleTabClick(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3 py-2.5 lg:py-2 min-h-[44px] lg:min-h-0 rounded-xl text-xs transition-colors cursor-pointer ${
                     isActive
                       ? 'bg-[#E8F1FF] dark:bg-blue-500/20 text-[#0B0F17] dark:text-sky-300 font-bold'
                       : 'text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-100/80 dark:hover:bg-white/5 hover:text-[#0B0F17] dark:hover:text-white'
@@ -258,7 +258,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => handleTabClick(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3 py-2.5 lg:py-2 min-h-[44px] lg:min-h-0 rounded-xl text-xs transition-colors cursor-pointer ${
                     isActive
                       ? 'bg-[#E8F1FF] dark:bg-blue-500/20 text-[#0B0F17] dark:text-sky-300 font-bold'
                       : 'text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-100/80 dark:hover:bg-white/5 hover:text-[#0B0F17] dark:hover:text-white'
@@ -316,7 +316,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* 4. Bottom User Profile & Auth Gateway */}
-      <div className="p-3 border-t border-slate-200/70 dark:border-white/10 bg-white dark:bg-white/[0.02]">
+      <div className="p-3 pb-safe lg:pb-3 border-t border-slate-200/70 dark:border-white/10 bg-white dark:bg-white/[0.02]">
         {isAuthenticated && currentUser ? (
           <div className="p-2.5 rounded-xl bg-[#F6F8FC] dark:bg-white/5 border border-slate-200/80 dark:border-white/10 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2.5 min-w-0">
@@ -342,7 +342,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={logout}
               title="Sign out of AESL Portal"
-              className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition shrink-0 cursor-pointer"
+              aria-label="Sign out of AESL Portal"
+              className="min-w-[40px] min-h-[40px] flex items-center justify-center text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition shrink-0 cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -379,56 +380,50 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {sidebarContent}
       </aside>
 
-      {/* Mobile Top Header Strip */}
-      <div className="lg:hidden sticky top-0 z-40 bg-white/95 dark:bg-[#090E17]/90 backdrop-blur-md border-b border-slate-200 dark:border-white/10 text-[#0B0F17] dark:text-white flex items-center justify-between px-4 h-15 print:hidden">
-        <div className="flex items-center gap-2.5">
-          <BrandLogo className="w-9 h-9" />
-          <div>
-            <span className="text-xs font-bold text-[#0B0F17] dark:text-white block leading-tight">
+      {/* Mobile Top Header Strip (Compact 56px sticky bar <= 15% cap) */}
+      <header className="lg:hidden sticky top-0 z-40 bg-white/95 dark:bg-[#090E17]/90 backdrop-blur-md border-b border-slate-200 dark:border-white/10 text-[#0B0F17] dark:text-white flex items-center justify-between px-3 sm:px-4 h-14 print:hidden">
+        <button
+          onClick={() => handleTabClick('dashboard')}
+          className="flex items-center gap-2 text-left min-w-0 cursor-pointer"
+        >
+          <BrandLogo className="w-8 h-8 shrink-0" />
+          <div className="min-w-0">
+            <span className="text-xs font-bold text-[#0B0F17] dark:text-white block leading-tight truncate">
               Anointed Engineering
             </span>
-            <span className="text-[10px] text-slate-500 dark:text-slate-400 block leading-tight">
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 block leading-tight truncate">
               Print Fleet Logistics
             </span>
           </div>
-        </div>
+        </button>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={toggleTheme}
             aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            className="p-2 rounded-full text-slate-600 dark:text-sky-400 bg-slate-100 dark:bg-white/10 transition cursor-pointer"
+            className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-full text-slate-600 dark:text-sky-400 bg-slate-100 dark:bg-white/10 transition cursor-pointer"
           >
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
           <button
-            onClick={onOpenGuide}
-            className="px-2.5 py-1.5 text-blue-900 dark:text-sky-300 bg-[#EFF6FF] dark:bg-blue-500/15 border border-blue-200 dark:border-blue-500/30 rounded-full text-xs font-semibold flex items-center gap-1 cursor-pointer"
-            title="Open Beginner Guide"
-          >
-            <BookOpen className="w-3.5 h-3.5 text-blue-700 dark:text-sky-400" />
-            <span className="hidden sm:inline">Guide</span>
-          </button>
-
-          <button
             onClick={onOpenDispatch}
-            className="px-3 py-1.5 text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full text-xs font-semibold flex items-center gap-1 cursor-pointer"
+            className="min-h-[40px] px-3 text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
             title="Dispatch to branch"
           >
             <Truck className="w-3.5 h-3.5 text-sky-400 dark:text-[#06090F]" />
-            <span className="hidden sm:inline">Dispatch</span>
+            <span>Dispatch</span>
           </button>
 
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:text-[#0B0F17] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer"
             aria-label="Open navigation menu"
           >
             <Menu className="w-5 h-5" />
           </button>
         </div>
-      </div>
+      </header>
 
       {/* Mobile Slide-over Drawer Backdrop & Drawer */}
       {mobileMenuOpen && (

@@ -99,10 +99,10 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
       )}
 
       {/* Modern Blue / Moving Dark Gradient Header */}
-      <section className="bg-blue-hero rounded-3xl p-6 sm:p-8 border border-blue-200/70 dark:border-blue-500/20 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+      <section className="bg-blue-hero rounded-3xl p-4 sm:p-8 border border-blue-200/70 dark:border-blue-500/20 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-5">
         <div>
           <div className="text-xs font-medium text-blue-950/75 dark:text-slate-400 flex items-center gap-2">
-            <BrandLogo className="w-6 h-6" />
+            <BrandLogo className="w-6 h-6 shrink-0" />
             <span className="font-semibold text-[#0B0F17] dark:text-white">AESL Location Directory</span>
             <span aria-hidden="true">·</span>
             <span className="font-mono">{branches.length} Active Sites</span>
@@ -115,25 +115,25 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap shrink-0">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2.5 sm:flex-wrap shrink-0">
           <button
             onClick={() => {
               loadAESLBranches();
               showToast(`Official AESL ${AESL_LOCATIONS.length} locations restored successfully.`);
             }}
             title="Reload official Anointed Engineering Services locations"
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 border border-slate-200/90 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/15 transition-colors cursor-pointer whitespace-nowrap"
+            className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 border border-slate-200/90 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/15 transition-colors cursor-pointer whitespace-nowrap"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-blue-700 dark:text-sky-400" />
-            <span>Reload AESL {AESL_LOCATIONS.length} Locations</span>
+            <RotateCcw className="w-3.5 h-3.5 text-blue-700 dark:text-sky-400 shrink-0" />
+            <span className="truncate">Reload {AESL_LOCATIONS.length} Sites</span>
           </button>
 
           <button
             onClick={onOpenAddBranch}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
+            className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
           >
-            <Plus className="w-4 h-4" />
-            <span>Add New Location</span>
+            <Plus className="w-4 h-4 shrink-0" />
+            <span>Add Location</span>
           </button>
         </div>
       </section>
@@ -141,40 +141,40 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
       {/* Category Tabs & Quick Search */}
       <div className="bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 p-4 space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
             <button
               onClick={() => setCategoryFilter('all')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+              className={`min-h-[36px] px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                 categoryFilter === 'all'
                   ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F]'
                   : 'bg-white dark:bg-white/5 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-white/10 hover:text-[#0B0F17] dark:hover:text-white'
               }`}
             >
-              All Locations ({branches.length})
+              All ({branches.length})
             </button>
 
             <button
               onClick={() => setCategoryFilter('Headquarters')}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+              className={`min-h-[36px] inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                 categoryFilter === 'Headquarters'
                   ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F]'
                   : 'bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-white/10 hover:text-[#0B0F17] dark:hover:text-white'
               }`}
             >
               <Briefcase className="w-3.5 h-3.5" />
-              <span>Headquarters Offices ({hqCount})</span>
+              <span>HQ Offices ({hqCount})</span>
             </button>
 
             <button
               onClick={() => setCategoryFilter('Regional Branch')}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+              className={`min-h-[36px] inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                 categoryFilter === 'Regional Branch'
                   ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F]'
                   : 'bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-white/10 hover:text-[#0B0F17] dark:hover:text-white'
               }`}
             >
               <MapPin className="w-3.5 h-3.5" />
-              <span>Regional Branches ({regionalCount})</span>
+              <span>Regional ({regionalCount})</span>
             </button>
           </div>
 
@@ -185,7 +185,7 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search Adenta, Bolga, Workshop, HR..."
-              className="w-full pl-9 pr-3 py-2 text-xs bg-white dark:bg-[#0B111B] border border-slate-200 dark:border-white/15 rounded-xl text-[#0B0F17] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500"
+              className="w-full pl-9 pr-8 py-2 text-base sm:text-xs bg-white dark:bg-[#0B111B] border border-slate-200 dark:border-white/15 rounded-xl text-[#0B0F17] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500"
             />
             {searchQuery && (
               <button
@@ -273,90 +273,90 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1.5 flex-wrap">
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-                      {selectedBranch.address}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 text-xs text-slate-500 dark:text-slate-400 mt-2 sm:flex-wrap">
+                    <span className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
+                      <span>{selectedBranch.address}</span>
                     </span>
-                    <span aria-hidden="true">·</span>
-                    <span className="flex items-center gap-1 font-semibold text-slate-700 dark:text-slate-200">
-                      <Briefcase className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-                      Lead: {selectedBranch.managerName}
+                    <span className="hidden sm:inline" aria-hidden="true">·</span>
+                    <span className="flex items-center gap-1.5 font-semibold text-slate-700 dark:text-slate-200">
+                      <Briefcase className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
+                      <span>Lead: {selectedBranch.managerName}</span>
                     </span>
-                    <span aria-hidden="true">·</span>
-                    <span className="flex items-center gap-1 font-mono">
-                      <Phone className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-                      {selectedBranch.contactPhone}
+                    <span className="hidden sm:inline" aria-hidden="true">·</span>
+                    <span className="flex items-center gap-1.5 font-mono">
+                      <Phone className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
+                      <span>{selectedBranch.contactPhone}</span>
                     </span>
-                    <span aria-hidden="true">·</span>
-                    <span className="flex items-center gap-1">
-                      <Mail className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-                      {selectedBranch.email}
+                    <span className="hidden sm:inline" aria-hidden="true">·</span>
+                    <span className="flex items-center gap-1.5 break-all">
+                      <Mail className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
+                      <span>{selectedBranch.email}</span>
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 self-start lg:self-auto flex-wrap">
+              <div className="grid grid-cols-3 sm:flex sm:items-center gap-2 w-full lg:w-auto shrink-0">
                 <button
                   onClick={() => setEditModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/10 transition-colors cursor-pointer whitespace-nowrap"
+                  className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/10 transition-colors cursor-pointer whitespace-nowrap"
                 >
-                  <Edit2 className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-                  <span>Edit Details</span>
+                  <Edit2 className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0" />
+                  <span>Edit</span>
                 </button>
 
                 <button
                   onClick={() => onOpenLogUsageForBranch(selectedBranch.id)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/5 border border-slate-200 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/10 transition-colors cursor-pointer whitespace-nowrap"
+                  className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-2 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/5 border border-slate-200 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/10 transition-colors cursor-pointer whitespace-nowrap"
                 >
-                  <Send className="w-3.5 h-3.5 text-blue-600 dark:text-sky-400" />
+                  <Send className="w-3.5 h-3.5 text-blue-600 dark:text-sky-400 shrink-0" />
                   <span>Log Usage</span>
                 </button>
 
                 <button
                   onClick={() => onOpenDispatchForBranch(selectedBranch.id)}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
+                  className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
                 >
-                  <Truck className="w-3.5 h-3.5 text-sky-400 dark:text-[#06090F]" />
-                  <span>Dispatch Here</span>
+                  <Truck className="w-3.5 h-3.5 text-sky-400 dark:text-[#06090F] shrink-0" />
+                  <span>Dispatch</span>
                 </button>
               </div>
             </div>
 
             {/* Sub-tab selection */}
-            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-white/10 flex items-center gap-2 flex-wrap">
+            <div className="mt-5 pt-4 border-t border-slate-100 dark:border-white/10 flex items-center gap-2 overflow-x-auto no-scrollbar">
               <button
                 onClick={() => setActiveSubTab('inventory')}
-                className={`px-3.5 py-1.5 text-xs font-semibold rounded-full transition-colors cursor-pointer whitespace-nowrap ${
+                className={`min-h-[38px] px-3.5 py-1.5 text-xs font-semibold rounded-full transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                   activeSubTab === 'inventory'
                     ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F]'
                     : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
                 }`}
               >
-                On-Site Cartridge Stock ({branchStock.length})
+                On-Site Stock ({branchStock.length})
               </button>
 
               <button
                 onClick={() => setActiveSubTab('history')}
-                className={`px-3.5 py-1.5 text-xs font-semibold rounded-full transition-colors cursor-pointer whitespace-nowrap ${
+                className={`min-h-[38px] px-3.5 py-1.5 text-xs font-semibold rounded-full transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                   activeSubTab === 'history'
                     ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F]'
                     : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
                 }`}
               >
-                Delivery & Usage Ledger ({branchDispatches.length + branchUsages.length})
+                Ledger ({branchDispatches.length + branchUsages.length})
               </button>
 
               <button
                 onClick={() => setActiveSubTab('printers')}
-                className={`px-3.5 py-1.5 text-xs font-semibold rounded-full transition-colors cursor-pointer whitespace-nowrap ${
+                className={`min-h-[38px] px-3.5 py-1.5 text-xs font-semibold rounded-full transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                   activeSubTab === 'printers'
                     ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F]'
                     : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
                 }`}
               >
-                Printers Deployed ({selectedBranch.printers.length})
+                Printers ({selectedBranch.printers.length})
               </button>
             </div>
           </div>
@@ -391,66 +391,116 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
                   </button>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-[#F6F8FC] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
-                      <tr>
-                        <th className="py-3 px-4">Cartridge Model</th>
-                        <th className="py-3 px-4">Color</th>
-                        <th className="py-3 px-4 text-right">Total Delivered</th>
-                        <th className="py-3 px-4 text-right">In Transit</th>
-                        <th className="py-3 px-4 text-right">Consumed</th>
-                        <th className="py-3 px-4 text-right">On-Site Reserve</th>
-                        <th className="py-3 px-4 text-right">Quick Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                      {branchStock.map((item) => (
-                        <tr key={item.cartridgeId} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
-                          <td className="py-3 px-4 font-semibold text-[#0B0F17] dark:text-white">
-                            {item.cartridgeModel}
-                          </td>
-                          <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
-                            {item.cartridgeColor}
-                          </td>
-                          <td className="py-3 px-4 text-right font-mono tabular-nums text-slate-700 dark:text-slate-200">
-                            {item.totalReceived}
-                          </td>
-                          <td className="py-3 px-4 text-right font-mono tabular-nums">
-                            {item.inTransitCount > 0 ? (
-                              <span className="text-amber-700 dark:text-amber-400 font-semibold">{item.inTransitCount}</span>
-                            ) : (
-                              <span className="text-slate-400 dark:text-slate-600">0</span>
-                            )}
-                          </td>
-                          <td className="py-3 px-4 text-right font-mono tabular-nums text-slate-700 dark:text-slate-200">
-                            {item.totalUsed}
-                          </td>
-                          <td className="py-3 px-4 text-right font-mono tabular-nums">
-                            <span className={`font-semibold ${item.onHandCount <= 1 ? 'text-rose-600 dark:text-rose-400' : 'text-blue-700 dark:text-sky-400'}`}>
-                              {item.onHandCount} units
-                            </span>
-                          </td>
-                          <td className="py-3 px-4 text-right space-x-2">
-                            <button
-                              onClick={() => onOpenLogUsageForBranch(selectedBranch.id)}
-                              className="text-xs font-semibold text-blue-700 dark:text-sky-400 hover:underline cursor-pointer"
-                            >
-                              Log Used
-                            </button>
-                            <span className="text-slate-300 dark:text-slate-600">·</span>
-                            <button
-                              onClick={() => onOpenDispatchForBranch(selectedBranch.id)}
-                              className="text-xs font-semibold text-[#0B0F17] dark:text-white hover:underline cursor-pointer"
-                            >
-                              Dispatch More
-                            </button>
-                          </td>
+                <>
+                  {/* Mobile Stock Cards */}
+                  <div className="md:hidden divide-y divide-slate-100 dark:divide-white/5">
+                    {branchStock.map((item) => (
+                      <div key={item.cartridgeId} className="p-4 space-y-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h4 className="font-bold text-sm text-[#0B0F17] dark:text-white">{item.cartridgeModel}</h4>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400">{item.cartridgeColor}</span>
+                          </div>
+                          <span className={`font-mono text-sm font-bold ${item.onHandCount <= 1 ? 'text-rose-600 dark:text-rose-400' : 'text-blue-700 dark:text-sky-400'}`}>
+                            {item.onHandCount} units left
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                          <div className="bg-[#F8FAFD] dark:bg-white/[0.03] rounded-xl py-1.5">
+                            <span className="text-[10px] text-slate-400 block">Delivered</span>
+                            <span className="font-mono font-bold text-[#0B0F17] dark:text-white">{item.totalReceived}</span>
+                          </div>
+                          <div className="bg-[#F8FAFD] dark:bg-white/[0.03] rounded-xl py-1.5">
+                            <span className="text-[10px] text-slate-400 block">In Transit</span>
+                            <span className={`font-mono font-bold ${item.inTransitCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}`}>{item.inTransitCount}</span>
+                          </div>
+                          <div className="bg-[#F8FAFD] dark:bg-white/[0.03] rounded-xl py-1.5">
+                            <span className="text-[10px] text-slate-400 block">Consumed</span>
+                            <span className="font-mono font-bold text-[#0B0F17] dark:text-white">{item.totalUsed}</span>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 pt-1">
+                          <button
+                            onClick={() => onOpenLogUsageForBranch(selectedBranch.id)}
+                            className="min-h-[40px] px-3 py-1.5 text-xs font-semibold text-blue-700 dark:text-sky-300 bg-[#EFF6FF] dark:bg-blue-500/15 rounded-full cursor-pointer"
+                          >
+                            Log Used
+                          </button>
+                          <button
+                            onClick={() => onOpenDispatchForBranch(selectedBranch.id)}
+                            className="min-h-[40px] px-3 py-1.5 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full cursor-pointer"
+                          >
+                            Dispatch More
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Desktop Table */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-[#F6F8FC] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
+                        <tr>
+                          <th className="py-3 px-4">Cartridge Model</th>
+                          <th className="py-3 px-4">Color</th>
+                          <th className="py-3 px-4 text-right">Total Delivered</th>
+                          <th className="py-3 px-4 text-right">In Transit</th>
+                          <th className="py-3 px-4 text-right">Consumed</th>
+                          <th className="py-3 px-4 text-right">On-Site Reserve</th>
+                          <th className="py-3 px-4 text-right">Quick Action</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                        {branchStock.map((item) => (
+                          <tr key={item.cartridgeId} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
+                            <td className="py-3 px-4 font-semibold text-[#0B0F17] dark:text-white">
+                              {item.cartridgeModel}
+                            </td>
+                            <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
+                              {item.cartridgeColor}
+                            </td>
+                            <td className="py-3 px-4 text-right font-mono tabular-nums text-slate-700 dark:text-slate-200">
+                              {item.totalReceived}
+                            </td>
+                            <td className="py-3 px-4 text-right font-mono tabular-nums">
+                              {item.inTransitCount > 0 ? (
+                                <span className="text-amber-700 dark:text-amber-400 font-semibold">{item.inTransitCount}</span>
+                              ) : (
+                                <span className="text-slate-400 dark:text-slate-600">0</span>
+                              )}
+                            </td>
+                            <td className="py-3 px-4 text-right font-mono tabular-nums text-slate-700 dark:text-slate-200">
+                              {item.totalUsed}
+                            </td>
+                            <td className="py-3 px-4 text-right font-mono tabular-nums">
+                              <span className={`font-semibold ${item.onHandCount <= 1 ? 'text-rose-600 dark:text-rose-400' : 'text-blue-700 dark:text-sky-400'}`}>
+                                {item.onHandCount} units
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-right space-x-2">
+                              <button
+                                onClick={() => onOpenLogUsageForBranch(selectedBranch.id)}
+                                className="text-xs font-semibold text-blue-700 dark:text-sky-400 hover:underline cursor-pointer"
+                              >
+                                Log Used
+                              </button>
+                              <span className="text-slate-300 dark:text-slate-600">·</span>
+                              <button
+                                onClick={() => onOpenDispatchForBranch(selectedBranch.id)}
+                                className="text-xs font-semibold text-[#0B0F17] dark:text-white hover:underline cursor-pointer"
+                              >
+                                Dispatch More
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               )}
             </div>
           )}

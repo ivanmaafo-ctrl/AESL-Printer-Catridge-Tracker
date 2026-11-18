@@ -80,27 +80,31 @@ export const DispatchModal: React.FC<DispatchModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/65 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-[#0D1420] rounded-3xl shadow-2xl border border-slate-200 dark:border-white/15 w-full max-w-lg overflow-hidden transition-all animate-in fade-in zoom-in-95 duration-150">
-        
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/65 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="bg-white dark:bg-[#0D1420] rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-white/15 w-full max-w-lg max-h-[92dvh] flex flex-col overflow-hidden transition-all animate-in fade-in zoom-in-95 duration-150">
+        <div className="sm:hidden pt-2.5 flex justify-center shrink-0">
+          <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+        </div>
+
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-blue-900/10 dark:border-white/10 bg-blue-hero">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] rounded-2xl shadow-xs">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-blue-900/10 dark:border-white/10 bg-blue-hero shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="p-2 bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] rounded-2xl shadow-xs shrink-0">
               <Truck className="w-5 h-5" />
             </div>
-            <div>
-              <h2 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
+            <div className="min-w-0">
+              <h2 className="text-base font-bold text-slate-900 dark:text-white leading-tight truncate">
                 Dispatch Cartridges to Branch
               </h2>
-              <p className="text-xs text-slate-600 dark:text-slate-400">
+              <p className="text-xs text-slate-600 dark:text-slate-400 truncate">
                 Allocate and ship stock from central warehouse
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-full hover:bg-white/70 dark:hover:bg-white/10 transition-colors cursor-pointer"
+            aria-label="Close dispatch modal"
+            className="min-w-[40px] min-h-[40px] flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-full hover:bg-white/70 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -108,7 +112,7 @@ export const DispatchModal: React.FC<DispatchModalProps> = ({
 
         {/* Modal Body / Empty Prerequisite Check */}
         {branches.length === 0 || cartridges.length === 0 ? (
-          <div className="p-6 text-center space-y-3">
+          <div className="p-5 sm:p-6 pb-safe text-center space-y-3 overflow-y-auto flex-1">
             <AlertCircle className="w-10 h-10 text-amber-500 mx-auto" />
             <h3 className="text-sm font-bold text-slate-900 dark:text-white">Setup Required Before Dispatching</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
@@ -122,14 +126,14 @@ export const DispatchModal: React.FC<DispatchModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-5 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors shadow-xs cursor-pointer"
+                className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors shadow-xs cursor-pointer"
               >
                 Got It
               </button>
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
             {error && (
               <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-500/15 border border-rose-200 dark:border-rose-500/30 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
@@ -153,7 +157,7 @@ export const DispatchModal: React.FC<DispatchModalProps> = ({
                 value={branchId}
                 onChange={(e) => setBranchId(e.target.value)}
                 required
-                className="w-full px-3.5 py-2 text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                className="w-full min-h-[44px] px-3.5 py-2 text-base sm:text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
               >
                 <option value="" disabled>Select target branch / office</option>
                 {branches.some((b) => b.category === 'Headquarters' || b.code.startsWith('HQ')) && (
@@ -203,7 +207,7 @@ export const DispatchModal: React.FC<DispatchModalProps> = ({
                 value={cartridgeId}
                 onChange={(e) => setCartridgeId(e.target.value)}
                 required
-                className="w-full px-3.5 py-2 text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                className="w-full min-h-[44px] px-3.5 py-2 text-base sm:text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
               >
                 <option value="" disabled>Select cartridge SKU</option>
                 {cartridges.map((c) => (
@@ -227,7 +231,7 @@ export const DispatchModal: React.FC<DispatchModalProps> = ({
                   value={quantity}
                   onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                   required
-                  className="w-full px-3.5 py-2 text-sm font-mono bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                  className="w-full min-h-[44px] px-3.5 py-2 text-base sm:text-sm font-mono bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
                 />
               </div>
 
@@ -238,7 +242,7 @@ export const DispatchModal: React.FC<DispatchModalProps> = ({
                 <select
                   value={carrier}
                   onChange={(e) => setCarrier(e.target.value)}
-                  className="w-full px-3.5 py-2 text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                  className="w-full min-h-[44px] px-3.5 py-2 text-base sm:text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
                 >
                   <option value="AESL Logistics Vehicle">AESL Logistics Vehicle</option>
                   <option value="Internal Courier Van">Internal Courier Van</option>
@@ -261,7 +265,7 @@ export const DispatchModal: React.FC<DispatchModalProps> = ({
                   value={trackingNumber}
                   onChange={(e) => setTrackingNumber(e.target.value)}
                   placeholder="Auto-generated if blank"
-                  className="w-full px-3.5 py-2 text-sm font-mono bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                  className="w-full min-h-[44px] px-3.5 py-2 text-base sm:text-sm font-mono bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
                 />
               </div>
 
@@ -274,7 +278,7 @@ export const DispatchModal: React.FC<DispatchModalProps> = ({
                   value={dispatchedBy}
                   onChange={(e) => setDispatchedBy(e.target.value)}
                   required
-                  className="w-full px-3.5 py-2 text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                  className="w-full min-h-[44px] px-3.5 py-2 text-base sm:text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
                 />
               </div>
             </div>
@@ -289,25 +293,25 @@ export const DispatchModal: React.FC<DispatchModalProps> = ({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="e.g. Urgent replacement for teller printer; deliver before 2 PM"
-                className="w-full px-3.5 py-2 text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                className="w-full min-h-[44px] px-3.5 py-2 text-base sm:text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
               />
             </div>
 
             {/* Action buttons */}
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-white/10">
+            <div className="grid grid-cols-2 sm:flex items-center justify-end gap-2 pt-3 pb-safe sm:pb-0 border-t border-slate-100 dark:border-white/10">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-white/[0.06] border border-slate-200 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                className="min-h-[44px] px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-white/[0.06] border border-slate-200 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/10 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={!currentCartridge || currentCartridge.centralStock === 0}
-                className="px-5 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-xs cursor-pointer"
+                className="min-h-[44px] px-5 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-xs cursor-pointer"
               >
-                Confirm & Dispatch Stock
+                Confirm Dispatch
               </button>
             </div>
           </form>

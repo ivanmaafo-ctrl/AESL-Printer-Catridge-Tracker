@@ -15,6 +15,16 @@ import { ReportsView } from './components/ReportsView';
 import { AdminConsoleView } from './components/AdminConsoleView';
 import { AdminLoginView } from './components/AdminLoginView';
 import { BrandLogo, BrandLoaderScreen } from './components/BrandLogo';
+import {
+  Activity,
+  Package,
+  Building2,
+  Truck,
+  Send,
+  AlertTriangle,
+  FileSpreadsheet,
+  Shield,
+} from 'lucide-react';
 
 import { DispatchModal } from './components/Modals/DispatchModal';
 import { RestockModal } from './components/Modals/RestockModal';
@@ -25,7 +35,7 @@ import { WalkthroughModal } from './components/Modals/WalkthroughModal';
 
 const AppContent: React.FC = () => {
   const { authReady, isAuthenticated } = useAdminAuth();
-  const { inventoryLoading } = useInventory();
+  const { inventoryLoading, lowStockAlerts } = useInventory();
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [isBooting, setIsBooting] = useState(true);
@@ -117,7 +127,55 @@ const AppContent: React.FC = () => {
 
       {/* Main Content Area offset by fixed desktop sidebar */}
       <div className="lg:pl-64 xl:pl-72 print:pl-0 flex-1 flex flex-col min-w-0">
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 print:p-0 print:max-w-none">
+        {/* Mobile 1-Tap Scrollable View Switcher (non-sticky to keep sticky chrome under 15%) */}
+        <nav
+          aria-label="Mobile view navigation"
+          className="lg:hidden print:hidden border-b border-slate-200/80 dark:border-white/10 bg-[#F8FAFD] dark:bg-[#090E17]/75 px-3 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar"
+        >
+          {(
+            [
+              { id: 'dashboard', label: 'Overview', icon: Activity },
+              { id: 'inventory', label: 'Stock', icon: Package },
+              { id: 'branches', label: 'Branches', icon: Building2 },
+              { id: 'dispatches', label: 'Dispatches', icon: Truck },
+              { id: 'usage', label: 'Usage', icon: Send },
+              {
+                id: 'reorder',
+                label: lowStockAlerts.length > 0 ? `Alerts (${lowStockAlerts.length})` : 'Alerts',
+                icon: AlertTriangle,
+              },
+              { id: 'reports', label: 'Reports', icon: FileSpreadsheet },
+              { id: 'admin', label: 'Admin', icon: Shield },
+            ] as Array<{ id: ActiveTab; label: string; icon: React.ComponentType<{ className?: string }> }>
+          ).map((item) => {
+            const Icon = item.icon;
+            const active = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`min-h-[38px] px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
+                  active
+                    ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] shadow-2xs'
+                    : 'bg-white dark:bg-white/5 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-white/10'
+                }`}
+              >
+                <Icon
+                  className={`w-3.5 h-3.5 shrink-0 ${
+                    active
+                      ? 'text-sky-400 dark:text-[#06090F]'
+                      : item.id === 'reorder' && lowStockAlerts.length > 0
+                      ? 'text-amber-600 dark:text-amber-400'
+                      : 'text-slate-400 dark:text-slate-400'
+                  }`}
+                />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+
+        <main className="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-8 print:p-0 print:max-w-none">
           {/* View Switcher */}
           {activeTab === 'dashboard' && (
             <DashboardView
@@ -175,13 +233,13 @@ const AppContent: React.FC = () => {
         </main>
 
         {/* Quiet Corporate Footer */}
-        <footer className="border-t border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#070B12]/80 backdrop-blur-sm py-4 mt-auto print:hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-2">
-            <div className="flex items-center gap-2.5">
-              <BrandLogo className="w-6 h-6" />
+        <footer className="border-t border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#070B12]/80 backdrop-blur-sm py-4 pb-safe mt-auto print:hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-2 text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+              <BrandLogo className="w-6 h-6 shrink-0" />
               <span className="font-bold text-slate-800 dark:text-slate-100">Anointed Engineering Services Limited</span>
-              <span aria-hidden="true">·</span>
-              <span>IT Department · Multi-Branch Printer Cartridge Logistics</span>
+              <span className="hidden sm:inline" aria-hidden="true">·</span>
+              <span className="hidden sm:inline">IT Department · Multi-Branch Printer Cartridge Logistics</span>
             </div>
             <div>
               <span>Cloud-Synced IT Warehouse & Site Operations Portal</span>

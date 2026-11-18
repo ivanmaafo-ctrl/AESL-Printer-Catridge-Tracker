@@ -289,7 +289,7 @@ function toIsoDateOrder(val: unknown): number {
 }
 
 export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { authReady, isAuthenticated, currentUser } = useAdminAuth();
+  const { authReady, isAuthenticated, isAdmin, currentUser } = useAdminAuth();
 
   const [cartridges, setCartridges] = useState<CartridgeSKU[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -365,6 +365,85 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             batch2.set(doc(db, 'dispatches', sanitizeId(d.id, 'dsp')), buildDispatchDoc(d, uid));
           });
           await batch2.commit();
+          try {
+            localStorage.setItem('aesl_catalog_v2_synced', 'true');
+          } catch {
+            // ignore storage errors
+          }
+        } else if (!cartSnap.empty && isAdmin) {
+          let alreadySynced = false;
+          try {
+            alreadySynced = localStorage.getItem('aesl_catalog_v2_synced') === 'true';
+          } catch {
+            alreadySynced = false;
+          }
+
+          if (!alreadySynced) {
+            const existingMap = new Map<string, any>();
+            cartSnap.docs.forEach((d) => existingMap.set(d.id, d.data()));
+
+            const batchSync = writeBatch(db);
+            let opCount = 0;
+
+            const sku285a = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-285a');
+            const sku1107a = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-1107a');
+            const sku1500a = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-1500a');
+            const skuExv14 = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-exv14');
+
+            if (sku285a && !existingMap.has('cart-285a')) {
+              batchSync.set(doc(db, 'cartridges', 'cart-285a'), buildCartridgeDoc(sku285a, uid));
+              opCount += 1;
+            }
+            if (sku1107a && existingMap.has('cart-1107a')) {
+              const d1107 = existingMap.get('cart-1107a');
+              if (d1107.minThreshold === 15) {
+                batchSync.update(doc(db, 'cartridges', 'cart-1107a'), {
+                  minThreshold: 20,
+                  isBestSeller: true,
+                  specification: sku1107a.specification,
+                  notes: sku1107a.notes,
+                  updatedByUid: uid,
+                  updatedAt: serverTimestamp(),
+                });
+                opCount += 1;
+              }
+            }
+            if (sku1500a && existingMap.has('cart-1500a')) {
+              const d1500 = existingMap.get('cart-1500a');
+              if (d1500.minThreshold === 15 || !d1500.isBestSeller) {
+                batchSync.update(doc(db, 'cartridges', 'cart-1500a'), {
+                  minThreshold: 20,
+                  isBestSeller: true,
+                  specification: sku1500a.specification,
+                  notes: sku1500a.notes,
+                  updatedByUid: uid,
+                  updatedAt: serverTimestamp(),
+                });
+                opCount += 1;
+              }
+            }
+            if (skuExv14 && existingMap.has('cart-exv14')) {
+              const dExv14 = existingMap.get('cart-exv14');
+              if (dExv14.minThreshold === 15) {
+                batchSync.update(doc(db, 'cartridges', 'cart-exv14'), {
+                  minThreshold: 5,
+                  notes: skuExv14.notes,
+                  updatedByUid: uid,
+                  updatedAt: serverTimestamp(),
+                });
+                opCount += 1;
+              }
+            }
+
+            if (opCount > 0) {
+              await batchSync.commit();
+            }
+            try {
+              localStorage.setItem('aesl_catalog_v2_synced', 'true');
+            } catch {
+              // ignore storage errors
+            }
+          }
         }
       } catch (err) {
         console.warn('Initial seed check skipped or handled:', err);
@@ -560,7 +639,9 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (cart.centralStock < threshold) {
         const deficit = Math.max(0, threshold - cart.centralStock);
         const packMultiple = cart.reorderPackSize || 1;
-        const suggestedReorder = Math.max(packMultiple, Math.ceil(deficit / packMultiple) * packMultiple);
+        const suggestedReorder = cart.isBestSeller
+          ? 40
+          : Math.max(packMultiple, Math.ceil(deficit / packMultiple) * packMultiple);
         const criticalCutoff = Math.max(1, Math.floor(threshold / 3));
 
         alerts.push({

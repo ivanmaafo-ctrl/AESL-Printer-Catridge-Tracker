@@ -213,11 +213,11 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Modern Blue / Moving Dark Gradient Admin Header */}
-      <section className="bg-blue-hero rounded-3xl p-6 sm:p-8 border border-blue-200/70 dark:border-blue-500/20">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div className="flex items-start gap-3.5">
-            <BrandLogo className="w-12 h-12 shrink-0" />
-            <div>
+      <section className="bg-blue-hero rounded-3xl p-4 sm:p-8 border border-blue-200/70 dark:border-blue-500/20">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-5">
+          <div className="flex items-start gap-3 sm:gap-3.5">
+            <BrandLogo className="w-10 h-10 sm:w-12 sm:h-12 shrink-0" />
+            <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap text-xs">
                 <span className={`font-semibold ${isSuperAdmin ? 'text-amber-700 dark:text-amber-400' : 'text-blue-800 dark:text-sky-400'}`}>
                   {isSuperAdmin ? 'Tier 1 · Super Admin Authority' : 'Tier 2 · Operations Admin'}
@@ -227,7 +227,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                   AESL IT Department
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0B0F17] dark:text-white mt-1">
+              <h1 className="text-xl sm:text-3xl font-bold tracking-tight text-[#0B0F17] dark:text-white mt-1">
                 Master Administration & Backup Console
               </h1>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-2xl">
@@ -236,14 +236,16 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 self-start lg:self-auto flex-wrap">
-            <div className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/90 dark:bg-white/10 border border-slate-200/80 dark:border-white/15 text-xs">
-              <span className="font-bold text-[#0B0F17] dark:text-white">{currentUser?.displayName}</span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">({currentUser?.email || currentUser?.username})</span>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full lg:w-auto flex-wrap">
+            <div className="flex items-center justify-between sm:justify-start gap-2 px-3.5 py-2 rounded-2xl sm:rounded-full bg-white/90 dark:bg-white/10 border border-slate-200/80 dark:border-white/15 text-xs min-w-0">
+              <div className="flex items-center gap-1.5 min-w-0 truncate">
+                <span className="font-bold text-[#0B0F17] dark:text-white shrink-0">{currentUser?.displayName}</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono truncate">({currentUser?.email || currentUser?.username})</span>
+              </div>
               <button
                 type="button"
                 onClick={logout}
-                className="ml-1 inline-flex items-center gap-1 px-2.5 py-0.5 bg-slate-100 dark:bg-white/10 hover:bg-rose-50 dark:hover:bg-rose-500/20 text-slate-700 dark:text-slate-200 hover:text-rose-700 dark:hover:text-rose-300 rounded-full text-[11px] font-semibold transition cursor-pointer"
+                className="shrink-0 ml-1 inline-flex items-center gap-1 px-2.5 py-1 min-h-[32px] bg-slate-100 dark:bg-white/10 hover:bg-rose-50 dark:hover:bg-rose-500/20 text-slate-700 dark:text-slate-200 hover:text-rose-700 dark:hover:text-rose-300 rounded-full text-[11px] font-semibold transition cursor-pointer"
                 title="Sign out of AESL Portal"
               >
                 <LogOut className="w-3 h-3" />
@@ -251,42 +253,44 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
               </button>
             </div>
 
-            <button
-              onClick={onOpenAddBranch}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 hover:bg-slate-50 dark:hover:bg-white/15 border border-slate-200/90 dark:border-white/15 rounded-full transition-colors cursor-pointer whitespace-nowrap"
-              title="Add a new AESL office, workshop, or branch location"
-            >
-              <Plus className="w-4 h-4 text-blue-700 dark:text-sky-400" />
-              <span>Add Location</span>
-            </button>
+            <div className="grid grid-cols-2 sm:flex items-center gap-2 flex-wrap">
+              <button
+                onClick={onOpenAddBranch}
+                className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 hover:bg-slate-50 dark:hover:bg-white/15 border border-slate-200/90 dark:border-white/15 rounded-full transition-colors cursor-pointer whitespace-nowrap"
+                title="Add a new AESL office, workshop, or branch location"
+              >
+                <Plus className="w-4 h-4 text-blue-700 dark:text-sky-400" />
+                <span>Add Location</span>
+              </button>
 
-            <button
-              onClick={handleDownloadBackup}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 hover:bg-slate-50 dark:hover:bg-white/15 border border-slate-200/90 dark:border-white/15 rounded-full transition-colors cursor-pointer whitespace-nowrap"
-            >
-              <Download className="w-4 h-4 text-blue-700 dark:text-sky-400" />
-              <span>Download JSON Backup</span>
-            </button>
+              <button
+                onClick={handleDownloadBackup}
+                className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 hover:bg-slate-50 dark:hover:bg-white/15 border border-slate-200/90 dark:border-white/15 rounded-full transition-colors cursor-pointer whitespace-nowrap"
+              >
+                <Download className="w-4 h-4 text-blue-700 dark:text-sky-400" />
+                <span>JSON Backup</span>
+              </button>
 
-            <button
-              onClick={() => {
-                if (!isSuperAdmin) {
-                  showToast('error', 'Restoring database from backup requires Super Admin clearance.');
-                  return;
-                }
-                fileInputRef.current?.click();
-              }}
-              className={`inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-full transition-colors cursor-pointer whitespace-nowrap ${
-                isSuperAdmin
-                  ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] hover:bg-slate-800 dark:hover:bg-sky-300'
-                  : 'bg-white/60 dark:bg-white/5 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10'
-              }`}
-              title={!isSuperAdmin ? 'Requires Super Admin clearance' : 'Upload backup file'}
-            >
-              <Upload className="w-4 h-4" />
-              <span>Restore Backup</span>
-              {!isSuperAdmin && <Lock className="w-3 h-3 ml-0.5 text-amber-600 dark:text-amber-400" />}
-            </button>
+              <button
+                onClick={() => {
+                  if (!isSuperAdmin) {
+                    showToast('error', 'Restoring database from backup requires Super Admin clearance.');
+                    return;
+                  }
+                  fileInputRef.current?.click();
+                }}
+                className={`col-span-2 sm:col-span-1 min-h-[42px] inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-full transition-colors cursor-pointer whitespace-nowrap ${
+                  isSuperAdmin
+                    ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] hover:bg-slate-800 dark:hover:bg-sky-300'
+                    : 'bg-white/60 dark:bg-white/5 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10'
+                }`}
+                title={!isSuperAdmin ? 'Requires Super Admin clearance' : 'Upload backup file'}
+              >
+                <Upload className="w-4 h-4" />
+                <span>Restore Backup</span>
+                {!isSuperAdmin && <Lock className="w-3 h-3 ml-0.5 text-amber-600 dark:text-amber-400" />}
+              </button>
+            </div>
             <input
               type="file"
               ref={fileInputRef}
@@ -298,7 +302,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
         </div>
 
         {/* Admin Sub-Tabs */}
-        <div className="mt-6 pt-4 border-t border-blue-900/10 dark:border-white/10 flex items-center gap-2 overflow-x-auto text-xs">
+        <div className="mt-5 sm:mt-6 pt-4 border-t border-blue-900/10 dark:border-white/10 flex items-center gap-2 overflow-x-auto no-scrollbar text-xs">
           {[
             { id: 'inventory', label: `Master Inventory (${cartridges.length})`, icon: Package },
             { id: 'branches', label: `Offices & Branches (${branches.length})`, icon: Building2 },
@@ -312,7 +316,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
               <button
                 key={tab.id}
                 onClick={() => setActiveAdminTab(tab.id as typeof activeAdminTab)}
-                className={`px-3.5 py-2 rounded-full font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
+                className={`min-h-[40px] px-3.5 py-2 rounded-full font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                   active
                     ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F]'
                     : 'bg-white/75 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-white/10 border border-slate-200/70 dark:border-white/10'
@@ -346,7 +350,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
       {/* Tab 1: Master Inventory Matrix */}
       {activeAdminTab === 'inventory' && (
         <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F6F8FC] dark:bg-white/[0.03]">
+          <div className="px-4 sm:px-5 py-4 border-b border-slate-100 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F6F8FC] dark:bg-white/[0.03]">
             <div>
               <h2 className="text-base font-bold text-[#0B0F17] dark:text-white">
                 Direct Master Inventory Matrix
@@ -358,7 +362,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
 
             <button
               onClick={onOpenAddCartridge}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors self-start sm:self-auto cursor-pointer whitespace-nowrap"
+              className="w-full sm:w-auto min-h-[42px] inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
             >
               <Plus className="w-4 h-4" />
               <span>Add New Cartridge SKU</span>
@@ -366,7 +370,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
           </div>
 
           {cartridges.length === 0 ? (
-            <div className="p-12 text-center text-slate-500 dark:text-slate-400">
+            <div className="p-10 sm:p-12 text-center text-slate-500 dark:text-slate-400">
               <Package className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">No Cartridge Models Yet</h3>
               <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto mb-4">
@@ -374,348 +378,261 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
               </p>
               <button
                 onClick={onOpenAddCartridge}
-                className="px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full cursor-pointer"
+                className="min-h-[42px] px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full cursor-pointer"
               >
                 Add First Cartridge SKU
               </button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-[#F6F8FC] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
-                  <tr>
-                    <th className="py-3 px-4">Model & SKU</th>
-                    <th className="py-3 px-4">Specifications / Notes</th>
-                    <th className="py-3 px-4 text-center">In Office at the Moment</th>
-                    <th className="py-3 px-4 text-center">15-Unit Gauge Status</th>
-                    <th className="py-3 px-4 text-center">Gauge Alert Trigger</th>
-                    <th className="py-3 px-4 text-center">Sent Out to Branches</th>
-                    <th className="py-3 px-4 text-right">Master Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                  {cartridges.map((cart) => {
-                    const draft = getDraft(cart);
-                    const sentOutCount = getSentOutCountForCartridge(cart.id);
+            <>
+              {/* Mobile Inventory Edit Cards */}
+              <div className="md:hidden divide-y divide-slate-100 dark:divide-white/5">
+                {cartridges.map((cart) => {
+                  const draft = getDraft(cart);
+                  const sentOutCount = getSentOutCountForCartridge(cart.id);
 
-                    return (
-                      <tr key={cart.id} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
-                        <td className="py-3 px-4">
-                          <span className="font-bold text-[#0B0F17] dark:text-white block text-xs sm:text-sm">
+                  return (
+                    <div key={cart.id} className="p-4 space-y-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <span className="font-bold text-[#0B0F17] dark:text-white block text-sm">
                             {cart.model}
                           </span>
-                          <span className="font-mono text-slate-500 dark:text-slate-400 text-[11px]">
-                            {cart.sku} · {cart.color}
+                          <span className="font-mono text-slate-500 dark:text-slate-400 text-[11px] block mt-0.5">
+                            {cart.sku} · {cart.color} · {sentOutCount} sent out
                           </span>
-                        </td>
+                        </div>
 
-                        <td className="py-3 px-4 max-w-xs">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            updateCartridge(cart.id, { isBestSeller: !cart.isBestSeller });
+                            showToast(
+                              'success',
+                              `${cart.sku} ${!cart.isBestSeller ? 'marked as Best Seller (40-unit reorder)' : 'removed from Best Sellers'}.`
+                            );
+                          }}
+                          className={`min-h-[34px] text-[11px] font-semibold px-2.5 py-1 rounded-full border transition cursor-pointer shrink-0 ${
+                            cart.isBestSeller
+                              ? 'bg-[#EFF6FF] dark:bg-sky-400/15 text-blue-700 dark:text-sky-300 border-blue-200 dark:border-sky-400/30'
+                              : 'bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10'
+                          }`}
+                        >
+                          {cart.isBestSeller ? '★ Best Seller' : '☆ Standard'}
+                        </button>
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+                          Specification / Notes
+                        </label>
+                        <input
+                          type="text"
+                          value={draft.spec}
+                          onChange={(e) => handleStockDraftChange(cart.id, 'spec', e.target.value)}
+                          placeholder="e.g. CE505A Black, High Yield"
+                          className="w-full min-h-[40px] px-3 py-2 text-base sm:text-xs bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+                            In Office Stock
+                          </label>
                           <input
-                            type="text"
-                            value={draft.spec}
-                            onChange={(e) => handleStockDraftChange(cart.id, 'spec', e.target.value)}
-                            placeholder="e.g. CE505A Black, High Yield"
-                            className="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white border border-slate-300 dark:border-white/15 rounded-lg focus:border-blue-500 focus:outline-none"
+                            type="number"
+                            min={0}
+                            value={draft.stock}
+                            onChange={(e) =>
+                              handleStockDraftChange(
+                                cart.id,
+                                'stock',
+                                Math.max(0, parseInt(e.target.value) || 0)
+                              )
+                            }
+                            className="w-full min-h-[42px] px-2 py-1.5 text-base font-mono font-bold text-center border-2 border-blue-500/60 dark:border-sky-400/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white"
                           />
-                        </td>
+                        </div>
 
-                        <td className="py-3 px-4 text-center">
-                          <div className="inline-flex items-center gap-1">
-                            <input
-                              type="number"
-                              min={0}
-                              value={draft.stock}
-                              onChange={(e) =>
-                                handleStockDraftChange(
-                                  cart.id,
-                                  'stock',
-                                  Math.max(0, parseInt(e.target.value) || 0)
-                                )
-                              }
-                              className="w-18 px-2 py-1 text-xs font-mono font-bold text-center border-2 border-blue-500/60 dark:border-sky-400/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white"
-                            />
-                            <span className="text-[11px] text-slate-500 dark:text-slate-400">units</span>
-                          </div>
-                        </td>
-
-                        <td className="py-3 px-4 text-center">
-                          <GaugeIndicator
-                            currentStock={draft.stock}
-                            gaugeTarget={draft.threshold}
-                            compact={true}
+                        <div>
+                          <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+                            Alert Trigger
+                          </label>
+                          <input
+                            type="number"
+                            min={1}
+                            value={draft.threshold}
+                            onChange={(e) =>
+                              handleStockDraftChange(
+                                cart.id,
+                                'threshold',
+                                Math.max(1, parseInt(e.target.value) || 1)
+                              )
+                            }
+                            className="w-full min-h-[42px] px-2 py-1.5 text-base font-mono text-center border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-xl focus:outline-none"
                           />
-                        </td>
+                        </div>
+                      </div>
 
-                        <td className="py-3 px-4 text-center">
-                          <div className="inline-flex items-center gap-1">
-                            <input
-                              type="number"
-                              min={1}
-                              value={draft.threshold}
-                              onChange={(e) =>
-                                handleStockDraftChange(
-                                  cart.id,
-                                  'threshold',
-                                  Math.max(1, parseInt(e.target.value) || 1)
-                                )
-                              }
-                              className="w-16 px-1.5 py-1 text-xs font-mono text-center border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-lg focus:outline-none"
-                            />
-                            <span className="text-[10px] text-slate-400 dark:text-slate-500">trigger</span>
-                          </div>
-                        </td>
+                      <GaugeIndicator
+                        currentStock={draft.stock}
+                        gaugeTarget={draft.threshold}
+                        compact={false}
+                      />
 
-                        <td className="py-3 px-4 text-center font-mono font-bold tabular-nums text-slate-800 dark:text-slate-200 text-xs">
-                          {sentOutCount} units sent
-                        </td>
+                      <div className="flex items-center gap-2 pt-0.5">
+                        <button
+                          onClick={() => handleSaveCartridge(cart.id)}
+                          className="flex-1 min-h-[42px] inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 hover:bg-slate-800 dark:hover:bg-sky-300 rounded-full transition-colors cursor-pointer"
+                        >
+                          <Save className="w-3.5 h-3.5" />
+                          <span>Save Changes</span>
+                        </button>
 
-                        <td className="py-3 px-4 text-right">
-                          <div className="flex items-center justify-end gap-1.5">
-                            <button
-                              onClick={() => handleSaveCartridge(cart.id)}
-                              className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 hover:bg-slate-800 dark:hover:bg-sky-300 rounded-full transition-colors cursor-pointer"
-                            >
-                              <Save className="w-3 h-3" />
-                              <span>Save</span>
-                            </button>
-
-                            <button
-                              onClick={() => {
-                                if (window.confirm(`Delete ${cart.model}?`)) {
-                                  deleteCartridge(cart.id);
-                                  showToast('success', 'Cartridge deleted.');
-                                }
-                              }}
-                              className="p-1.5 text-slate-300 dark:text-slate-600 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Tab 2: Offices & Branches Master Manager */}
-      {activeAdminTab === 'branches' && (
-        <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100 dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-[#F6F8FC] dark:bg-white/[0.03]">
-            <div>
-              <h2 className="text-base font-bold text-[#0B0F17] dark:text-white">
-                Offices & Branches Master Registry
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Add, rename, edit location codes, and manage all company branch destinations.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="inline-flex rounded-full bg-slate-200/70 dark:bg-white/5 p-0.5 text-xs">
-                <button
-                  onClick={() => setAdminBranchFilter('all')}
-                  className={`px-3 py-1 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
-                    adminBranchFilter === 'all'
-                      ? 'bg-white dark:bg-sky-400 text-[#0B0F17] dark:text-[#06090F] shadow-2xs'
-                      : 'text-slate-600 dark:text-slate-300 hover:text-[#0B0F17] dark:hover:text-white'
-                  }`}
-                >
-                  All ({branches.length})
-                </button>
-                <button
-                  onClick={() => setAdminBranchFilter('Headquarters')}
-                  className={`px-3 py-1 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
-                    adminBranchFilter === 'Headquarters'
-                      ? 'bg-white dark:bg-sky-400 text-[#0B0F17] dark:text-[#06090F] shadow-2xs'
-                      : 'text-slate-600 dark:text-slate-300 hover:text-[#0B0F17] dark:hover:text-white'
-                  }`}
-                >
-                  HQ Offices ({branches.filter((b) => b.category === 'Headquarters' || b.code.startsWith('HQ')).length})
-                </button>
-                <button
-                  onClick={() => setAdminBranchFilter('Regional Branch')}
-                  className={`px-3 py-1 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
-                    adminBranchFilter === 'Regional Branch'
-                      ? 'bg-white dark:bg-sky-400 text-[#0B0F17] dark:text-[#06090F] shadow-2xs'
-                      : 'text-slate-600 dark:text-slate-300 hover:text-[#0B0F17] dark:hover:text-white'
-                  }`}
-                >
-                  Regional ({branches.filter((b) => b.category !== 'Headquarters' && !b.code.startsWith('HQ')).length})
-                </button>
+                        <button
+                          onClick={() => {
+                            if (window.confirm(`Delete ${cart.model}?`)) {
+                              deleteCartridge(cart.id);
+                              showToast('success', 'Cartridge deleted.');
+                            }
+                          }}
+                          className="min-w-[42px] min-h-[42px] inline-flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-white/5 rounded-full transition-colors cursor-pointer"
+                          aria-label={`Delete ${cart.model}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
-              <button
-                onClick={onOpenAddBranch}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add Location</span>
-              </button>
-            </div>
-          </div>
-
-          {branches.length === 0 ? (
-            <div className="p-12 text-center text-slate-500 dark:text-slate-400">
-              <Building2 className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">No Offices or Branches Configured</h3>
-              <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto mb-4">
-                Add your company branch offices, site locations, or client projects.
-              </p>
-              <button
-                onClick={onOpenAddBranch}
-                className="px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full cursor-pointer"
-              >
-                Add First Office / Branch
-              </button>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-[#F6F8FC] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
-                  <tr>
-                    <th className="py-3 px-4">Code</th>
-                    <th className="py-3 px-4">Type</th>
-                    <th className="py-3 px-4">Office / Branch Name</th>
-                    <th className="py-3 px-4">City / Area</th>
-                    <th className="py-3 px-4">Address / Site Location</th>
-                    <th className="py-3 px-4 text-center">Printers Configured</th>
-                    <th className="py-3 px-4 text-right">Master Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                  {branches
-                    .filter((b) => {
-                      const isHq = b.category === 'Headquarters' || b.code.startsWith('HQ');
-                      if (adminBranchFilter === 'Headquarters') return isHq;
-                      if (adminBranchFilter === 'Regional Branch') return !isHq;
-                      return true;
-                    })
-                    .map((b) => {
-                      const isHq = b.category === 'Headquarters' || b.code.startsWith('HQ');
-                      const isEditing = editingBranchId === b.id;
-                      const draft = branchDrafts[b.id] || {
-                        name: b.name,
-                        code: b.code,
-                        city: b.city,
-                        address: b.address,
-                      };
+              {/* Desktop Table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-[#F6F8FC] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
+                    <tr>
+                      <th className="py-3 px-4">Model & SKU</th>
+                      <th className="py-3 px-4">Specifications / Notes</th>
+                      <th className="py-3 px-4 text-center">In Office at the Moment</th>
+                      <th className="py-3 px-4 text-center">15-Unit Gauge Status</th>
+                      <th className="py-3 px-4 text-center">Gauge Alert Trigger</th>
+                      <th className="py-3 px-4 text-center">Sent Out to Branches</th>
+                      <th className="py-3 px-4 text-right">Master Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                    {cartridges.map((cart) => {
+                      const draft = getDraft(cart);
+                      const sentOutCount = getSentOutCountForCartridge(cart.id);
 
                       return (
-                        <tr key={b.id} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
+                        <tr key={cart.id} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
                           <td className="py-3 px-4">
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                value={draft.code}
-                                onChange={(e) =>
-                                  setBranchDrafts((prev) => ({
-                                    ...prev,
-                                    [b.id]: { ...draft, code: e.target.value },
-                                  }))
-                                }
-                                className="w-20 px-2 py-1 text-xs font-mono border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-lg"
-                              />
-                            ) : (
-                              <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{b.code}</span>
-                            )}
-                          </td>
-
-                          <td className="py-3 px-4">
-                            <span className={`text-[11px] font-semibold ${isHq ? 'text-blue-700 dark:text-sky-400' : 'text-slate-500 dark:text-slate-400'}`}>
-                              {isHq ? 'Headquarters' : 'Regional Branch'}
+                            <span className="font-bold text-[#0B0F17] dark:text-white block text-xs sm:text-sm">
+                              {cart.model}
                             </span>
-                          </td>
-
-                          <td className="py-3 px-4">
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                value={draft.name}
-                                onChange={(e) =>
-                                  setBranchDrafts((prev) => ({
-                                    ...prev,
-                                    [b.id]: { ...draft, name: e.target.value },
-                                  }))
-                                }
-                                className="w-full px-2 py-1 text-xs font-bold border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-lg"
-                              />
-                            ) : (
-                              <span className="font-bold text-[#0B0F17] dark:text-white">{b.name}</span>
-                            )}
-                          </td>
-
-                          <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                value={draft.city}
-                                onChange={(e) =>
-                                  setBranchDrafts((prev) => ({
-                                    ...prev,
-                                    [b.id]: { ...draft, city: e.target.value },
-                                  }))
-                                }
-                                className="w-28 px-2 py-1 text-xs border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-lg"
-                              />
-                            ) : (
-                              b.city
-                            )}
-                          </td>
-
-                          <td className="py-3 px-4 text-slate-600 dark:text-slate-300 max-w-xs">
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                value={draft.address}
-                                onChange={(e) =>
-                                  setBranchDrafts((prev) => ({
-                                    ...prev,
-                                    [b.id]: { ...draft, address: e.target.value },
-                                  }))
-                                }
-                                className="w-full px-2 py-1 text-xs border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-lg"
-                              />
-                            ) : (
-                              <span className="truncate block" title={b.address}>
-                                {b.address}
+                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                              <span className="font-mono text-slate-500 dark:text-slate-400 text-[11px]">
+                                {cart.sku} · {cart.color}
                               </span>
-                            )}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  updateCartridge(cart.id, { isBestSeller: !cart.isBestSeller });
+                                  showToast(
+                                    'success',
+                                    `${cart.sku} ${!cart.isBestSeller ? 'marked as Best Seller (40-unit reorder)' : 'removed from Best Sellers'}.`
+                                  );
+                                }}
+                                className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border transition cursor-pointer ${
+                                  cart.isBestSeller
+                                    ? 'bg-[#EFF6FF] dark:bg-sky-400/15 text-blue-700 dark:text-sky-300 border-blue-200 dark:border-sky-400/30'
+                                    : 'bg-slate-50 dark:bg-white/5 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-white/10 hover:text-slate-700 dark:hover:text-slate-200'
+                                }`}
+                                title="Best Sellers suggest 40 units when below alert gauge"
+                              >
+                                {cart.isBestSeller ? '★ Best Seller (40u)' : '☆ Standard'}
+                              </button>
+                            </div>
                           </td>
 
-                          <td className="py-3 px-4 text-center font-mono font-bold text-slate-800 dark:text-slate-200">
-                            {b.printers.length} devices
+                          <td className="py-3 px-4 max-w-xs">
+                            <input
+                              type="text"
+                              value={draft.spec}
+                              onChange={(e) => handleStockDraftChange(cart.id, 'spec', e.target.value)}
+                              placeholder="e.g. CE505A Black, High Yield"
+                              className="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white border border-slate-300 dark:border-white/15 rounded-lg focus:border-blue-500 focus:outline-none"
+                            />
+                          </td>
+
+                          <td className="py-3 px-4 text-center">
+                            <div className="inline-flex items-center gap-1">
+                              <input
+                                type="number"
+                                min={0}
+                                value={draft.stock}
+                                onChange={(e) =>
+                                  handleStockDraftChange(
+                                    cart.id,
+                                    'stock',
+                                    Math.max(0, parseInt(e.target.value) || 0)
+                                  )
+                                }
+                                className="w-18 px-2 py-1 text-xs font-mono font-bold text-center border-2 border-blue-500/60 dark:border-sky-400/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white"
+                              />
+                              <span className="text-[11px] text-slate-500 dark:text-slate-400">units</span>
+                            </div>
+                          </td>
+
+                          <td className="py-3 px-4 text-center">
+                            <GaugeIndicator
+                              currentStock={draft.stock}
+                              gaugeTarget={draft.threshold}
+                              compact={true}
+                            />
+                          </td>
+
+                          <td className="py-3 px-4 text-center">
+                            <div className="inline-flex items-center gap-1">
+                              <input
+                                type="number"
+                                min={1}
+                                value={draft.threshold}
+                                onChange={(e) =>
+                                  handleStockDraftChange(
+                                    cart.id,
+                                    'threshold',
+                                    Math.max(1, parseInt(e.target.value) || 1)
+                                  )
+                                }
+                                className="w-16 px-1.5 py-1 text-xs font-mono text-center border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-lg focus:outline-none"
+                              />
+                              <span className="text-[10px] text-slate-400 dark:text-slate-500">trigger</span>
+                            </div>
+                          </td>
+
+                          <td className="py-3 px-4 text-center font-mono font-bold tabular-nums text-slate-800 dark:text-slate-200 text-xs">
+                            {sentOutCount} units sent
                           </td>
 
                           <td className="py-3 px-4 text-right">
                             <div className="flex items-center justify-end gap-1.5">
-                              {isEditing ? (
-                                <button
-                                  onClick={() => handleSaveBranch(b.id)}
-                                  className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-white dark:text-[#06090F] bg-blue-600 dark:bg-sky-400 hover:bg-blue-700 rounded-full transition-colors cursor-pointer"
-                                >
-                                  <Save className="w-3 h-3" />
-                                  <span>Save</span>
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => startEditBranch(b)}
-                                  className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 rounded-full transition-colors cursor-pointer"
-                                >
-                                  <Edit2 className="w-3 h-3" />
-                                  <span>Edit</span>
-                                </button>
-                              )}
+                              <button
+                                onClick={() => handleSaveCartridge(cart.id)}
+                                className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 hover:bg-slate-800 dark:hover:bg-sky-300 rounded-full transition-colors cursor-pointer"
+                              >
+                                <Save className="w-3 h-3" />
+                                <span>Save</span>
+                              </button>
 
                               <button
                                 onClick={() => {
-                                  if (window.confirm(`Delete ${b.name}?`)) {
-                                    deleteBranch(b.id);
-                                    showToast('success', 'Branch deleted.');
+                                  if (window.confirm(`Delete ${cart.model}?`)) {
+                                    deleteCartridge(cart.id);
+                                    showToast('success', 'Cartridge deleted.');
                                   }
                                 }}
                                 className="p-1.5 text-slate-300 dark:text-slate-600 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
@@ -727,16 +644,390 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                         </tr>
                       );
                     })}
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Tab 2: Offices & Branches Master Manager */}
+      {activeAdminTab === 'branches' && (
+        <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden">
+          <div className="px-4 sm:px-5 py-4 border-b border-slate-100 dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-[#F6F8FC] dark:bg-white/[0.03]">
+            <div>
+              <h2 className="text-base font-bold text-[#0B0F17] dark:text-white">
+                Offices & Branches Master Registry
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Add, rename, edit location codes, and manage all company branch destinations.
+              </p>
             </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <div className="inline-flex rounded-full bg-slate-200/70 dark:bg-white/5 p-0.5 text-xs overflow-x-auto no-scrollbar max-w-full">
+                <button
+                  onClick={() => setAdminBranchFilter('all')}
+                  className={`min-h-[36px] px-3 py-1 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                    adminBranchFilter === 'all'
+                      ? 'bg-white dark:bg-sky-400 text-[#0B0F17] dark:text-[#06090F] shadow-2xs'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-[#0B0F17] dark:hover:text-white'
+                  }`}
+                >
+                  All ({branches.length})
+                </button>
+                <button
+                  onClick={() => setAdminBranchFilter('Headquarters')}
+                  className={`min-h-[36px] px-3 py-1 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                    adminBranchFilter === 'Headquarters'
+                      ? 'bg-white dark:bg-sky-400 text-[#0B0F17] dark:text-[#06090F] shadow-2xs'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-[#0B0F17] dark:hover:text-white'
+                  }`}
+                >
+                  HQ Offices ({branches.filter((b) => b.category === 'Headquarters' || b.code.startsWith('HQ')).length})
+                </button>
+                <button
+                  onClick={() => setAdminBranchFilter('Regional Branch')}
+                  className={`min-h-[36px] px-3 py-1 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                    adminBranchFilter === 'Regional Branch'
+                      ? 'bg-white dark:bg-sky-400 text-[#0B0F17] dark:text-[#06090F] shadow-2xs'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-[#0B0F17] dark:hover:text-white'
+                  }`}
+                >
+                  Regional ({branches.filter((b) => b.category !== 'Headquarters' && !b.code.startsWith('HQ')).length})
+                </button>
+              </div>
+
+              <button
+                onClick={onOpenAddBranch}
+                className="min-h-[40px] inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Location</span>
+              </button>
+            </div>
+          </div>
+
+          {branches.length === 0 ? (
+            <div className="p-10 sm:p-12 text-center text-slate-500 dark:text-slate-400">
+              <Building2 className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">No Offices or Branches Configured</h3>
+              <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto mb-4">
+                Add your company branch offices, site locations, or client projects.
+              </p>
+              <button
+                onClick={onOpenAddBranch}
+                className="min-h-[42px] px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full cursor-pointer"
+              >
+                Add First Office / Branch
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Mobile Branches List */}
+              <div className="md:hidden divide-y divide-slate-100 dark:divide-white/5">
+                {branches
+                  .filter((b) => {
+                    const isHq = b.category === 'Headquarters' || b.code.startsWith('HQ');
+                    if (adminBranchFilter === 'Headquarters') return isHq;
+                    if (adminBranchFilter === 'Regional Branch') return !isHq;
+                    return true;
+                  })
+                  .map((b) => {
+                    const isHq = b.category === 'Headquarters' || b.code.startsWith('HQ');
+                    const isEditing = editingBranchId === b.id;
+                    const draft = branchDrafts[b.id] || {
+                      name: b.name,
+                      code: b.code,
+                      city: b.city,
+                      address: b.address,
+                    };
+
+                    return (
+                      <div key={b.id} className="p-4 space-y-2.5">
+                        {isEditing ? (
+                          <div className="space-y-2.5">
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block mb-1">Code</label>
+                                <input
+                                  type="text"
+                                  value={draft.code}
+                                  onChange={(e) =>
+                                    setBranchDrafts((prev) => ({
+                                      ...prev,
+                                      [b.id]: { ...draft, code: e.target.value },
+                                    }))
+                                  }
+                                  className="w-full min-h-[40px] px-2.5 py-1.5 text-base font-mono border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-xl"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block mb-1">City</label>
+                                <input
+                                  type="text"
+                                  value={draft.city}
+                                  onChange={(e) =>
+                                    setBranchDrafts((prev) => ({
+                                      ...prev,
+                                      [b.id]: { ...draft, city: e.target.value },
+                                    }))
+                                  }
+                                  className="w-full min-h-[40px] px-2.5 py-1.5 text-base border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-xl"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block mb-1">Office / Branch Name</label>
+                              <input
+                                type="text"
+                                value={draft.name}
+                                onChange={(e) =>
+                                  setBranchDrafts((prev) => ({
+                                    ...prev,
+                                    [b.id]: { ...draft, name: e.target.value },
+                                  }))
+                                }
+                                className="w-full min-h-[40px] px-2.5 py-1.5 text-base font-bold border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-xl"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block mb-1">Address</label>
+                              <input
+                                type="text"
+                                value={draft.address}
+                                onChange={(e) =>
+                                  setBranchDrafts((prev) => ({
+                                    ...prev,
+                                    [b.id]: { ...draft, address: e.target.value },
+                                  }))
+                                }
+                                className="w-full min-h-[40px] px-2.5 py-1.5 text-base border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-xl"
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="flex items-center justify-between gap-2 text-[11px]">
+                              <span className="font-mono font-bold text-slate-600 dark:text-slate-300">
+                                {b.code} · {b.city}
+                              </span>
+                              <span className={`font-semibold ${isHq ? 'text-blue-700 dark:text-sky-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                                {isHq ? 'Headquarters' : 'Regional Branch'}
+                              </span>
+                            </div>
+                            <div className="text-sm font-bold text-[#0B0F17] dark:text-white mt-0.5">
+                              {b.name}
+                            </div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                              {b.address} · <span className="font-mono">{b.printers.length} devices</span>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-2 pt-1">
+                          {isEditing ? (
+                            <button
+                              onClick={() => handleSaveBranch(b.id)}
+                              className="flex-1 min-h-[40px] inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-blue-600 dark:bg-sky-400 rounded-full cursor-pointer"
+                            >
+                              <Save className="w-3.5 h-3.5" />
+                              <span>Save Branch</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => startEditBranch(b)}
+                              className="flex-1 min-h-[40px] inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/10 rounded-full cursor-pointer"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                              <span>Edit Details</span>
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => {
+                              if (window.confirm(`Delete ${b.name}?`)) {
+                                deleteBranch(b.id);
+                                showToast('success', 'Branch deleted.');
+                              }
+                            }}
+                            className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-white/5 rounded-full transition-colors cursor-pointer"
+                            aria-label={`Delete ${b.name}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+
+              {/* Desktop Table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-[#F6F8FC] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
+                    <tr>
+                      <th className="py-3 px-4">Code</th>
+                      <th className="py-3 px-4">Type</th>
+                      <th className="py-3 px-4">Office / Branch Name</th>
+                      <th className="py-3 px-4">City / Area</th>
+                      <th className="py-3 px-4">Address / Site Location</th>
+                      <th className="py-3 px-4 text-center">Printers Configured</th>
+                      <th className="py-3 px-4 text-right">Master Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                    {branches
+                      .filter((b) => {
+                        const isHq = b.category === 'Headquarters' || b.code.startsWith('HQ');
+                        if (adminBranchFilter === 'Headquarters') return isHq;
+                        if (adminBranchFilter === 'Regional Branch') return !isHq;
+                        return true;
+                      })
+                      .map((b) => {
+                        const isHq = b.category === 'Headquarters' || b.code.startsWith('HQ');
+                        const isEditing = editingBranchId === b.id;
+                        const draft = branchDrafts[b.id] || {
+                          name: b.name,
+                          code: b.code,
+                          city: b.city,
+                          address: b.address,
+                        };
+
+                        return (
+                          <tr key={b.id} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
+                            <td className="py-3 px-4">
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  value={draft.code}
+                                  onChange={(e) =>
+                                    setBranchDrafts((prev) => ({
+                                      ...prev,
+                                      [b.id]: { ...draft, code: e.target.value },
+                                    }))
+                                  }
+                                  className="w-20 px-2 py-1 text-xs font-mono border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-lg"
+                                />
+                              ) : (
+                                <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{b.code}</span>
+                              )}
+                            </td>
+
+                            <td className="py-3 px-4">
+                              <span className={`text-[11px] font-semibold ${isHq ? 'text-blue-700 dark:text-sky-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                                {isHq ? 'Headquarters' : 'Regional Branch'}
+                              </span>
+                            </td>
+
+                            <td className="py-3 px-4">
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  value={draft.name}
+                                  onChange={(e) =>
+                                    setBranchDrafts((prev) => ({
+                                      ...prev,
+                                      [b.id]: { ...draft, name: e.target.value },
+                                    }))
+                                  }
+                                  className="w-full px-2 py-1 text-xs font-bold border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-lg"
+                                />
+                              ) : (
+                                <span className="font-bold text-[#0B0F17] dark:text-white">{b.name}</span>
+                              )}
+                            </td>
+
+                            <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  value={draft.city}
+                                  onChange={(e) =>
+                                    setBranchDrafts((prev) => ({
+                                      ...prev,
+                                      [b.id]: { ...draft, city: e.target.value },
+                                    }))
+                                  }
+                                  className="w-28 px-2 py-1 text-xs border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-lg"
+                                />
+                              ) : (
+                                b.city
+                              )}
+                            </td>
+
+                            <td className="py-3 px-4 text-slate-600 dark:text-slate-300 max-w-xs">
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  value={draft.address}
+                                  onChange={(e) =>
+                                    setBranchDrafts((prev) => ({
+                                      ...prev,
+                                      [b.id]: { ...draft, address: e.target.value },
+                                    }))
+                                  }
+                                  className="w-full px-2 py-1 text-xs border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-lg"
+                                />
+                              ) : (
+                                <span className="truncate block" title={b.address}>
+                                  {b.address}
+                                </span>
+                              )}
+                            </td>
+
+                            <td className="py-3 px-4 text-center font-mono font-bold text-slate-800 dark:text-slate-200">
+                              {b.printers.length} devices
+                            </td>
+
+                            <td className="py-3 px-4 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                {isEditing ? (
+                                  <button
+                                    onClick={() => handleSaveBranch(b.id)}
+                                    className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-white dark:text-[#06090F] bg-blue-600 dark:bg-sky-400 hover:bg-blue-700 rounded-full transition-colors cursor-pointer"
+                                  >
+                                    <Save className="w-3 h-3" />
+                                    <span>Save</span>
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => startEditBranch(b)}
+                                    className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 rounded-full transition-colors cursor-pointer"
+                                  >
+                                    <Edit2 className="w-3 h-3" />
+                                    <span>Edit</span>
+                                  </button>
+                                )}
+
+                                <button
+                                  onClick={() => {
+                                    if (window.confirm(`Delete ${b.name}?`)) {
+                                      deleteBranch(b.id);
+                                      showToast('success', 'Branch deleted.');
+                                    }
+                                  }}
+                                  className="p-1.5 text-slate-300 dark:text-slate-600 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       )}
 
       {/* Tab 3: Backup & Portability Hub */}
       {activeAdminTab === 'backup' && (
-        <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 space-y-6">
+        <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 p-4 sm:p-6 space-y-5 sm:space-y-6">
           <div>
             <h2 className="text-base font-bold text-[#0B0F17] dark:text-white">
               Database Backup, Migration & Portability Hub
@@ -747,7 +1038,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-[#F6F8FC] dark:bg-white/[0.03] space-y-4 flex flex-col justify-between">
+            <div className="p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-[#F6F8FC] dark:bg-white/[0.03] space-y-4 flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-2 text-[#0B0F17] dark:text-white font-bold text-sm">
                   <Download className="w-4 h-4 text-blue-700 dark:text-sky-400" />
@@ -760,14 +1051,14 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
 
               <button
                 onClick={handleDownloadBackup}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 hover:bg-slate-800 dark:hover:bg-sky-300 rounded-full transition-colors cursor-pointer"
+                className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 hover:bg-slate-800 dark:hover:bg-sky-300 rounded-full transition-colors cursor-pointer"
               >
                 <Download className="w-4 h-4" />
                 <span>Export & Download Database (.json)</span>
               </button>
             </div>
 
-            <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-[#F6F8FC] dark:bg-white/[0.03] space-y-4 flex flex-col justify-between">
+            <div className="p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-[#F6F8FC] dark:bg-white/[0.03] space-y-4 flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-2 text-[#0B0F17] dark:text-white font-bold text-sm">
                   <Upload className="w-4 h-4 text-blue-700 dark:text-sky-400" />
@@ -780,7 +1071,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
 
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 hover:bg-slate-50 dark:hover:bg-white/15 border border-slate-200 dark:border-white/15 rounded-full transition-colors cursor-pointer"
+                className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 hover:bg-slate-50 dark:hover:bg-white/15 border border-slate-200 dark:border-white/15 rounded-full transition-colors cursor-pointer"
               >
                 <Upload className="w-4 h-4 text-blue-700 dark:text-sky-400" />
                 <span>Select & Restore Backup File</span>
@@ -796,9 +1087,9 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
               </span>
             </div>
 
-            <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+            <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap w-full sm:w-auto">
               {!isSuperAdmin ? (
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/25 rounded-xl text-xs text-amber-900 dark:text-amber-300">
+                <div className="inline-flex items-center gap-2 px-3 py-2 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/25 rounded-xl text-xs text-amber-900 dark:text-amber-300">
                   <Lock className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
                   <span>Clearing data or reloading locations requires <strong>Super Admin (maafok830@gmail.com)</strong>.</span>
                 </div>
@@ -806,81 +1097,81 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                 <>
                   <button
                     onClick={() => setConfirmAction('branches')}
-                    className="px-3.5 py-1.5 text-xs font-semibold text-blue-800 dark:text-sky-300 bg-[#EFF6FF] dark:bg-blue-500/15 hover:bg-blue-100 dark:hover:bg-blue-500/25 border border-blue-200 dark:border-blue-500/30 rounded-full transition-colors cursor-pointer"
+                    className="min-h-[38px] px-3.5 py-1.5 text-xs font-semibold text-blue-800 dark:text-sky-300 bg-[#EFF6FF] dark:bg-blue-500/15 hover:bg-blue-100 dark:hover:bg-blue-500/25 border border-blue-200 dark:border-blue-500/30 rounded-full transition-colors cursor-pointer"
                   >
                     Restore {AESL_LOCATIONS.length} AESL Locations
                   </button>
 
                   <button
                     onClick={() => setConfirmAction('sample')}
-                    className="px-3.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 rounded-full transition-colors cursor-pointer"
+                    className="min-h-[38px] px-3.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 rounded-full transition-colors cursor-pointer"
                   >
                     Load Sample Template
                   </button>
 
                   <button
                     onClick={() => setConfirmAction('wipe')}
-                    className="px-3.5 py-1.5 text-xs font-semibold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-500/15 hover:bg-rose-100 dark:hover:bg-rose-500/25 border border-rose-200 dark:border-rose-500/30 rounded-full transition-colors cursor-pointer"
+                    className="min-h-[38px] px-3.5 py-1.5 text-xs font-semibold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-500/15 hover:bg-rose-100 dark:hover:bg-rose-500/25 border border-rose-200 dark:border-rose-500/30 rounded-full transition-colors cursor-pointer"
                   >
                     Clear All Data
                   </button>
                 </>
               ) : confirmAction === 'branches' ? (
-                <div className="flex items-center gap-2 bg-[#EFF6FF] dark:bg-blue-500/15 p-1.5 rounded-full border border-blue-200 dark:border-blue-500/30">
-                  <span className="text-xs text-blue-950 dark:text-sky-200 font-semibold px-2">Restore all {AESL_LOCATIONS.length} AESL locations?</span>
+                <div className="flex items-center flex-wrap gap-2 bg-[#EFF6FF] dark:bg-blue-500/15 p-2.5 sm:p-1.5 rounded-2xl sm:rounded-full border border-blue-200 dark:border-blue-500/30">
+                  <span className="text-xs text-blue-950 dark:text-sky-200 font-semibold px-1.5 sm:px-2">Restore all {AESL_LOCATIONS.length} AESL locations?</span>
                   <button
                     onClick={() => {
                       loadAESLBranches();
                       setConfirmAction(null);
                       showToast('success', `Official AESL ${AESL_LOCATIONS.length} locations restored successfully.`);
                     }}
-                    className="px-3 py-1 bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] rounded-full text-xs font-semibold cursor-pointer"
+                    className="min-h-[36px] px-3 py-1 bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] rounded-full text-xs font-semibold cursor-pointer"
                   >
                     Yes, Restore
                   </button>
                   <button
                     onClick={() => setConfirmAction(null)}
-                    className="px-2.5 py-1 bg-white dark:bg-white/10 text-slate-600 dark:text-slate-200 rounded-full text-xs cursor-pointer"
+                    className="min-h-[36px] px-2.5 py-1 bg-white dark:bg-white/10 text-slate-600 dark:text-slate-200 rounded-full text-xs cursor-pointer"
                   >
                     Cancel
                   </button>
                 </div>
               ) : confirmAction === 'sample' ? (
-                <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/10 p-1.5 rounded-full border border-slate-300 dark:border-white/15">
-                  <span className="text-xs text-slate-800 dark:text-white font-semibold px-2">Load sample records?</span>
+                <div className="flex items-center flex-wrap gap-2 bg-slate-100 dark:bg-white/10 p-2.5 sm:p-1.5 rounded-2xl sm:rounded-full border border-slate-300 dark:border-white/15">
+                  <span className="text-xs text-slate-800 dark:text-white font-semibold px-1.5 sm:px-2">Load sample records?</span>
                   <button
                     onClick={() => {
                       loadSampleTemplateData();
                       setConfirmAction(null);
                       showToast('success', 'Sample template loaded successfully.');
                     }}
-                    className="px-3 py-1 bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] rounded-full text-xs font-semibold cursor-pointer"
+                    className="min-h-[36px] px-3 py-1 bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] rounded-full text-xs font-semibold cursor-pointer"
                   >
                     Yes, Load
                   </button>
                   <button
                     onClick={() => setConfirmAction(null)}
-                    className="px-2.5 py-1 bg-white dark:bg-white/10 text-slate-600 dark:text-slate-200 rounded-full text-xs cursor-pointer"
+                    className="min-h-[36px] px-2.5 py-1 bg-white dark:bg-white/10 text-slate-600 dark:text-slate-200 rounded-full text-xs cursor-pointer"
                   >
                     Cancel
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 bg-rose-50 dark:bg-rose-500/15 p-1.5 rounded-full border border-rose-200 dark:border-rose-500/30">
-                  <span className="text-xs text-rose-900 dark:text-rose-200 font-semibold px-2">Wipe all records?</span>
+                <div className="flex items-center flex-wrap gap-2 bg-rose-50 dark:bg-rose-500/15 p-2.5 sm:p-1.5 rounded-2xl sm:rounded-full border border-rose-200 dark:border-rose-500/30">
+                  <span className="text-xs text-rose-900 dark:text-rose-200 font-semibold px-1.5 sm:px-2">Wipe all records?</span>
                   <button
                     onClick={() => {
                       clearAllData();
                       setConfirmAction(null);
                       showToast('success', 'All records cleared. Database is now completely empty.');
                     }}
-                    className="px-3 py-1 bg-rose-600 text-white rounded-full text-xs font-semibold hover:bg-rose-700 cursor-pointer"
+                    className="min-h-[36px] px-3 py-1 bg-rose-600 text-white rounded-full text-xs font-semibold hover:bg-rose-700 cursor-pointer"
                   >
                     Yes, Wipe Clean
                   </button>
                   <button
                     onClick={() => setConfirmAction(null)}
-                    className="px-2.5 py-1 bg-white dark:bg-white/10 text-slate-600 dark:text-slate-200 rounded-full text-xs cursor-pointer"
+                    className="min-h-[36px] px-2.5 py-1 bg-white dark:bg-white/10 text-slate-600 dark:text-slate-200 rounded-full text-xs cursor-pointer"
                   >
                     Cancel
                   </button>

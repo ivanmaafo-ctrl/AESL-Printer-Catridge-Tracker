@@ -156,7 +156,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
           type="button"
           disabled={verifyBusy}
           onClick={handleCheckVerification}
-          className="w-full py-3 px-4 bg-[#0B0F17] hover:bg-slate-800 dark:bg-sky-400 dark:hover:bg-sky-300 text-white dark:text-[#06090F] font-semibold text-sm rounded-full transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+          className="w-full min-h-[46px] py-3 px-4 bg-[#0B0F17] hover:bg-slate-800 dark:bg-sky-400 dark:hover:bg-sky-300 text-white dark:text-[#06090F] font-semibold text-sm rounded-full transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
         >
           {verifyBusy ? <BrandSpinner size="xs" /> : <RefreshCw className="w-4 h-4" />}
           <span>I&apos;ve Verified — Enter Portal</span>
@@ -166,7 +166,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
           type="button"
           disabled={verifyBusy}
           onClick={handleResendVerification}
-          className="w-full py-2.5 px-4 bg-[#EFF6FF] hover:bg-blue-100 dark:bg-blue-500/15 dark:hover:bg-blue-500/25 text-blue-900 dark:text-sky-300 font-semibold text-xs rounded-full border border-blue-200 dark:border-blue-500/30 transition cursor-pointer disabled:opacity-70"
+          className="w-full min-h-[44px] py-2.5 px-4 bg-[#EFF6FF] hover:bg-blue-100 dark:bg-blue-500/15 dark:hover:bg-blue-500/25 text-blue-900 dark:text-sky-300 font-semibold text-xs rounded-full border border-blue-200 dark:border-blue-500/30 transition cursor-pointer disabled:opacity-70"
         >
           Send Verification Email to Inbox
         </button>
@@ -174,7 +174,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
         <button
           type="button"
           onClick={logout}
-          className="w-full py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 flex items-center justify-center gap-1.5 cursor-pointer"
+          className="w-full min-h-[40px] py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 flex items-center justify-center gap-1.5 cursor-pointer"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Sign Out & Use Another Account</span>
@@ -200,7 +200,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
         </p>
       </div>
 
-      <div className="bg-white dark:bg-[#0B111B]/90 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-lg shadow-slate-200/50 dark:shadow-none p-6 sm:p-8">
+      <div className="bg-white dark:bg-[#0B111B]/90 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-lg shadow-slate-200/50 dark:shadow-none p-5 sm:p-8">
         <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/10 mb-5">
           <div>
             <h2 className="text-base font-bold text-[#0B0F17] dark:text-white">
@@ -210,7 +210,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
               Invite-only access · Cloud-synced across all devices
             </p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 dark:text-slate-400">
+          <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 dark:text-slate-400 shrink-0">
             <Lock className="w-4 h-4" />
           </div>
         </div>
@@ -247,7 +247,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@anointedengineering.com"
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-50/70 dark:bg-[#070B12] border border-slate-300 dark:border-white/15 rounded-xl text-sm text-[#0B0F17] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 transition"
+                className="w-full min-h-[46px] pl-10 pr-4 py-2.5 bg-slate-50/70 dark:bg-[#070B12] border border-slate-300 dark:border-white/15 rounded-xl text-base sm:text-sm text-[#0B0F17] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 transition"
                 autoComplete="email"
               />
             </div>
@@ -281,13 +281,13 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full pl-10 pr-11 py-2.5 bg-slate-50/70 dark:bg-[#070B12] border border-slate-300 dark:border-white/15 rounded-xl text-sm text-[#0B0F17] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 transition font-mono"
+                  className="w-full min-h-[46px] pl-10 pr-12 py-2.5 bg-slate-50/70 dark:bg-[#070B12] border border-slate-300 dark:border-white/15 rounded-xl text-base sm:text-sm text-[#0B0F17] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 transition font-mono"
                   autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"
+                  className="absolute inset-y-0 right-0 min-w-[44px] flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"
                   tabIndex={-1}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
@@ -301,7 +301,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
             <button
               type="submit"
               disabled={isSubmitting || isGoogleLoading}
-              className="w-full py-3 px-4 bg-[#0B0F17] hover:bg-slate-800 dark:bg-sky-400 dark:hover:bg-sky-300 text-white dark:text-[#06090F] font-semibold text-sm rounded-full shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+              className="w-full min-h-[48px] py-3 px-4 bg-[#0B0F17] hover:bg-slate-800 dark:bg-sky-400 dark:hover:bg-sky-300 text-white dark:text-[#06090F] font-semibold text-sm rounded-full shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
             >
               {isSubmitting ? (
                 <>
@@ -347,7 +347,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
               type="button"
               onClick={handleGoogleLogin}
               disabled={isGoogleLoading || isSubmitting}
-              className="w-full py-2.5 px-4 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-800 dark:text-white border border-slate-300 dark:border-white/15 rounded-full text-xs font-semibold transition flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-70"
+              className="w-full min-h-[46px] py-2.5 px-4 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-800 dark:text-white border border-slate-300 dark:border-white/15 rounded-full text-xs font-semibold transition flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-70"
             >
               {isGoogleLoading ? (
                 <>
@@ -356,7 +356,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
                 </>
               ) : (
                 <>
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
                     <path
                       fill="#4285F4"
                       d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"
@@ -394,7 +394,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#06090F] text-[#0B0F17] dark:text-slate-100 font-sans flex flex-col relative isolate overflow-y-auto">
+    <div className="min-h-screen bg-white dark:bg-[#06090F] text-[#0B0F17] dark:text-slate-100 font-sans flex flex-col relative isolate overflow-y-auto pb-safe">
       <div
         aria-hidden="true"
         className="hidden dark:block fixed inset-0 -z-10 overflow-hidden pointer-events-none"
@@ -421,7 +421,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
         onClick={toggleTheme}
         title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-        className="fixed top-5 right-5 p-2.5 rounded-full bg-white/90 dark:bg-white/10 border border-slate-200 dark:border-white/15 text-slate-600 dark:text-sky-400 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer z-20"
+        className="fixed top-3.5 right-3.5 sm:top-5 sm:right-5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-white/90 dark:bg-white/10 border border-slate-200 dark:border-white/15 text-slate-600 dark:text-sky-400 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer z-20"
       >
         {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
       </button>

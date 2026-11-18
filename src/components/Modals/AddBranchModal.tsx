@@ -100,34 +100,38 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/65 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-[#0D1420] rounded-3xl shadow-2xl border border-slate-200 dark:border-white/15 w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden transition-all animate-in fade-in zoom-in-95 duration-150">
-        
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/65 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="bg-white dark:bg-[#0D1420] rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-white/15 w-full max-w-lg max-h-[92dvh] flex flex-col overflow-hidden transition-all animate-in fade-in zoom-in-95 duration-150">
+        <div className="sm:hidden pt-2.5 flex justify-center shrink-0">
+          <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+        </div>
+
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-blue-900/10 dark:border-white/10 bg-blue-hero shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] rounded-2xl shadow-xs">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-blue-900/10 dark:border-white/10 bg-blue-hero shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="p-2 bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] rounded-2xl shadow-xs shrink-0">
               <Building2 className="w-5 h-5" />
             </div>
-            <div>
-              <h2 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
+            <div className="min-w-0">
+              <h2 className="text-base font-bold text-slate-900 dark:text-white leading-tight truncate">
                 Add New Location / Branch
               </h2>
-              <p className="text-xs text-slate-600 dark:text-slate-400">
-                Register an office, workshop, or branch to receive and consume cartridges
+              <p className="text-xs text-slate-600 dark:text-slate-400 truncate">
+                Register an office, workshop, or branch to receive cartridges
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-full hover:bg-white/70 dark:hover:bg-white/10 transition-colors cursor-pointer"
+            aria-label="Close add branch modal"
+            className="min-w-[40px] min-h-[40px] flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-full hover:bg-white/70 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Scrollable Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
@@ -139,7 +143,7 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="e.g. BR-BOL or HQ-HR"
                 required
-                className="w-full px-3.5 py-2 text-sm font-mono bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full min-h-[44px] px-3.5 py-2 text-base sm:text-sm font-mono bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
 
@@ -150,7 +154,7 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as any)}
-                className="w-full px-3.5 py-2 text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold"
+                className="w-full min-h-[44px] px-3.5 py-2 text-base sm:text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold"
               >
                 <option value="Headquarters">Headquarters (Anointed House)</option>
                 <option value="Regional Branch">Regional Branch (Across Ghana)</option>
@@ -168,7 +172,7 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Bolgatanga Branch or HR Office"
               required
-              className="w-full px-3.5 py-2 text-sm font-bold bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              className="w-full min-h-[44px] px-3.5 py-2 text-base sm:text-sm font-bold bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
           </div>
 
@@ -182,7 +186,7 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="e.g. Accra"
-                className="w-full px-3.5 py-2 text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full min-h-[44px] px-3.5 py-2 text-base sm:text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
 
@@ -195,7 +199,7 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
                 value={managerName}
                 onChange={(e) => setManagerName(e.target.value)}
                 placeholder="e.g. Branch Operations Lead"
-                className="w-full px-3.5 py-2 text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full min-h-[44px] px-3.5 py-2 text-base sm:text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
           </div>
@@ -209,7 +213,7 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="e.g. Adenta Barrier Road, Greater Accra"
-              className="w-full px-3.5 py-2 text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              className="w-full min-h-[44px] px-3.5 py-2 text-base sm:text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
           </div>
 
@@ -223,7 +227,7 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
                 value={contactPhone}
                 onChange={(e) => setContactPhone(e.target.value)}
                 placeholder="+233 30 250 0000"
-                className="w-full px-3.5 py-2 text-sm font-mono bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full min-h-[44px] px-3.5 py-2 text-base sm:text-sm font-mono bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
 
@@ -236,7 +240,7 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="branch@aesl-ghana.com"
-                className="w-full px-3.5 py-2 text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full min-h-[44px] px-3.5 py-2 text-base sm:text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
           </div>
@@ -250,7 +254,7 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
               <button
                 type="button"
                 onClick={handleAddPrinter}
-                className="inline-flex items-center gap-1 text-xs font-semibold text-blue-700 dark:text-sky-400 hover:text-blue-800 dark:hover:text-sky-300 cursor-pointer"
+                className="inline-flex items-center gap-1 min-h-[40px] px-2 text-xs font-semibold text-blue-700 dark:text-sky-400 hover:text-blue-800 dark:hover:text-sky-300 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Printer</span>
@@ -269,7 +273,8 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
                       <button
                         type="button"
                         onClick={() => handleRemovePrinter(printer.id)}
-                        className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1 rounded cursor-pointer"
+                        aria-label={`Remove printer ${idx + 1}`}
+                        className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -282,14 +287,14 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
                       placeholder="Name / Station"
                       value={printer.name}
                       onChange={(e) => handleUpdatePrinter(printer.id, 'name', e.target.value)}
-                      className="px-2.5 py-1.5 bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-lg"
+                      className="min-h-[40px] px-3 py-1.5 text-base sm:text-xs bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-lg"
                     />
                     <input
                       type="text"
                       placeholder="Printer Model"
                       value={printer.model}
                       onChange={(e) => handleUpdatePrinter(printer.id, 'model', e.target.value)}
-                      className="px-2.5 py-1.5 bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-lg"
+                      className="min-h-[40px] px-3 py-1.5 text-base sm:text-xs bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-lg"
                     />
                   </div>
 
@@ -299,12 +304,12 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
                       placeholder="Room / Location"
                       value={printer.location}
                       onChange={(e) => handleUpdatePrinter(printer.id, 'location', e.target.value)}
-                      className="px-2.5 py-1.5 bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-lg"
+                      className="min-h-[40px] px-3 py-1.5 text-base sm:text-xs bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-lg"
                     />
                     <select
                       value={printer.cartridgeSkuId}
                       onChange={(e) => handleUpdatePrinter(printer.id, 'cartridgeSkuId', e.target.value)}
-                      className="px-2.5 py-1.5 bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-lg"
+                      className="min-h-[40px] px-3 py-1.5 text-base sm:text-xs bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-lg"
                     >
                       {cartridges.map((c) => (
                         <option key={c.id} value={c.id}>
@@ -319,17 +324,17 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
           </div>
 
           {/* Footer buttons */}
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-white/10">
+          <div className="grid grid-cols-2 sm:flex items-center justify-end gap-2 pt-3 pb-safe sm:pb-0 border-t border-slate-100 dark:border-white/10">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-white/[0.06] border border-slate-200 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/10 transition-colors cursor-pointer"
+              className="min-h-[44px] px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-white/[0.06] border border-slate-200 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/10 transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors shadow-xs cursor-pointer"
+              className="min-h-[44px] px-5 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors shadow-xs cursor-pointer"
             >
               Save Branch
             </button>

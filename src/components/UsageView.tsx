@@ -97,16 +97,16 @@ export const UsageView: React.FC<UsageViewProps> = ({ onOpenLogUsage }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       {/* Modern Blue / Moving Dark Gradient Header */}
-      <section className="bg-blue-hero rounded-3xl p-6 sm:p-8 border border-blue-200/70 dark:border-blue-500/20 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+      <section className="bg-blue-hero rounded-3xl p-4 sm:p-8 border border-blue-200/70 dark:border-blue-500/20 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-5">
         <div>
           <div className="text-xs font-medium text-blue-950/75 dark:text-slate-400 flex items-center gap-2">
             <span className="font-semibold text-[#0B0F17] dark:text-white">Consumption Audit</span>
             <span aria-hidden="true">·</span>
             <span className="font-mono">{usages.length} Events</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0B0F17] dark:text-white mt-1.5">
+          <h1 className="text-xl sm:text-3xl font-bold tracking-tight text-[#0B0F17] dark:text-white mt-1.5">
             Branch Cartridge Consumption & Usage
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-2xl">
@@ -114,10 +114,10 @@ export const UsageView: React.FC<UsageViewProps> = ({ onOpenLogUsage }) => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap shrink-0">
+        <div className="grid grid-cols-2 sm:flex items-center gap-2 sm:gap-2.5 flex-wrap shrink-0">
           <button
             onClick={handleExportCSV}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 border border-slate-200/90 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/15 transition-colors cursor-pointer whitespace-nowrap"
+            className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 border border-slate-200/90 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/15 transition-colors cursor-pointer whitespace-nowrap"
           >
             <Download className="w-4 h-4 text-blue-700 dark:text-sky-400" />
             <span>Export CSV</span>
@@ -125,21 +125,21 @@ export const UsageView: React.FC<UsageViewProps> = ({ onOpenLogUsage }) => {
 
           <button
             onClick={onOpenLogUsage}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
+            className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
-            <span>Log Cartridge Usage</span>
+            <span>Log Usage</span>
           </button>
         </div>
       </section>
 
       {/* Bento Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-sm p-5 rounded-2xl border border-slate-200/70 dark:border-white/10">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="col-span-2 sm:col-span-1 bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-sm p-4 sm:p-5 rounded-2xl border border-slate-200/70 dark:border-white/10">
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
             Total Cartridges Used
           </span>
-          <div className="text-3xl font-semibold font-mono tabular-nums text-[#0B0F17] dark:text-white mt-2">
+          <div className="text-2xl sm:text-3xl font-semibold font-mono tabular-nums text-[#0B0F17] dark:text-white mt-1.5 sm:mt-2">
             {totalUsedUnits} <span className="text-xs font-sans font-normal text-slate-500 dark:text-slate-400">units</span>
           </div>
           <span className="text-xs text-slate-500 dark:text-slate-400 mt-1 block">
@@ -147,33 +147,33 @@ export const UsageView: React.FC<UsageViewProps> = ({ onOpenLogUsage }) => {
           </span>
         </div>
 
-        <div className="bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-sm p-5 rounded-2xl border border-slate-200/70 dark:border-white/10">
+        <div className="bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-sm p-4 sm:p-5 rounded-2xl border border-slate-200/70 dark:border-white/10">
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
             Highest Usage Branch
           </span>
-          <div className="text-xl font-bold text-[#0B0F17] dark:text-white mt-2 line-clamp-1">
+          <div className="text-base sm:text-xl font-bold text-[#0B0F17] dark:text-white mt-1.5 sm:mt-2 line-clamp-1">
             {topBranch ? topBranch[0] : 'None'}
           </div>
-          <span className="text-xs text-slate-500 dark:text-slate-400 mt-1 block font-mono">
-            {topBranch ? `${topBranch[1]} cartridges replaced` : '0 events'}
+          <span className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1 block font-mono">
+            {topBranch ? `${topBranch[1]} swapped` : '0 events'}
           </span>
         </div>
 
-        <div className="bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-sm p-5 rounded-2xl border border-slate-200/70 dark:border-white/10">
+        <div className="bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-sm p-4 sm:p-5 rounded-2xl border border-slate-200/70 dark:border-white/10">
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
-            Avg Pages Printed per Unit
+            Avg Pages / Unit
           </span>
-          <div className="text-3xl font-semibold font-mono tabular-nums text-[#0B0F17] dark:text-white mt-2">
+          <div className="text-2xl sm:text-3xl font-semibold font-mono tabular-nums text-[#0B0F17] dark:text-white mt-1.5 sm:mt-2">
             {avgPages > 0 ? avgPages.toLocaleString() : 'N/A'} <span className="text-xs font-sans font-normal text-slate-500 dark:text-slate-400">{avgPages > 0 ? 'pgs' : ''}</span>
           </div>
-          <span className="text-xs text-slate-500 dark:text-slate-400 mt-1 block">
-            Derived from recorded lifecycle page counters
+          <span className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1 block">
+            From lifecycle counters
           </span>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-sm p-4 rounded-2xl border border-slate-200/80 dark:border-white/10 space-y-3">
+      <div className="bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-sm p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-white/10 space-y-3">
         <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -181,19 +181,19 @@ export const UsageView: React.FC<UsageViewProps> = ({ onOpenLogUsage }) => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search branch, printer device, technician, or cartridge..."
-              className="w-full pl-10 pr-3 py-2 text-xs sm:text-sm bg-white dark:bg-[#0B111B] border border-slate-200 dark:border-white/15 rounded-xl text-[#0B0F17] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500"
+              placeholder="Search branch, printer, technician, or cartridge..."
+              className="w-full min-h-[42px] pl-10 pr-3 py-2 text-base sm:text-sm bg-white dark:bg-[#0B111B] border border-slate-200 dark:border-white/15 rounded-xl text-[#0B0F17] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500"
             />
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Branch:</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:flex items-center gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium shrink-0">Branch:</span>
               <select
                 value={branchFilter}
                 onChange={(e) => setBranchFilter(e.target.value)}
-                className="px-2.5 py-1.5 text-xs bg-white dark:bg-[#0B111B] text-[#0B0F17] dark:text-slate-100 border border-slate-200 dark:border-white/15 rounded-xl focus:outline-none"
+                className="w-full min-w-0 min-h-[40px] sm:min-h-0 px-2.5 py-2 sm:py-1.5 text-base sm:text-xs bg-white dark:bg-[#0B111B] text-[#0B0F17] dark:text-slate-100 border border-slate-200 dark:border-white/15 rounded-xl focus:outline-none truncate"
               >
                 <option value="ALL">All Branches</option>
                 {branches.map((b) => (
@@ -204,12 +204,12 @@ export const UsageView: React.FC<UsageViewProps> = ({ onOpenLogUsage }) => {
               </select>
             </div>
 
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Reason:</span>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium shrink-0">Reason:</span>
               <select
                 value={reasonFilter}
                 onChange={(e) => setReasonFilter(e.target.value)}
-                className="px-2.5 py-1.5 text-xs bg-white dark:bg-[#0B111B] text-[#0B0F17] dark:text-slate-100 border border-slate-200 dark:border-white/15 rounded-xl focus:outline-none"
+                className="w-full min-w-0 min-h-[40px] sm:min-h-0 px-2.5 py-2 sm:py-1.5 text-base sm:text-xs bg-white dark:bg-[#0B111B] text-[#0B0F17] dark:text-slate-100 border border-slate-200 dark:border-white/15 rounded-xl focus:outline-none truncate"
               >
                 <option value="ALL">All Reasons</option>
                 <option value="Depleted">Depleted</option>
@@ -222,100 +222,152 @@ export const UsageView: React.FC<UsageViewProps> = ({ onOpenLogUsage }) => {
         </div>
       </div>
 
-      {/* Usage Table */}
+      {/* Usage History */}
       <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-[#F6F8FC] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
-              <tr>
-                <th className="py-3 px-4">Event Code & Date</th>
-                <th className="py-3 px-4">Branch Location</th>
-                <th className="py-3 px-4">Installed Printer Device</th>
-                <th className="py-3 px-4">Cartridge Model</th>
-                <th className="py-3 px-4 text-center">Qty Used</th>
-                <th className="py-3 px-4">Swap Reason</th>
-                <th className="py-3 px-4">Technician / Staff</th>
-                <th className="py-3 px-4 text-right">Printed Pages</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-              {filteredUsages.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="py-12 text-center text-slate-500 dark:text-slate-400">
-                    <Send className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-                    <p className="font-semibold text-slate-700 dark:text-slate-300">No usage records match your search.</p>
-                  </td>
-                </tr>
-              ) : (
-                filteredUsages.map((usg) => (
-                  <tr key={usg.id} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
-                    <td className="py-3.5 px-4">
-                      <div>
-                        <span className="font-mono font-bold text-[#0B0F17] dark:text-white block text-xs">
-                          {usg.usageCode}
-                        </span>
-                        <span className="font-mono text-slate-500 dark:text-slate-400 text-[11px]">
-                          {usg.installedDate}
-                        </span>
+        {filteredUsages.length === 0 ? (
+          <div className="py-12 px-4 text-center text-slate-500 dark:text-slate-400">
+            <Send className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+            <p className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+              No usage records match your search.
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Mobile Card List */}
+            <div className="md:hidden divide-y divide-slate-100 dark:divide-white/5">
+              {filteredUsages.map((usg) => (
+                <div key={usg.id} className="p-4 space-y-2.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                        {usg.usageCode} · {usg.installedDate}
                       </div>
-                    </td>
-
-                    <td className="py-3.5 px-4 font-bold text-[#0B0F17] dark:text-white">
-                      {usg.branchName}
-                    </td>
-
-                    <td className="py-3.5 px-4 text-slate-700 dark:text-slate-300">
-                      <div className="flex items-center gap-1.5">
-                        <Printer className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
-                        <span className="truncate max-w-[200px]" title={usg.printerName}>
-                          {usg.printerName}
-                        </span>
+                      <div className="text-sm font-bold text-[#0B0F17] dark:text-white mt-0.5 truncate">
+                        {usg.branchName}
                       </div>
-                    </td>
+                    </div>
+                    <span className="shrink-0 font-mono tabular-nums text-xs font-bold text-blue-700 dark:text-sky-400">
+                      {usg.quantity} unit{usg.quantity !== 1 ? 's' : ''}
+                    </span>
+                  </div>
 
-                    <td className="py-3.5 px-4">
-                      <div>
-                        <span className="font-medium text-slate-800 dark:text-slate-200 block">
-                          {usg.cartridgeModel}
-                        </span>
-                        <span className="text-slate-500 dark:text-slate-400 text-[11px]">
-                          {usg.cartridgeColor}
-                        </span>
-                      </div>
-                    </td>
+                  <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300">
+                    <Printer className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span className="truncate">{usg.printerName}</span>
+                  </div>
 
-                    <td className="py-3.5 px-4 text-center font-mono tabular-nums font-bold text-sm text-[#0B0F17] dark:text-white">
-                      {usg.quantity}
-                    </td>
-
-                    <td className="py-3.5 px-4">
-                      <span className="text-slate-700 dark:text-slate-200 font-medium">
-                        {usg.reason}
+                  <div className="p-2.5 rounded-xl bg-[#F6F8FC] dark:bg-white/[0.03] border border-slate-200/60 dark:border-white/10 text-xs flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <span className="font-semibold text-[#0B0F17] dark:text-white block truncate">
+                        {usg.cartridgeModel}
                       </span>
-                      {usg.notes && (
-                        <span className="block text-[11px] text-slate-400 dark:text-slate-500 italic mt-0.5 truncate max-w-[180px]" title={usg.notes}>
-                          &ldquo;{usg.notes}&rdquo;
-                        </span>
-                      )}
-                    </td>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                        {usg.cartridgeColor} · {usg.reason}
+                      </span>
+                    </div>
+                    {usg.estimatedPagesPrinted ? (
+                      <span className="font-mono tabular-nums text-[11px] font-semibold text-slate-600 dark:text-slate-300 shrink-0">
+                        {usg.estimatedPagesPrinted.toLocaleString()} pgs
+                      </span>
+                    ) : null}
+                  </div>
 
-                    <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300 font-medium">
-                      {usg.installedBy}
-                    </td>
+                  <div className="flex items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+                    <span className="truncate">Tech: {usg.installedBy}</span>
+                    {usg.notes && (
+                      <span className="italic truncate max-w-[55%]">&ldquo;{usg.notes}&rdquo;</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
 
-                    <td className="py-3.5 px-4 text-right font-mono tabular-nums text-slate-700 dark:text-slate-200">
-                      {usg.estimatedPagesPrinted ? (
-                        <span>{usg.estimatedPagesPrinted.toLocaleString()} pgs</span>
-                      ) : (
-                        <span className="text-slate-300 dark:text-slate-600">—</span>
-                      )}
-                    </td>
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-[#F6F8FC] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
+                  <tr>
+                    <th className="py-3 px-4">Event Code & Date</th>
+                    <th className="py-3 px-4">Branch Location</th>
+                    <th className="py-3 px-4">Installed Printer Device</th>
+                    <th className="py-3 px-4">Cartridge Model</th>
+                    <th className="py-3 px-4 text-center">Qty Used</th>
+                    <th className="py-3 px-4">Swap Reason</th>
+                    <th className="py-3 px-4">Technician / Staff</th>
+                    <th className="py-3 px-4 text-right">Printed Pages</th>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                  {filteredUsages.map((usg) => (
+                    <tr key={usg.id} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
+                      <td className="py-3.5 px-4">
+                        <div>
+                          <span className="font-mono font-bold text-[#0B0F17] dark:text-white block text-xs">
+                            {usg.usageCode}
+                          </span>
+                          <span className="font-mono text-slate-500 dark:text-slate-400 text-[11px]">
+                            {usg.installedDate}
+                          </span>
+                        </div>
+                      </td>
+
+                      <td className="py-3.5 px-4 font-bold text-[#0B0F17] dark:text-white">
+                        {usg.branchName}
+                      </td>
+
+                      <td className="py-3.5 px-4 text-slate-700 dark:text-slate-300">
+                        <div className="flex items-center gap-1.5">
+                          <Printer className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
+                          <span className="truncate max-w-[200px]" title={usg.printerName}>
+                            {usg.printerName}
+                          </span>
+                        </div>
+                      </td>
+
+                      <td className="py-3.5 px-4">
+                        <div>
+                          <span className="font-medium text-slate-800 dark:text-slate-200 block">
+                            {usg.cartridgeModel}
+                          </span>
+                          <span className="text-slate-500 dark:text-slate-400 text-[11px]">
+                            {usg.cartridgeColor}
+                          </span>
+                        </div>
+                      </td>
+
+                      <td className="py-3.5 px-4 text-center font-mono tabular-nums font-bold text-sm text-[#0B0F17] dark:text-white">
+                        {usg.quantity}
+                      </td>
+
+                      <td className="py-3.5 px-4">
+                        <span className="text-slate-700 dark:text-slate-200 font-medium">
+                          {usg.reason}
+                        </span>
+                        {usg.notes && (
+                          <span className="block text-[11px] text-slate-400 dark:text-slate-500 italic mt-0.5 truncate max-w-[180px]" title={usg.notes}>
+                            &ldquo;{usg.notes}&rdquo;
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300 font-medium">
+                        {usg.installedBy}
+                      </td>
+
+                      <td className="py-3.5 px-4 text-right font-mono tabular-nums text-slate-700 dark:text-slate-200">
+                        {usg.estimatedPagesPrinted ? (
+                          <span>{usg.estimatedPagesPrinted.toLocaleString()} pgs</span>
+                        ) : (
+                          <span className="text-slate-300 dark:text-slate-600">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

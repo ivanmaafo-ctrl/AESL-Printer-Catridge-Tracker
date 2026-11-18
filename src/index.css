@@ -20,10 +20,31 @@
     letter-spacing: -0.025em;
   }
 
+  html, body {
+    overflow-x: clip;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button, a, select, input, [role="button"] {
+    touch-action: manipulation;
+  }
+
   .font-mono {
     font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-feature-settings: "tnum" 1;
   }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
 .bg-blue-hero {
