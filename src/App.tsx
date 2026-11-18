@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { InventoryProvider, useInventory } from './context/InventoryContext';
+import { InventoryProvider } from './context/InventoryContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Sidebar } from './components/Sidebar';
 import { ActiveTab } from './components/Navbar';
 import { AlertBanner } from './components/AlertBanner';
@@ -56,7 +57,29 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-[#06090F] text-[#0B0F17] dark:text-slate-100 font-sans flex flex-col relative isolate">
+      {/* Moving Dark Mode Atmospheric Color Gradient Layer */}
+      <div
+        aria-hidden="true"
+        className="hidden dark:block fixed inset-0 -z-10 overflow-hidden pointer-events-none print:hidden"
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-[#040814] via-[#071226] to-[#080F20]" />
+        <div
+          className="dark-ambient-orb-a absolute -top-40 -left-24 w-[680px] h-[680px] rounded-full opacity-45 blur-3xl"
+          style={{
+            background:
+              'radial-gradient(circle, rgba(37,99,235,0.32) 0%, rgba(14,165,233,0.14) 45%, rgba(6,9,15,0) 72%)',
+          }}
+        />
+        <div
+          className="dark-ambient-orb-b absolute -bottom-48 -right-24 w-[760px] h-[760px] rounded-full opacity-45 blur-3xl"
+          style={{
+            background:
+              'radial-gradient(circle, rgba(56,189,248,0.24) 0%, rgba(30,58,138,0.22) 45%, rgba(6,9,15,0) 72%)',
+          }}
+        />
+      </div>
+
       {/* Side Navigation Bar with Integrated Task Bar */}
       <Sidebar
         activeTab={activeTab}
@@ -138,10 +161,10 @@ const AppContent: React.FC = () => {
         </main>
 
         {/* Quiet Corporate Footer */}
-        <footer className="border-t border-slate-200 bg-white py-4 mt-auto print:hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+        <footer className="border-t border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#070B12]/80 backdrop-blur-sm py-4 mt-auto print:hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-2">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-800">Anointed Engineering Services Limited</span>
+              <span className="font-bold text-slate-800 dark:text-slate-100">Anointed Engineering Services Limited</span>
               <span aria-hidden="true">·</span>
               <span>IT Department · Multi-Branch Printer Cartridge Logistics</span>
             </div>
@@ -194,10 +217,12 @@ const AppContent: React.FC = () => {
 
 export default function App() {
   return (
-    <AdminAuthProvider>
-      <InventoryProvider>
-        <AppContent />
-      </InventoryProvider>
-    </AdminAuthProvider>
+    <ThemeProvider>
+      <AdminAuthProvider>
+        <InventoryProvider>
+          <AppContent />
+        </InventoryProvider>
+      </AdminAuthProvider>
+    </ThemeProvider>
   );
 }

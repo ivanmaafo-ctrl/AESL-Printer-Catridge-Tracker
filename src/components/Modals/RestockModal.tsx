@@ -62,27 +62,27 @@ export const RestockModal: React.FC<RestockModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-lg overflow-hidden transition-all animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/65 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-[#0D1420] rounded-3xl shadow-2xl border border-slate-200 dark:border-white/15 w-full max-w-lg overflow-hidden transition-all animate-in fade-in zoom-in-95 duration-150">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-blue-900/10 dark:border-white/10 bg-blue-hero">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] rounded-2xl shadow-xs">
               <Plus className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-900 leading-tight">
+              <h2 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
                 Top Up Central Warehouse Inventory
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-600 dark:text-slate-400">
                 Receive new cartridge delivery from vendor
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+            className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-full hover:bg-white/70 dark:hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -91,8 +91,8 @@ export const RestockModal: React.FC<RestockModalProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {success && (
-            <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
-              <PackageCheck className="w-4 h-4 shrink-0 text-emerald-600" />
+            <div className="p-3 rounded-2xl bg-[#E8F1FF] dark:bg-blue-500/15 border border-blue-200 dark:border-blue-500/30 text-blue-800 dark:text-sky-300 text-xs flex items-center gap-2">
+              <PackageCheck className="w-4 h-4 shrink-0 text-blue-600 dark:text-sky-400" />
               <span>Stock topped up successfully! Warehouse inventory updated.</span>
             </div>
           )}
@@ -100,12 +100,12 @@ export const RestockModal: React.FC<RestockModalProps> = ({
           {/* Cartridge Model */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-semibold text-slate-700">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Cartridge SKU to Restock <span className="text-rose-500">*</span>
               </label>
               {currentCartridge && (
-                <span className="text-xs font-mono text-slate-500">
-                  Current Stock: <strong>{currentCartridge.centralStock}</strong> / Min Threshold: <strong>{currentCartridge.minThreshold}</strong>
+                <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
+                  Current Stock: <strong className="text-slate-900 dark:text-white">{currentCartridge.centralStock}</strong> · Min: <strong className="text-slate-900 dark:text-white">{currentCartridge.minThreshold}</strong>
                 </span>
               )}
             </div>
@@ -113,7 +113,7 @@ export const RestockModal: React.FC<RestockModalProps> = ({
               value={cartridgeId}
               onChange={(e) => setCartridgeId(e.target.value)}
               required
-              className="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+              className="w-full px-3.5 py-2 text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
             >
               {cartridges.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -126,7 +126,7 @@ export const RestockModal: React.FC<RestockModalProps> = ({
           {/* Quantity & Unit Cost */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Quantity Received (Units) <span className="text-rose-500">*</span>
               </label>
               <input
@@ -135,12 +135,12 @@ export const RestockModal: React.FC<RestockModalProps> = ({
                 value={quantity}
                 onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                 required
-                className="w-full px-3 py-2 text-sm font-mono bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                className="w-full px-3.5 py-2 text-sm font-mono bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Unit Purchase Cost ($)
               </label>
               <input
@@ -148,7 +148,7 @@ export const RestockModal: React.FC<RestockModalProps> = ({
                 step="0.01"
                 value={unitCost}
                 onChange={(e) => setUnitCost(parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2 text-sm font-mono bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                className="w-full px-3.5 py-2 text-sm font-mono bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
               />
             </div>
           </div>
@@ -156,7 +156,7 @@ export const RestockModal: React.FC<RestockModalProps> = ({
           {/* PO Number & Supplier */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 PO / Invoice # <span className="text-rose-500">*</span>
               </label>
               <input
@@ -164,12 +164,12 @@ export const RestockModal: React.FC<RestockModalProps> = ({
                 value={poNumber}
                 onChange={(e) => setPoNumber(e.target.value)}
                 required
-                className="w-full px-3 py-2 text-sm font-mono bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                className="w-full px-3.5 py-2 text-sm font-mono bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Vendor / Supplier
               </label>
               <input
@@ -177,14 +177,14 @@ export const RestockModal: React.FC<RestockModalProps> = ({
                 value={supplier}
                 onChange={(e) => setSupplier(e.target.value)}
                 required
-                className="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                className="w-full px-3.5 py-2 text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
               />
             </div>
           </div>
 
           {/* Received By */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
               Received By (Staff Member)
             </label>
             <input
@@ -192,13 +192,13 @@ export const RestockModal: React.FC<RestockModalProps> = ({
               value={receivedBy}
               onChange={(e) => setReceivedBy(e.target.value)}
               required
-              className="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+              className="w-full px-3.5 py-2 text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
             />
           </div>
 
           {/* Notes */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
               Intake Notes
             </label>
             <input
@@ -206,30 +206,30 @@ export const RestockModal: React.FC<RestockModalProps> = ({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. Received in original sealed factory packaging"
-              className="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+              className="w-full px-3.5 py-2 text-sm bg-white dark:bg-[#070B12] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
             />
           </div>
 
           {/* Total value display */}
-          <div className="p-3 bg-slate-50 rounded-lg text-xs flex justify-between items-center text-slate-600 font-mono">
+          <div className="p-3.5 bg-[#F6F8FC] dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/10 rounded-2xl text-xs flex justify-between items-center text-slate-600 dark:text-slate-400 font-mono">
             <span>Total Intake Value:</span>
-            <span className="font-bold text-slate-900 text-sm">
+            <span className="font-bold text-slate-900 dark:text-white text-sm">
               ${(quantity * (unitCost || 0)).toFixed(2)}
             </span>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-white/10">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+              className="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-white/[0.06] border border-slate-200 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/10 transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-xs"
+              className="px-5 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors shadow-xs cursor-pointer"
             >
               Confirm Restock
             </button>

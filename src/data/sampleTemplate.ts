@@ -11,8 +11,8 @@ export const SAMPLE_TEMPLATE_CARTRIDGES: CartridgeSKU[] = [
     type: 'Toner',
     color: 'Black',
     compatiblePrinters: ['HP LaserJet P2035', 'HP LaserJet P2055dn'],
-    centralStock: 35, // Below 50 gauge! Triggers alert
-    minThreshold: 50, // 50-unit gauge
+    centralStock: 10, // Below 15 gauge! Triggers alert
+    minThreshold: 15, // 15-unit gauge
     unitCost: 68.0,
     supplier: 'Accra IT Supplies Ltd',
     pageYield: 2300,
@@ -28,8 +28,8 @@ export const SAMPLE_TEMPLATE_CARTRIDGES: CartridgeSKU[] = [
     type: 'Toner',
     color: 'Black',
     compatiblePrinters: ['HP Color LaserJet Pro M255dw', 'HP Color LaserJet MFP M283fdw'],
-    centralStock: 62, // Above 50 gauge -> Healthy
-    minThreshold: 50,
+    centralStock: 24, // Above 15 gauge -> Healthy
+    minThreshold: 15,
     unitCost: 72.0,
     supplier: 'Accra IT Supplies Ltd',
     pageYield: 1350,
@@ -45,8 +45,8 @@ export const SAMPLE_TEMPLATE_CARTRIDGES: CartridgeSKU[] = [
     type: 'Toner',
     color: 'Cyan',
     compatiblePrinters: ['HP Color LaserJet Pro M255dw', 'HP Color LaserJet MFP M283fdw'],
-    centralStock: 42, // Below 50 gauge! Triggers alert
-    minThreshold: 50,
+    centralStock: 11, // Below 15 gauge! Triggers alert
+    minThreshold: 15,
     unitCost: 78.0,
     supplier: 'Accra IT Supplies Ltd',
     pageYield: 1250,
@@ -62,8 +62,8 @@ export const SAMPLE_TEMPLATE_CARTRIDGES: CartridgeSKU[] = [
     type: 'Toner',
     color: 'Black',
     compatiblePrinters: ['Brother HL-L2350DW', 'Brother MFC-L2750DW'],
-    centralStock: 12, // Critical (<15) alert!
-    minThreshold: 50,
+    centralStock: 4, // Critical (<=5) alert!
+    minThreshold: 15,
     unitCost: 54.0,
     supplier: 'MegaTech Systems Ghana',
     pageYield: 3000,
@@ -79,8 +79,8 @@ export const SAMPLE_TEMPLATE_CARTRIDGES: CartridgeSKU[] = [
     type: 'Toner',
     color: 'Black',
     compatiblePrinters: ['Canon imageCLASS LBP226dw', 'Canon imageCLASS MF445dw'],
-    centralStock: 58, // Healthy
-    minThreshold: 50,
+    centralStock: 20, // Healthy
+    minThreshold: 15,
     unitCost: 110.0,
     supplier: 'MegaTech Systems Ghana',
     pageYield: 10000,

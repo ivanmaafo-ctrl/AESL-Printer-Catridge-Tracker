@@ -42,7 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'branches', label: 'Offices & Branches', icon: Building2 },
     { id: 'dispatches', label: 'Sent to Branches', icon: Truck },
     { id: 'usage', label: 'Usage Log', icon: Send },
-    { id: 'reorder', label: '50-Gauge Alerts', icon: AlertTriangle },
+    { id: 'reorder', label: '15-Gauge Alerts', icon: AlertTriangle },
     { id: 'admin', label: 'Master Admin', icon: isSuperAdmin ? ShieldCheck : Shield },
   ];
 
@@ -196,7 +196,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>{item.label}</span>
                 {isAdminTab && (
                   isAuthenticated ? (
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                   ) : (
                     <Lock className="w-3 h-3 text-slate-400" />
                   )

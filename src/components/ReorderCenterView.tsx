@@ -7,10 +7,7 @@ import {
   CheckCircle2,
   Download,
   Plus,
-  RefreshCw,
   FileText,
-  DollarSign,
-  Package,
 } from 'lucide-react';
 import { GaugeIndicator } from './GaugeIndicator';
 
@@ -28,7 +25,6 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
     cartridges,
   } = useInventory();
 
-  // Custom editable reorder quantities
   const [reorderQuantities, setReorderQuantities] = useState<Record<string, number>>(() => {
     const map: Record<string, number> = {};
     lowStockAlerts.forEach((a) => {
@@ -37,12 +33,11 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
     return map;
   });
 
-  const [poNumber, setPoNumber] = useState(
+  const [poNumber] = useState(
     `PO-RESTOCK-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`
   );
   const [batchSuccess, setBatchSuccess] = useState(false);
 
-  // Sync if alerts change
   React.useEffect(() => {
     setReorderQuantities((prev) => {
       const next = { ...prev };
@@ -74,20 +69,14 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
   const handleBatchReceiveAll = () => {
     if (lowStockAlerts.length === 0) return;
 
-    if (
-      window.confirm(
-        `Confirm intake receipt for ${totalSuggestedUnits} units across ${lowStockAlerts.length} SKUs into central warehouse with ${poNumber}?`
-      )
-    ) {
-      const items = lowStockAlerts.map((a) => ({
-        cartridgeId: a.cartridge.id,
-        quantity: reorderQuantities[a.cartridge.id] ?? a.suggestedReorder,
-      }));
+    const items = lowStockAlerts.map((a) => ({
+      cartridgeId: a.cartridge.id,
+      quantity: reorderQuantities[a.cartridge.id] ?? a.suggestedReorder,
+    }));
 
-      batchTopUpAlerts(items, poNumber);
-      setBatchSuccess(true);
-      setTimeout(() => setBatchSuccess(false), 3000);
-    }
+    batchTopUpAlerts(items, poNumber);
+    setBatchSuccess(true);
+    setTimeout(() => setBatchSuccess(false), 3000);
   };
 
   const handleExportReorderPO = () => {
@@ -142,47 +131,50 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
 
   return (
     <div className="space-y-6">
-      
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+      {/* Modern Blue / Moving Dark Gradient Header */}
+      <section className="bg-blue-hero rounded-3xl p-6 sm:p-8 border border-blue-200/70 dark:border-blue-500/20 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+          <div className="text-xs font-medium text-blue-950/75 dark:text-slate-400 flex items-center gap-2">
+            <span className="font-semibold text-[#0B0F17] dark:text-white">15-Unit Buffer Surveillance</span>
+            <span aria-hidden="true">·</span>
+            <span className="font-mono">{lowStockAlerts.length} SKUs Flagged</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0B0F17] dark:text-white mt-1.5">
             Low Stock Alerts & Top-Up Manager
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Automated threshold surveillance, suggested supplier order quantities, and batch intake
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-2xl">
+            Automated threshold surveillance, suggested supplier order quantities, and batch warehouse intake.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5 flex-wrap shrink-0">
           {lowStockAlerts.length > 0 && (
             <button
               onClick={handleExportReorderPO}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors shadow-xs"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 border border-slate-200/90 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/15 transition-colors cursor-pointer whitespace-nowrap"
             >
-              <Download className="w-4 h-4 text-slate-500" />
+              <Download className="w-4 h-4 text-blue-700 dark:text-sky-400" />
               <span>Export Purchase Order CSV</span>
             </button>
           )}
 
           <button
             onClick={() => onOpenRestock()}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-xs"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             <span>Single Restock Intake</span>
           </button>
         </div>
-      </div>
+      </section>
 
-      {/* Success banner if batch received */}
       {batchSuccess && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between animate-in fade-in duration-200">
+        <div className="p-4 rounded-2xl bg-[#EFF6FF] dark:bg-blue-500/15 border border-blue-200 dark:border-blue-500/30 text-blue-900 dark:text-sky-200 text-xs flex items-center justify-between animate-in fade-in duration-200">
           <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <CheckCircle2 className="w-5 h-5 text-blue-600 dark:text-sky-400 shrink-0" />
             <div>
-              <span className="font-bold text-sm block text-emerald-900">
-                Top-Up Completed Successfully!
+              <span className="font-bold text-sm block text-blue-950 dark:text-white">
+                Top-Up Completed Successfully
               </span>
               <span>All depleted cartridges have been received and credited to central warehouse inventory.</span>
             </div>
@@ -192,91 +184,81 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
 
       {/* Stock Health Status Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        
-        {/* Critical Card */}
-        <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs">
+        <div className="bg-rose-50/50 dark:bg-rose-500/10 rounded-2xl p-5 border border-rose-200/80 dark:border-rose-500/25">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-rose-700">
-              Critical (≤15 Left)
+            <span className="text-xs font-semibold text-rose-700 dark:text-rose-400">
+              Critical (≤5 Left)
             </span>
-            <div className="p-2 bg-rose-50 text-rose-600 rounded-lg">
-              <ShieldAlert className="w-5 h-5" />
-            </div>
+            <ShieldAlert className="w-4 h-4 text-rose-600 dark:text-rose-400" />
           </div>
-          <div className="text-3xl font-bold font-mono tabular-nums text-rose-700 mt-2">
-            {criticalCount} SKUs
+          <div className="text-3xl font-semibold font-mono tabular-nums text-rose-700 dark:text-rose-300 mt-2">
+            {criticalCount} <span className="text-xs font-sans font-normal">SKUs</span>
           </div>
-          <span className="text-xs text-slate-500 mt-1 block">
-            Prone to stockouts if branch demands toner immediately
+          <span className="text-xs text-slate-600 dark:text-slate-300 mt-1 block">
+            Prone to stockouts if branch demands toner
           </span>
         </div>
 
-        {/* Low Stock Warning Card */}
-        <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs">
+        <div className="bg-amber-50/50 dark:bg-amber-500/10 rounded-2xl p-5 border border-amber-200/80 dark:border-amber-500/25">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-amber-700">
+            <span className="text-xs font-semibold text-amber-800 dark:text-amber-300">
               Low Stock Warning
             </span>
-            <div className="p-2 bg-amber-50 text-amber-600 rounded-lg">
-              <AlertTriangle className="w-5 h-5" />
-            </div>
+            <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
-          <div className="text-3xl font-bold font-mono tabular-nums text-amber-800 mt-2">
-            {warningCount} SKUs
+          <div className="text-3xl font-semibold font-mono tabular-nums text-amber-800 dark:text-amber-300 mt-2">
+            {warningCount} <span className="text-xs font-sans font-normal">SKUs</span>
           </div>
-          <span className="text-xs text-slate-500 mt-1 block">
+          <span className="text-xs text-slate-600 dark:text-slate-300 mt-1 block">
             Below safe minimum buffer threshold
           </span>
         </div>
 
-        {/* Healthy Card */}
-        <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs">
+        <div className="bg-[#F3F8FF] dark:bg-blue-500/10 rounded-2xl p-5 border border-blue-200/80 dark:border-blue-500/25">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700">
+            <span className="text-xs font-semibold text-blue-700 dark:text-sky-300">
               Adequate Stock
             </span>
-            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
+            <CheckCircle2 className="w-4 h-4 text-blue-600 dark:text-sky-400" />
           </div>
-          <div className="text-3xl font-bold font-mono tabular-nums text-emerald-700 mt-2">
-            {cartridges.length - lowStockAlerts.length} SKUs
+          <div className="text-3xl font-semibold font-mono tabular-nums text-blue-700 dark:text-sky-400 mt-2">
+            {cartridges.length - lowStockAlerts.length} <span className="text-xs font-sans font-normal">SKUs</span>
           </div>
-          <span className="text-xs text-slate-500 mt-1 block">
+          <span className="text-xs text-slate-600 dark:text-slate-300 mt-1 block">
             Operating above designated safe threshold
           </span>
         </div>
       </div>
 
       {/* Suggested Reorder List & Batch Replenish Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-        <div className="px-5 py-4 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-50/50">
+      <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-100 dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-[#F6F8FC] dark:bg-white/[0.03]">
           <div>
             <div className="flex items-center gap-2">
-              <PackageCheck className="w-5 h-5 text-blue-600" />
-              <h2 className="text-base font-bold text-slate-900">
+              <PackageCheck className="w-5 h-5 text-blue-700 dark:text-sky-400" />
+              <h2 className="text-base font-bold text-[#0B0F17] dark:text-white">
                 Purchase Order Requisition & Top-Up Sheet
               </h2>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Calculates suggested order amounts based on minimum threshold, safety buffer, and factory pack sizes
             </p>
           </div>
 
           {lowStockAlerts.length > 0 && (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <div className="text-right">
-                <span className="text-xs text-slate-500 block">Est. PO Total</span>
-                <span className="text-sm font-bold font-mono text-slate-900">
+                <span className="text-xs text-slate-500 dark:text-slate-400 block">Est. PO Total</span>
+                <span className="text-sm font-bold font-mono text-[#0B0F17] dark:text-white">
                   ${totalEstimatedCost.toFixed(2)} ({totalSuggestedUnits} units)
                 </span>
               </div>
 
               <button
                 onClick={handleBatchReceiveAll}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-colors shadow-xs whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 hover:bg-slate-800 dark:hover:bg-sky-300 rounded-full transition-colors whitespace-nowrap cursor-pointer"
               >
-                <PackageCheck className="w-4 h-4 text-emerald-400" />
+                <PackageCheck className="w-4 h-4 text-sky-400 dark:text-[#06090F]" />
                 <span>Receive All Into Warehouse</span>
               </button>
             </div>
@@ -284,92 +266,87 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
         </div>
 
         {lowStockAlerts.length === 0 ? (
-          <div className="p-12 text-center text-slate-500">
-            <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
-            <h3 className="text-base font-bold text-slate-900">All Central Inventory is Healthy!</h3>
-            <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+          <div className="p-12 text-center text-slate-500 dark:text-slate-400">
+            <CheckCircle2 className="w-10 h-10 text-blue-600 dark:text-sky-400 mx-auto mb-2" />
+            <h3 className="text-base font-bold text-[#0B0F17] dark:text-white">All Central Inventory is Healthy</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
               Every printer cartridge SKU in central warehouse is currently stocked above its configured minimum threshold.
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase font-semibold">
+              <thead className="bg-[#F6F8FC] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
                 <tr>
                   <th className="py-3 px-4">Cartridge Model & SKU</th>
                   <th className="py-3 px-4">Supplier</th>
                   <th className="py-3 px-4 text-center">In Office at the Moment</th>
-                  <th className="py-3 px-4 text-center">50-Gauge Status</th>
+                  <th className="py-3 px-4 text-center">15-Gauge Status</th>
                   <th className="py-3 px-4 text-center">Suggested Order</th>
                   <th className="py-3 px-4 text-right">Unit Price</th>
                   <th className="py-3 px-4 text-right">Estimated Line Total</th>
                   <th className="py-3 px-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                 {lowStockAlerts.map((alert) => {
                   const currentQty =
                     reorderQuantities[alert.cartridge.id] ?? alert.suggestedReorder;
                   const lineTotal = currentQty * alert.cartridge.unitCost;
 
                   return (
-                    <tr key={alert.cartridge.id} className="hover:bg-slate-50/70 transition-colors">
-                      {/* Model & SKU */}
+                    <tr key={alert.cartridge.id} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
                       <td className="py-3.5 px-4">
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-bold text-slate-900 text-xs sm:text-sm">
+                            <span className="font-bold text-[#0B0F17] dark:text-white text-xs sm:text-sm">
                               {alert.cartridge.model}
                             </span>
                             {alert.cartridge.isBestSeller && (
-                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
-                                Best Seller
+                              <span className="text-[11px] font-semibold text-blue-700 dark:text-sky-400">
+                                · Best Seller
                               </span>
                             )}
                             <span
-                              className={`text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded ${
+                              className={`text-[10px] font-mono font-bold ${
                                 alert.severity === 'CRITICAL'
-                                  ? 'bg-rose-100 text-rose-700'
-                                  : 'bg-amber-100 text-amber-800'
+                                  ? 'text-rose-600 dark:text-rose-400'
+                                  : 'text-amber-700 dark:text-amber-400'
                               }`}
                             >
-                              {alert.currentStock === 0 ? 'OUT OF STOCK' : alert.severity}
+                              · {alert.currentStock === 0 ? 'OUT OF STOCK' : alert.severity}
                             </span>
                           </div>
-                          <span className="font-mono text-slate-500 text-[11px]">
+                          <span className="font-mono text-slate-500 dark:text-slate-400 text-[11px]">
                             {alert.cartridge.sku} · {alert.cartridge.color} · Pack of {alert.cartridge.reorderPackSize}
                           </span>
                         </div>
                       </td>
 
-                      {/* Supplier */}
-                      <td className="py-3.5 px-4 text-slate-700">
+                      <td className="py-3.5 px-4 text-slate-700 dark:text-slate-300">
                         {alert.cartridge.supplier}
                       </td>
 
-                      {/* In Office (Current Stock) */}
                       <td className="py-3.5 px-4 text-center">
                         <span
                           className={`font-mono font-bold text-sm tabular-nums ${
                             alert.currentStock === 0
-                              ? 'text-rose-600'
-                              : 'text-amber-700'
+                              ? 'text-rose-600 dark:text-rose-400'
+                              : 'text-amber-700 dark:text-amber-400'
                           }`}
                         >
                           {alert.currentStock} units
                         </span>
                       </td>
 
-                      {/* 50-Gauge Indicator */}
                       <td className="py-3.5 px-4 text-center">
                         <GaugeIndicator
                           currentStock={alert.currentStock}
-                          gaugeTarget={alert.minThreshold || 50}
+                          gaugeTarget={alert.minThreshold || 15}
                           compact={true}
                         />
                       </td>
 
-                      {/* Suggested Order Qty (editable) */}
                       <td className="py-3.5 px-4 text-center">
                         <div className="inline-flex items-center gap-1.5">
                           <input
@@ -382,30 +359,27 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
                                 parseInt(e.target.value) || 1
                               )
                             }
-                            className="w-16 px-2 py-1 text-xs font-mono font-bold text-center border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
+                            className="w-16 px-2 py-1 text-xs font-mono font-bold text-center border border-slate-300 dark:border-white/15 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white"
                           />
-                          <span className="text-[11px] text-slate-400">units</span>
+                          <span className="text-[11px] text-slate-400 dark:text-slate-500">units</span>
                         </div>
                       </td>
 
-                      {/* Unit Price */}
-                      <td className="py-3.5 px-4 text-right font-mono tabular-nums text-slate-800">
-                        {alert.cartridge.unitCost > 0 ? `$${alert.cartridge.unitCost.toFixed(2)}` : <span className="text-slate-400">—</span>}
+                      <td className="py-3.5 px-4 text-right font-mono tabular-nums text-slate-800 dark:text-slate-200">
+                        {alert.cartridge.unitCost > 0 ? `$${alert.cartridge.unitCost.toFixed(2)}` : <span className="text-slate-400 dark:text-slate-600">—</span>}
                       </td>
 
-                      {/* Estimated Total */}
-                      <td className="py-3.5 px-4 text-right font-mono tabular-nums font-bold text-slate-900">
-                        {lineTotal > 0 ? `$${lineTotal.toFixed(2)}` : <span className="text-slate-400">—</span>}
+                      <td className="py-3.5 px-4 text-right font-mono tabular-nums font-bold text-[#0B0F17] dark:text-white">
+                        {lineTotal > 0 ? `$${lineTotal.toFixed(2)}` : <span className="text-slate-400 dark:text-slate-600">—</span>}
                       </td>
 
-                      {/* Action */}
                       <td className="py-3.5 px-4 text-right">
                         <button
                           onClick={() => onOpenRestock(alert.cartridge.id)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded border border-blue-200 transition-colors"
+                          className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-[#0B0F17] dark:text-[#06090F] bg-[#E8F1FF] dark:bg-sky-400 hover:bg-blue-200 dark:hover:bg-sky-300 rounded-full border border-blue-200 dark:border-transparent transition-colors cursor-pointer whitespace-nowrap"
                         >
                           <Plus className="w-3 h-3" />
-                          <span>Top Up Item</span>
+                          <span>Top Up</span>
                         </button>
                       </td>
                     </tr>
@@ -418,48 +392,48 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
       </div>
 
       {/* Past Restock Intake History */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-100 dark:border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-slate-600" />
-            <h3 className="text-sm font-bold text-slate-900">
+            <FileText className="w-4 h-4 text-blue-700 dark:text-sky-400" />
+            <h3 className="text-sm font-bold text-[#0B0F17] dark:text-white">
               Recent Warehouse Top-Up Intake Receipts
             </h3>
           </div>
-          <span className="text-xs font-mono text-slate-500">
+          <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
             {restocks.length} recorded deliveries
           </span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase font-semibold">
+            <thead className="bg-[#F6F8FC] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
               <tr>
-                <th className="py-2.5 px-4">PO / Intake #</th>
-                <th className="py-2.5 px-4">Cartridge Model</th>
-                <th className="py-2.5 px-4 text-center">Units Received</th>
-                <th className="py-2.5 px-4">Vendor</th>
-                <th className="py-2.5 px-4">Date</th>
-                <th className="py-2.5 px-4">Receiver</th>
-                <th className="py-2.5 px-4 text-right">Total Cost</th>
+                <th className="py-3 px-4">PO / Intake #</th>
+                <th className="py-3 px-4">Cartridge Model</th>
+                <th className="py-3 px-4 text-center">Units Received</th>
+                <th className="py-3 px-4">Vendor</th>
+                <th className="py-3 px-4">Date</th>
+                <th className="py-3 px-4">Receiver</th>
+                <th className="py-3 px-4 text-right">Total Cost</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
               {restocks.map((rst) => (
-                <tr key={rst.id} className="hover:bg-slate-50/70 transition-colors">
-                  <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                <tr key={rst.id} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
+                  <td className="py-3 px-4 font-mono font-bold text-[#0B0F17] dark:text-white">
                     {rst.poNumber}
                   </td>
-                  <td className="py-3 px-4 font-semibold text-slate-800">
+                  <td className="py-3 px-4 font-semibold text-slate-800 dark:text-slate-200">
                     {rst.cartridgeModel}
                   </td>
-                  <td className="py-3 px-4 text-center font-mono tabular-nums font-bold text-emerald-700">
+                  <td className="py-3 px-4 text-center font-mono tabular-nums font-bold text-blue-700 dark:text-sky-400">
                     +{rst.quantityReceived}
                   </td>
-                  <td className="py-3 px-4 text-slate-600">{rst.supplier}</td>
-                  <td className="py-3 px-4 font-mono text-slate-500">{rst.receivedDate}</td>
-                  <td className="py-3 px-4 text-slate-600">{rst.receivedBy}</td>
-                  <td className="py-3 px-4 text-right font-mono tabular-nums text-slate-800">
+                  <td className="py-3 px-4 text-slate-600 dark:text-slate-300">{rst.supplier}</td>
+                  <td className="py-3 px-4 font-mono text-slate-500 dark:text-slate-400">{rst.receivedDate}</td>
+                  <td className="py-3 px-4 text-slate-600 dark:text-slate-300">{rst.receivedBy}</td>
+                  <td className="py-3 px-4 text-right font-mono tabular-nums text-slate-800 dark:text-slate-200">
                     ${(rst.quantityReceived * rst.unitCost).toFixed(2)}
                   </td>
                 </tr>
@@ -468,7 +442,6 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
           </table>
         </div>
       </div>
-
     </div>
   );
 };

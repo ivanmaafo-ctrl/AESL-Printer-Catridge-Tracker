@@ -5,16 +5,10 @@ import {
   Plus,
   Search,
   Filter,
-  AlertTriangle,
   Truck,
-  Edit2,
   Trash2,
-  Check,
-  ShieldAlert,
-  Building2,
   FileSpreadsheet,
 } from 'lucide-react';
-import { CartridgeSKU } from '../types/inventory';
 import { GaugeIndicator } from './GaugeIndicator';
 
 interface CentralInventoryViewProps {
@@ -30,14 +24,12 @@ export const CentralInventoryView: React.FC<CentralInventoryViewProps> = ({
   onOpenDispatch,
   onOpenReports,
 }) => {
-  const { cartridges, updateCartridge, deleteCartridge, getSentOutCountForCartridge } = useInventory();
+  const { cartridges, deleteCartridge, getSentOutCountForCartridge } = useInventory();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [brandFilter, setBrandFilter] = useState('ALL');
   const [colorFilter, setColorFilter] = useState('ALL');
   const [stockStatusFilter, setStockStatusFilter] = useState<'ALL' | 'LOW' | 'HEALTHY'>('ALL');
-  const [editingThresholdId, setEditingThresholdId] = useState<string | null>(null);
-  const [tempThreshold, setTempThreshold] = useState<number>(5);
   const [confirmDeleteSkuId, setConfirmDeleteSkuId] = useState<string | null>(null);
 
   const brands = useMemo(() => {
@@ -72,10 +64,20 @@ export const CentralInventoryView: React.FC<CentralInventoryViewProps> = ({
     });
   }, [cartridges, searchQuery, brandFilter, colorFilter, stockStatusFilter]);
 
-  const handleSaveThreshold = (id: string) => {
-    updateCartridge(id, { minThreshold: Math.max(1, tempThreshold) });
-    setEditingThresholdId(null);
-  };
+  const totalUnitsInOffice = useMemo(
+    () => cartridges.reduce((sum, c) => sum + c.centralStock, 0),
+    [cartridges]
+  );
+
+  const belowGaugeCount = useMemo(
+    () => cartridges.filter((c) => c.centralStock < (c.minThreshold || 15)).length,
+    [cartridges]
+  );
+
+  const totalSentOut = useMemo(
+    () => cartridges.reduce((sum, c) => sum + getSentOutCountForCartridge(c.id), 0),
+    [cartridges, getSentOutCountForCartridge]
+  );
 
   const handleDelete = (id: string) => {
     deleteCartridge(id);
@@ -84,70 +86,104 @@ export const CentralInventoryView: React.FC<CentralInventoryViewProps> = ({
 
   return (
     <div className="space-y-6">
-      
-      {/* Header and top action bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+      {/* Modern Blue / Moving Dark Gradient Header */}
+      <section className="bg-blue-hero rounded-3xl p-6 sm:p-8 border border-blue-200/70 dark:border-blue-500/20 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+          <div className="text-xs font-medium text-blue-950/75 dark:text-slate-400 flex items-center gap-2">
+            <span className="font-semibold text-[#0B0F17] dark:text-white">Central Store</span>
+            <span aria-hidden="true">·</span>
+            <span>{cartridges.length} Registered SKUs</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0B0F17] dark:text-white mt-1.5">
             Central Warehouse Stockroom
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Manage central supplies, minimum replenish thresholds, and warehouse dispatches
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-2xl">
+            Manage central supplies, monitor 15-unit safety gauges, and dispatch toner cartridges to branches.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap shrink-0">
           <button
             onClick={onOpenReports}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-800 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 active:bg-slate-100 transition-colors shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 border border-slate-200/90 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/15 transition-colors cursor-pointer whitespace-nowrap"
           >
-            <FileSpreadsheet className="w-4 h-4 text-amber-600" />
+            <FileSpreadsheet className="w-4 h-4 text-blue-700 dark:text-sky-400" />
             <span>Report</span>
           </button>
 
           <button
             onClick={() => onOpenRestock()}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-800 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 active:bg-slate-100 transition-colors shadow-xs"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 border border-slate-200/90 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/15 transition-colors cursor-pointer whitespace-nowrap"
           >
-            <Package className="w-4 h-4 text-blue-600" />
+            <Package className="w-4 h-4 text-blue-700 dark:text-sky-400" />
             <span>Top Up Inventory</span>
           </button>
 
           <button
             onClick={onOpenAddCartridge}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-xs"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             <span>Add New SKU</span>
           </button>
         </div>
+      </section>
+
+      {/* Bento KPI Summary Strip */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-sm rounded-2xl p-5 border border-slate-200/70 dark:border-white/10">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">In Office at the Moment</span>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-semibold tracking-tight font-mono tabular-nums text-[#0B0F17] dark:text-white">
+              {totalUnitsInOffice}
+            </span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">units on shelf</span>
+          </div>
+        </div>
+
+        <div className="bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-sm rounded-2xl p-5 border border-slate-200/70 dark:border-white/10">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Below 15-Unit Gauge</span>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className={`text-3xl font-semibold tracking-tight font-mono tabular-nums ${belowGaugeCount > 0 ? 'text-amber-700 dark:text-amber-400' : 'text-blue-700 dark:text-sky-400'}`}>
+              {belowGaugeCount}
+            </span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">of {cartridges.length} SKUs</span>
+          </div>
+        </div>
+
+        <div className="bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-sm rounded-2xl p-5 border border-slate-200/70 dark:border-white/10">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Sent Out to Branches</span>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-semibold tracking-tight font-mono tabular-nums text-[#0B0F17] dark:text-white">
+              {totalSentOut}
+            </span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">units dispatched</span>
+          </div>
+        </div>
       </div>
 
       {/* Search & Filter Toolbar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.03)] space-y-3">
+      <div className="bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-sm p-4 rounded-2xl border border-slate-200/80 dark:border-white/10 space-y-3">
         <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-          
-          {/* Search box */}
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search model, SKU, compatible printer, or supplier..."
-              className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-slate-50/50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              className="w-full pl-10 pr-3 py-2 text-xs sm:text-sm bg-white dark:bg-[#0B111B] border border-slate-200 dark:border-white/15 rounded-xl text-[#0B0F17] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500"
             />
           </div>
 
-          {/* Filter segment */}
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <Filter className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-xs text-slate-500 font-medium">Brand:</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Brand:</span>
               <select
                 value={brandFilter}
                 onChange={(e) => setBrandFilter(e.target.value)}
-                className="px-2 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none"
+                className="px-2.5 py-1.5 text-xs bg-white dark:bg-[#0B111B] text-[#0B0F17] dark:text-slate-100 border border-slate-200 dark:border-white/15 rounded-xl focus:outline-none"
               >
                 {brands.map((b) => (
                   <option key={b} value={b}>
@@ -157,12 +193,12 @@ export const CentralInventoryView: React.FC<CentralInventoryViewProps> = ({
               </select>
             </div>
 
-            <div className="flex items-center gap-1">
-              <span className="text-xs text-slate-500 font-medium">Color:</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Color:</span>
               <select
                 value={colorFilter}
                 onChange={(e) => setColorFilter(e.target.value)}
-                className="px-2 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none"
+                className="px-2.5 py-1.5 text-xs bg-white dark:bg-[#0B111B] text-[#0B0F17] dark:text-slate-100 border border-slate-200 dark:border-white/15 rounded-xl focus:outline-none"
               >
                 {colors.map((c) => (
                   <option key={c} value={c}>
@@ -172,34 +208,33 @@ export const CentralInventoryView: React.FC<CentralInventoryViewProps> = ({
               </select>
             </div>
 
-            {/* Segmented control for Stock state */}
-            <div className="flex items-center bg-slate-100 p-0.5 rounded-lg text-xs font-medium">
+            <div className="flex items-center bg-slate-200/70 dark:bg-white/5 p-0.5 rounded-full text-xs font-semibold">
               <button
                 onClick={() => setStockStatusFilter('ALL')}
-                className={`px-2.5 py-1 rounded-md transition-colors ${
+                className={`px-3 py-1 rounded-full transition-colors cursor-pointer whitespace-nowrap ${
                   stockStatusFilter === 'ALL'
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-sky-400 text-[#0B0F17] dark:text-[#06090F] shadow-2xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-[#0B0F17] dark:hover:text-white'
                 }`}
               >
                 All ({cartridges.length})
               </button>
               <button
                 onClick={() => setStockStatusFilter('LOW')}
-                className={`px-2.5 py-1 rounded-md transition-colors ${
+                className={`px-3 py-1 rounded-full transition-colors cursor-pointer whitespace-nowrap ${
                   stockStatusFilter === 'LOW'
-                    ? 'bg-white text-amber-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-amber-400 text-amber-900 dark:text-[#06090F] shadow-2xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-[#0B0F17] dark:hover:text-white'
                 }`}
               >
                 Low / Reorder
               </button>
               <button
                 onClick={() => setStockStatusFilter('HEALTHY')}
-                className={`px-2.5 py-1 rounded-md transition-colors ${
+                className={`px-3 py-1 rounded-full transition-colors cursor-pointer whitespace-nowrap ${
                   stockStatusFilter === 'HEALTHY'
-                    ? 'bg-white text-emerald-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-sky-400 text-blue-900 dark:text-[#06090F] shadow-2xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-[#0B0F17] dark:hover:text-white'
                 }`}
               >
                 Healthy
@@ -210,27 +245,27 @@ export const CentralInventoryView: React.FC<CentralInventoryViewProps> = ({
       </div>
 
       {/* Inventory Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+      <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase font-semibold">
+            <thead className="bg-[#F8FAFD] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
               <tr>
                 <th className="py-3 px-4">Cartridge SKU & Specification</th>
                 <th className="py-3 px-4">Brand & Color</th>
                 <th className="py-3 px-4 text-center">In Office at the Moment</th>
-                <th className="py-3 px-4 text-center">50-Unit Gauge Status</th>
+                <th className="py-3 px-4 text-center">15-Unit Gauge Status</th>
                 <th className="py-3 px-4 text-center">Sent Out to Branches</th>
                 <th className="py-3 px-4 text-right">Unit Cost</th>
                 <th className="py-3 px-4 text-right">Quick Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
               {filteredCartridges.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-500">
-                    <Package className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                    <p className="font-semibold text-slate-700">No cartridges match your filter.</p>
-                    <p className="text-xs text-slate-400 mt-1">Try resetting the search terms or filters.</p>
+                  <td colSpan={7} className="py-12 text-center text-slate-500 dark:text-slate-400">
+                    <Package className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                    <p className="font-semibold text-slate-700 dark:text-slate-300">No cartridges match your filter.</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Try resetting the search terms or filters.</p>
                   </td>
                 </tr>
               ) : (
@@ -238,74 +273,67 @@ export const CentralInventoryView: React.FC<CentralInventoryViewProps> = ({
                   const sentOutCount = getSentOutCountForCartridge(cart.id);
 
                   return (
-                    <tr key={cart.id} className="hover:bg-slate-50/70 transition-colors">
-                      {/* Model & SKU */}
+                    <tr key={cart.id} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
                       <td className="py-3.5 px-4">
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-bold text-slate-900 text-xs sm:text-sm">
+                            <span className="font-bold text-[#0B0F17] dark:text-white text-xs sm:text-sm">
                               {cart.model}
                             </span>
                             {cart.isBestSeller && (
-                              <span className="px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded bg-blue-50 text-blue-700 border border-blue-200">
-                                Best Seller
+                              <span className="text-[11px] font-semibold text-blue-700 dark:text-sky-400">
+                                · Best Seller
                               </span>
                             )}
                           </div>
-                          <span className="font-mono text-slate-500 text-[11px]">
+                          <span className="font-mono text-slate-500 dark:text-slate-400 text-[11px]">
                             {cart.sku} {cart.specification ? `· ${cart.specification}` : ''}
                           </span>
                         </div>
                       </td>
 
-                      {/* Brand & Color */}
-                      <td className="py-3.5 px-4 text-slate-700">
+                      <td className="py-3.5 px-4 text-slate-700 dark:text-slate-300">
                         <div className="flex items-center gap-1.5">
                           <span className="font-medium">{cart.brand}</span>
-                          <span aria-hidden="true" className="text-slate-400">·</span>
+                          <span aria-hidden="true" className="text-slate-400 dark:text-slate-600">·</span>
                           <span>{cart.color}</span>
-                          <span aria-hidden="true" className="text-slate-400">·</span>
-                          <span className="text-slate-500 text-[11px]">{cart.type}</span>
+                          <span aria-hidden="true" className="text-slate-400 dark:text-slate-600">·</span>
+                          <span className="text-slate-500 dark:text-slate-400 text-[11px]">{cart.type}</span>
                         </div>
                       </td>
 
-                      {/* In Office (Warehouse) */}
                       <td className="py-3.5 px-4 text-center">
                         <div className="inline-flex flex-col items-center">
-                          <span className="text-sm font-bold font-mono tabular-nums text-slate-900">
+                          <span className="text-sm font-bold font-mono tabular-nums text-[#0B0F17] dark:text-white">
                             {cart.centralStock} units
                           </span>
-                          <span className="text-[10px] text-slate-400">In Central Store</span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500">In Central Store</span>
                         </div>
                       </td>
 
-                      {/* Visual 50-Unit Gauge Status */}
                       <td className="py-3.5 px-4 text-center">
                         <GaugeIndicator
                           currentStock={cart.centralStock}
-                          gaugeTarget={cart.minThreshold || 50}
+                          gaugeTarget={cart.minThreshold || 15}
                           compact={true}
                         />
                       </td>
 
-                      {/* Sent Out to Other Offices */}
-                      <td className="py-3.5 px-4 text-center font-mono font-bold tabular-nums text-slate-800 text-xs">
+                      <td className="py-3.5 px-4 text-center font-mono font-bold tabular-nums text-slate-800 dark:text-slate-200 text-xs">
                         {sentOutCount} units sent
                       </td>
 
-                      {/* Unit Cost */}
-                      <td className="py-3.5 px-4 text-right font-mono tabular-nums text-slate-800">
-                        {cart.unitCost > 0 ? `$${cart.unitCost.toFixed(2)}` : <span className="text-slate-400">—</span>}
+                      <td className="py-3.5 px-4 text-right font-mono tabular-nums text-slate-800 dark:text-slate-200">
+                        {cart.unitCost > 0 ? `$${cart.unitCost.toFixed(2)}` : <span className="text-slate-400 dark:text-slate-600">—</span>}
                       </td>
 
-                      {/* Actions */}
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => onOpenDispatch(cart.id)}
                             disabled={cart.centralStock === 0}
                             title="Dispatch to branch"
-                            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded border border-slate-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-[#0B0F17] dark:hover:text-sky-300 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 rounded-full border border-slate-200 dark:border-white/15 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                           >
                             <Truck className="w-3 h-3" />
                             <span>Dispatch</span>
@@ -314,23 +342,23 @@ export const CentralInventoryView: React.FC<CentralInventoryViewProps> = ({
                           <button
                             onClick={() => onOpenRestock(cart.id)}
                             title="Top up stock"
-                            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded transition-colors"
+                            className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 hover:bg-slate-800 dark:hover:bg-sky-300 rounded-full transition-colors cursor-pointer"
                           >
                             <Plus className="w-3 h-3" />
                             <span>Top Up</span>
                           </button>
 
                           {confirmDeleteSkuId === cart.id ? (
-                            <span className="inline-flex items-center gap-1 bg-rose-50 px-1 py-0.5 rounded border border-rose-200">
+                            <span className="inline-flex items-center gap-1 bg-rose-50 dark:bg-rose-500/15 px-1.5 py-0.5 rounded-full border border-rose-200 dark:border-rose-500/30">
                               <button
                                 onClick={() => handleDelete(cart.id)}
-                                className="px-1.5 py-0.5 bg-rose-600 text-white rounded text-[10px] font-bold"
+                                className="px-2 py-0.5 bg-rose-600 text-white rounded-full text-[10px] font-bold cursor-pointer"
                               >
                                 Delete
                               </button>
                               <button
                                 onClick={() => setConfirmDeleteSkuId(null)}
-                                className="px-1 py-0.5 text-slate-500 hover:text-slate-700 text-[10px]"
+                                className="px-1 py-0.5 text-slate-500 dark:text-slate-300 hover:text-slate-700 text-[10px] cursor-pointer"
                               >
                                 ×
                               </button>
@@ -339,7 +367,7 @@ export const CentralInventoryView: React.FC<CentralInventoryViewProps> = ({
                             <button
                               onClick={() => setConfirmDeleteSkuId(cart.id)}
                               title="Delete SKU"
-                              className="p-1 text-slate-300 hover:text-rose-600 rounded transition-colors"
+                              className="p-1.5 text-slate-300 dark:text-slate-600 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -354,7 +382,6 @@ export const CentralInventoryView: React.FC<CentralInventoryViewProps> = ({
           </table>
         </div>
       </div>
-
     </div>
   );
 };

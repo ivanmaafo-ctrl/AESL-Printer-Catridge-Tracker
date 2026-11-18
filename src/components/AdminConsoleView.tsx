@@ -5,7 +5,6 @@ import { AdminLoginView } from './AdminLoginView';
 import { AdminUserManagementTab } from './AdminUserManagementTab';
 import {
   Shield,
-  Key,
   Save,
   Download,
   Upload,
@@ -17,10 +16,7 @@ import {
   AlertTriangle,
   FileCode,
   Globe,
-  GitBranch,
-  RefreshCw,
   Edit2,
-  Sliders,
   LogOut,
   Users,
   Lock,
@@ -49,7 +45,6 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
   const {
     cartridges,
     branches,
-    dispatches,
     directUpdateStock,
     updateCartridge,
     deleteCartridge,
@@ -63,7 +58,6 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
     loadAESLBranches,
   } = useInventory();
 
-  // Local draft states for inline quick editing
   const [stockDrafts, setStockDrafts] = useState<Record<string, { stock: number; threshold: number; spec: string }>>({});
   const [editingBranchId, setEditingBranchId] = useState<string | null>(null);
   const [branchDrafts, setBranchDrafts] = useState<Record<string, { name: string; code: string; city: string; address: string }>>({});
@@ -75,27 +69,25 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // If not authenticated, show secure login portal
   if (!isAuthenticated) {
     return <AdminLoginView />;
   }
 
-  // Initialize stock drafts
   const getDraft = (cart: CartridgeSKU) => {
     return (
       stockDrafts[cart.id] || {
         stock: cart.centralStock,
-        threshold: cart.minThreshold !== undefined ? cart.minThreshold : 50,
+        threshold: cart.minThreshold !== undefined ? cart.minThreshold : 15,
         spec: cart.specification || '',
       }
     );
   };
 
-  const handleStockDraftChange = (id: string, field: 'stock' | 'threshold' | 'spec', value: any) => {
+  const handleStockDraftChange = (id: string, field: 'stock' | 'threshold' | 'spec', value: string | number) => {
     setStockDrafts((prev) => {
       const current = prev[id] || {
         stock: cartridges.find((c) => c.id === id)?.centralStock || 0,
-        threshold: cartridges.find((c) => c.id === id)?.minThreshold || 50,
+        threshold: cartridges.find((c) => c.id === id)?.minThreshold || 15,
         spec: cartridges.find((c) => c.id === id)?.specification || '',
       };
       return {
@@ -119,7 +111,6 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
     }
   };
 
-  // Branch editing
   const startEditBranch = (b: Branch) => {
     setEditingBranchId(b.id);
     setBranchDrafts((prev) => ({
@@ -152,7 +143,6 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
     setTimeout(() => setNotification(null), 3000);
   };
 
-  // Export JSON file
   const handleDownloadBackup = () => {
     const jsonStr = exportDatabaseJSON();
     const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -167,7 +157,6 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
     showToast('success', 'Backup file downloaded successfully.');
   };
 
-  // Import JSON file
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -188,51 +177,46 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
 
   return (
     <div className="space-y-6">
-      
-      {/* Admin Mode Badge Header */}
-      <div className="bg-slate-900 text-white rounded-xl p-5 border border-slate-800 shadow-md">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className={`p-2.5 rounded-lg text-white shrink-0 mt-0.5 ${
-              isSuperAdmin ? 'bg-gradient-to-tr from-amber-600 to-amber-500' : 'bg-blue-600'
-            }`}>
-              {isSuperAdmin ? <ShieldCheck className="w-6 h-6 text-slate-950" /> : <Shield className="w-6 h-6" />}
+      {/* Modern Blue / Moving Dark Gradient Admin Header */}
+      <section className="bg-blue-hero rounded-3xl p-6 sm:p-8 border border-blue-200/70 dark:border-blue-500/20">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+          <div className="flex items-start gap-3.5">
+            <div
+              className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
+                isSuperAdmin
+                  ? 'bg-[#0B0F17] dark:bg-amber-400 text-amber-400 dark:text-[#06090F]'
+                  : 'bg-[#0B0F17] dark:bg-sky-400 text-sky-400 dark:text-[#06090F]'
+              }`}
+            >
+              {isSuperAdmin ? <ShieldCheck className="w-6 h-6" /> : <Shield className="w-6 h-6" />}
             </div>
             <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className={`text-xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${
-                  isSuperAdmin
-                    ? 'bg-amber-400 text-slate-950 border-amber-300 font-extrabold'
-                    : 'bg-blue-500/20 text-blue-300 border-blue-500/40'
-                }`}>
+              <div className="flex items-center gap-2 flex-wrap text-xs">
+                <span className={`font-semibold ${isSuperAdmin ? 'text-amber-700 dark:text-amber-400' : 'text-blue-800 dark:text-sky-400'}`}>
                   {isSuperAdmin ? 'Tier 1 · Super Admin Authority' : 'Tier 2 · Operations Admin'}
                 </span>
-                <span className="text-xs text-slate-400 font-mono">
-                  Anointed Engineering Services Limited · IT Department
+                <span aria-hidden="true" className="text-slate-400 dark:text-slate-600">·</span>
+                <span className="text-slate-600 dark:text-slate-400 font-mono">
+                  AESL IT Department
                 </span>
               </div>
-              <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white mt-1">
-                Master Administration & Cloud Portability Console
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0B0F17] dark:text-white mt-1">
+                Master Administration & Backup Console
               </h1>
-              <p className="text-xs text-slate-300 mt-0.5">
-                Full direct control over In-Office warehouse counts, Sent-Out branch allocations, 50-unit threshold gauges, and Netlify hosting backups.
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-2xl">
+                Direct control over In-Office warehouse counts, branch allocations, 15-unit threshold gauges, and Netlify backups.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-start md:self-auto flex-wrap">
-            {/* Authenticated user session info */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs">
-              <div className="text-left">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-slate-200">{currentUser?.displayName || currentUser?.username}</span>
-                  <span className="text-[10px] text-slate-400 font-mono">(@{currentUser?.username})</span>
-                </div>
-              </div>
+          <div className="flex items-center gap-2.5 self-start lg:self-auto flex-wrap">
+            <div className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/90 dark:bg-white/10 border border-slate-200/80 dark:border-white/15 text-xs">
+              <span className="font-bold text-[#0B0F17] dark:text-white">{currentUser?.displayName || currentUser?.username}</span>
+              <span className="text-[11px] text-slate-400 font-mono">(@{currentUser?.username})</span>
               <button
                 type="button"
                 onClick={logout}
-                className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-slate-700 hover:bg-rose-900/60 hover:text-rose-200 text-slate-300 rounded text-[11px] font-semibold transition"
+                className="ml-1 inline-flex items-center gap-1 px-2.5 py-0.5 bg-slate-100 dark:bg-white/10 hover:bg-rose-50 dark:hover:bg-rose-500/20 text-slate-700 dark:text-slate-200 hover:text-rose-700 dark:hover:text-rose-300 rounded-full text-[11px] font-semibold transition cursor-pointer"
                 title="Sign out of Admin Portal"
               >
                 <LogOut className="w-3 h-3" />
@@ -242,9 +226,9 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
 
             <button
               onClick={handleDownloadBackup}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition-colors shadow-xs"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 hover:bg-slate-50 dark:hover:bg-white/15 border border-slate-200/90 dark:border-white/15 rounded-full transition-colors cursor-pointer whitespace-nowrap"
             >
-              <Download className="w-4 h-4 text-blue-400" />
+              <Download className="w-4 h-4 text-blue-700 dark:text-sky-400" />
               <span>Download JSON Backup</span>
             </button>
 
@@ -256,14 +240,16 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                 }
                 fileInputRef.current?.click();
               }}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white rounded-lg transition-colors shadow-xs ${
-                isSuperAdmin ? 'bg-blue-600 hover:bg-blue-700' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+              className={`inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-full transition-colors cursor-pointer whitespace-nowrap ${
+                isSuperAdmin
+                  ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] hover:bg-slate-800 dark:hover:bg-sky-300'
+                  : 'bg-white/60 dark:bg-white/5 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10'
               }`}
               title={!isSuperAdmin ? 'Requires Super Admin clearance' : 'Upload backup file'}
             >
               <Upload className="w-4 h-4" />
-              <span>Restore from Backup</span>
-              {!isSuperAdmin && <Lock className="w-3 h-3 ml-0.5 text-amber-400" />}
+              <span>Restore Backup</span>
+              {!isSuperAdmin && <Lock className="w-3 h-3 ml-0.5 text-amber-600 dark:text-amber-400" />}
             </button>
             <input
               type="file"
@@ -275,123 +261,84 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
           </div>
         </div>
 
-        {/* Admin Tabs */}
-        <div className="mt-5 pt-4 border-t border-slate-800 flex items-center gap-2 overflow-x-auto scrollbar-none text-xs">
-          <button
-            onClick={() => setActiveAdminTab('inventory')}
-            className={`px-3 py-1.5 rounded-lg font-semibold transition-colors flex items-center gap-1.5 ${
-              activeAdminTab === 'inventory'
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-300 hover:bg-slate-800'
-            }`}
-          >
-            <Package className="w-3.5 h-3.5" />
-            <span>Master Inventory & 50-Gauge Editor ({cartridges.length})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveAdminTab('branches')}
-            className={`px-3 py-1.5 rounded-lg font-semibold transition-colors flex items-center gap-1.5 ${
-              activeAdminTab === 'branches'
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-300 hover:bg-slate-800'
-            }`}
-          >
-            <Building2 className="w-3.5 h-3.5" />
-            <span>Offices & Branches Manager ({branches.length})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveAdminTab('backup')}
-            className={`px-3 py-1.5 rounded-lg font-semibold transition-colors flex items-center gap-1.5 ${
-              activeAdminTab === 'backup'
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-300 hover:bg-slate-800'
-            }`}
-          >
-            <FileCode className="w-3.5 h-3.5" />
-            <span>Data Export / Import Hub</span>
-          </button>
-
-          <button
-            onClick={() => setActiveAdminTab('netlify')}
-            className={`px-3 py-1.5 rounded-lg font-semibold transition-colors flex items-center gap-1.5 ${
-              activeAdminTab === 'netlify'
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-300 hover:bg-slate-800'
-            }`}
-          >
-            <Globe className="w-3.5 h-3.5" />
-            <span>Netlify & GitHub Hosting Helper</span>
-          </button>
-
-          <button
-            onClick={() => setActiveAdminTab('users')}
-            className={`px-3 py-1.5 rounded-lg font-semibold transition-colors flex items-center gap-1.5 ${
-              activeAdminTab === 'users'
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-300 hover:bg-slate-800'
-            }`}
-          >
-            <Users className="w-3.5 h-3.5" />
-            <span>Admin Accounts & Tiers ({users.length})</span>
-            {isSuperAdmin && (
-              <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" title="Super Admin Control Active" />
-            )}
-          </button>
+        {/* Admin Sub-Tabs */}
+        <div className="mt-6 pt-4 border-t border-blue-900/10 dark:border-white/10 flex items-center gap-2 overflow-x-auto text-xs">
+          {[
+            { id: 'inventory', label: `Master Inventory (${cartridges.length})`, icon: Package },
+            { id: 'branches', label: `Offices & Branches (${branches.length})`, icon: Building2 },
+            { id: 'backup', label: 'Backup & Portability', icon: FileCode },
+            { id: 'netlify', label: 'Netlify Hosting', icon: Globe },
+            { id: 'users', label: `Admin Accounts (${users.length})`, icon: Users },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const active = activeAdminTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveAdminTab(tab.id as typeof activeAdminTab)}
+                className={`px-3.5 py-2 rounded-full font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
+                  active
+                    ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F]'
+                    : 'bg-white/75 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-white/10 border border-slate-200/70 dark:border-white/10'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
-      </div>
+      </section>
 
-      {/* Toast Notification */}
       {notification && (
         <div
-          className={`p-3 rounded-lg text-xs font-semibold flex items-center gap-2 animate-in fade-in duration-150 ${
+          className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center gap-2 animate-in fade-in duration-150 ${
             notification.type === 'success'
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-              : 'bg-rose-50 text-rose-800 border border-rose-200'
+              ? 'bg-[#EFF6FF] dark:bg-blue-500/15 text-blue-900 dark:text-sky-200 border border-blue-200 dark:border-blue-500/30'
+              : 'bg-rose-50 dark:bg-rose-500/15 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-500/30'
           }`}
         >
           {notification.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
           ) : (
-            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+            <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
           )}
           <span>{notification.message}</span>
         </div>
       )}
 
-      {/* Tab 1: Master Inventory & 50-Gauge Direct Editor */}
+      {/* Tab 1: Master Inventory Matrix */}
       {activeAdminTab === 'inventory' && (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs space-y-4">
-          <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
+        <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F6F8FC] dark:bg-white/[0.03]">
             <div>
-              <h2 className="text-base font-bold text-slate-900">
+              <h2 className="text-base font-bold text-[#0B0F17] dark:text-white">
                 Direct Master Inventory Matrix
               </h2>
-              <p className="text-xs text-slate-500">
-                Directly adjust current stock In Office (Warehouse), Gauge Alert Threshold (default 50), and specifications with 0 restrictions.
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Directly adjust current stock In Office (Warehouse), Gauge Alert Threshold (default 15), and specifications.
               </p>
             </div>
 
             <button
               onClick={onOpenAddCartridge}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-xs self-start sm:self-auto"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors self-start sm:self-auto cursor-pointer whitespace-nowrap"
             >
               <Plus className="w-4 h-4" />
-              <span>+ Add New Cartridge SKU</span>
+              <span>Add New Cartridge SKU</span>
             </button>
           </div>
 
           {cartridges.length === 0 ? (
-            <div className="p-12 text-center text-slate-500">
-              <Package className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <h3 className="text-sm font-bold text-slate-800">No Cartridge Models Yet</h3>
+            <div className="p-12 text-center text-slate-500 dark:text-slate-400">
+              <Package className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">No Cartridge Models Yet</h3>
               <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto mb-4">
-                Click "+ Add New Cartridge SKU" to enter your cartridge models and specifications.
+                Click &ldquo;Add New Cartridge SKU&rdquo; to enter your cartridge models and specifications.
               </p>
               <button
                 onClick={onOpenAddCartridge}
-                className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full cursor-pointer"
               >
                 Add First Cartridge SKU
               </button>
@@ -399,46 +346,43 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase font-semibold">
+                <thead className="bg-[#F6F8FC] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
                   <tr>
                     <th className="py-3 px-4">Model & SKU</th>
                     <th className="py-3 px-4">Specifications / Notes</th>
                     <th className="py-3 px-4 text-center">In Office at the Moment</th>
-                    <th className="py-3 px-4 text-center">50-Unit Gauge Status</th>
+                    <th className="py-3 px-4 text-center">15-Unit Gauge Status</th>
                     <th className="py-3 px-4 text-center">Gauge Alert Trigger</th>
                     <th className="py-3 px-4 text-center">Sent Out to Branches</th>
                     <th className="py-3 px-4 text-right">Master Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                   {cartridges.map((cart) => {
                     const draft = getDraft(cart);
                     const sentOutCount = getSentOutCountForCartridge(cart.id);
 
                     return (
-                      <tr key={cart.id} className="hover:bg-slate-50/70 transition-colors">
-                        {/* Model & SKU */}
+                      <tr key={cart.id} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
                         <td className="py-3 px-4">
-                          <span className="font-bold text-slate-900 block text-xs sm:text-sm">
+                          <span className="font-bold text-[#0B0F17] dark:text-white block text-xs sm:text-sm">
                             {cart.model}
                           </span>
-                          <span className="font-mono text-slate-500 text-[11px]">
+                          <span className="font-mono text-slate-500 dark:text-slate-400 text-[11px]">
                             {cart.sku} · {cart.color}
                           </span>
                         </td>
 
-                        {/* Specification */}
                         <td className="py-3 px-4 max-w-xs">
                           <input
                             type="text"
                             value={draft.spec}
                             onChange={(e) => handleStockDraftChange(cart.id, 'spec', e.target.value)}
-                            placeholder="e.g. CE505A Black, High Yield 2.3k pages"
-                            className="w-full px-2 py-1 text-xs border border-slate-300 rounded focus:border-blue-500 focus:outline-none"
+                            placeholder="e.g. CE505A Black, High Yield"
+                            className="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white border border-slate-300 dark:border-white/15 rounded-lg focus:border-blue-500 focus:outline-none"
                           />
                         </td>
 
-                        {/* In Office (Warehouse) direct input */}
                         <td className="py-3 px-4 text-center">
                           <div className="inline-flex items-center gap-1">
                             <input
@@ -452,13 +396,12 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                                   Math.max(0, parseInt(e.target.value) || 0)
                                 )
                               }
-                              className="w-18 px-2 py-1 text-xs font-mono font-bold text-center border-2 border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white"
+                              className="w-18 px-2 py-1 text-xs font-mono font-bold text-center border-2 border-blue-500/60 dark:border-sky-400/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white"
                             />
-                            <span className="text-[11px] text-slate-500">units</span>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400">units</span>
                           </div>
                         </td>
 
-                        {/* Visual 50-Unit Gauge */}
                         <td className="py-3 px-4 text-center">
                           <GaugeIndicator
                             currentStock={draft.stock}
@@ -467,7 +410,6 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                           />
                         </td>
 
-                        {/* Alert Threshold input (default 50) */}
                         <td className="py-3 px-4 text-center">
                           <div className="inline-flex items-center gap-1">
                             <input
@@ -481,23 +423,21 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                                   Math.max(1, parseInt(e.target.value) || 1)
                                 )
                               }
-                              className="w-16 px-1.5 py-1 text-xs font-mono text-center border border-slate-300 rounded focus:outline-none"
+                              className="w-16 px-1.5 py-1 text-xs font-mono text-center border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-lg focus:outline-none"
                             />
-                            <span className="text-[10px] text-slate-400">trigger</span>
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500">trigger</span>
                           </div>
                         </td>
 
-                        {/* Sent Out to Other Offices */}
-                        <td className="py-3 px-4 text-center font-mono font-bold tabular-nums text-slate-800 text-sm">
+                        <td className="py-3 px-4 text-center font-mono font-bold tabular-nums text-slate-800 dark:text-slate-200 text-xs">
                           {sentOutCount} units sent
                         </td>
 
-                        {/* Master Actions */}
                         <td className="py-3 px-4 text-right">
                           <div className="flex items-center justify-end gap-1.5">
                             <button
                               onClick={() => handleSaveCartridge(cart.id)}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors shadow-2xs"
+                              className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 hover:bg-slate-800 dark:hover:bg-sky-300 rounded-full transition-colors cursor-pointer"
                             >
                               <Save className="w-3 h-3" />
                               <span>Save</span>
@@ -510,7 +450,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                                   showToast('success', 'Cartridge deleted.');
                                 }
                               }}
-                              className="p-1 text-slate-300 hover:text-rose-600 rounded transition-colors"
+                              className="p-1.5 text-slate-300 dark:text-slate-600 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -528,45 +468,45 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
 
       {/* Tab 2: Offices & Branches Master Manager */}
       {activeAdminTab === 'branches' && (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs space-y-4">
-          <div className="px-5 py-4 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-50/50">
+        <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100 dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-[#F6F8FC] dark:bg-white/[0.03]">
             <div>
-              <h2 className="text-base font-bold text-slate-900">
+              <h2 className="text-base font-bold text-[#0B0F17] dark:text-white">
                 Offices & Branches Master Registry
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Add, rename, edit location codes, and manage all company branch destinations.
               </p>
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
-              <div className="inline-flex rounded-lg bg-slate-200/70 p-0.5 text-xs">
+              <div className="inline-flex rounded-full bg-slate-200/70 dark:bg-white/5 p-0.5 text-xs">
                 <button
                   onClick={() => setAdminBranchFilter('all')}
-                  className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
+                  className={`px-3 py-1 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
                     adminBranchFilter === 'all'
-                      ? 'bg-white text-slate-900 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-white dark:bg-sky-400 text-[#0B0F17] dark:text-[#06090F] shadow-2xs'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-[#0B0F17] dark:hover:text-white'
                   }`}
                 >
                   All ({branches.length})
                 </button>
                 <button
                   onClick={() => setAdminBranchFilter('Headquarters')}
-                  className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
+                  className={`px-3 py-1 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
                     adminBranchFilter === 'Headquarters'
-                      ? 'bg-white text-blue-700 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-white dark:bg-sky-400 text-[#0B0F17] dark:text-[#06090F] shadow-2xs'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-[#0B0F17] dark:hover:text-white'
                   }`}
                 >
                   HQ Offices ({branches.filter((b) => b.category === 'Headquarters' || b.code.startsWith('HQ')).length})
                 </button>
                 <button
                   onClick={() => setAdminBranchFilter('Regional Branch')}
-                  className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
+                  className={`px-3 py-1 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
                     adminBranchFilter === 'Regional Branch'
-                      ? 'bg-white text-slate-900 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-white dark:bg-sky-400 text-[#0B0F17] dark:text-[#06090F] shadow-2xs'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-[#0B0F17] dark:hover:text-white'
                   }`}
                 >
                   Regional ({branches.filter((b) => b.category !== 'Headquarters' && !b.code.startsWith('HQ')).length})
@@ -575,24 +515,24 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
 
               <button
                 onClick={onOpenAddBranch}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-xs"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
               >
                 <Plus className="w-4 h-4" />
-                <span>+ Add Location</span>
+                <span>Add Location</span>
               </button>
             </div>
           </div>
 
           {branches.length === 0 ? (
-            <div className="p-12 text-center text-slate-500">
-              <Building2 className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <h3 className="text-sm font-bold text-slate-800">No Offices or Branches Configured</h3>
+            <div className="p-12 text-center text-slate-500 dark:text-slate-400">
+              <Building2 className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">No Offices or Branches Configured</h3>
               <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto mb-4">
                 Add your company branch offices, site locations, or client projects.
               </p>
               <button
                 onClick={onOpenAddBranch}
-                className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full cursor-pointer"
               >
                 Add First Office / Branch
               </button>
@@ -600,7 +540,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase font-semibold">
+                <thead className="bg-[#F6F8FC] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
                   <tr>
                     <th className="py-3 px-4">Code</th>
                     <th className="py-3 px-4">Type</th>
@@ -611,7 +551,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                     <th className="py-3 px-4 text-right">Master Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                   {branches
                     .filter((b) => {
                       const isHq = b.category === 'Headquarters' || b.code.startsWith('HQ');
@@ -630,8 +570,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                       };
 
                       return (
-                        <tr key={b.id} className="hover:bg-slate-50/70 transition-colors">
-                          {/* Code */}
+                        <tr key={b.id} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
                           <td className="py-3 px-4">
                             {isEditing ? (
                               <input
@@ -643,123 +582,115 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                                     [b.id]: { ...draft, code: e.target.value },
                                   }))
                                 }
-                                className="w-20 px-2 py-1 text-xs font-mono border rounded"
+                                className="w-20 px-2 py-1 text-xs font-mono border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-lg"
                               />
                             ) : (
-                              <span className="font-mono font-bold text-slate-700">{b.code}</span>
+                              <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{b.code}</span>
                             )}
                           </td>
 
-                          {/* Type */}
                           <td className="py-3 px-4">
-                            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
-                              isHq ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'
-                            }`}>
+                            <span className={`text-[11px] font-semibold ${isHq ? 'text-blue-700 dark:text-sky-400' : 'text-slate-500 dark:text-slate-400'}`}>
                               {isHq ? 'Headquarters' : 'Regional Branch'}
                             </span>
                           </td>
 
-                        {/* Name */}
-                        <td className="py-3 px-4">
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              value={draft.name}
-                              onChange={(e) =>
-                                setBranchDrafts((prev) => ({
-                                  ...prev,
-                                  [b.id]: { ...draft, name: e.target.value },
-                                }))
-                              }
-                              className="w-full px-2 py-1 text-xs font-bold border rounded"
-                            />
-                          ) : (
-                            <span className="font-bold text-slate-900">{b.name}</span>
-                          )}
-                        </td>
-
-                        {/* City */}
-                        <td className="py-3 px-4 text-slate-600">
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              value={draft.city}
-                              onChange={(e) =>
-                                setBranchDrafts((prev) => ({
-                                  ...prev,
-                                  [b.id]: { ...draft, city: e.target.value },
-                                }))
-                              }
-                              className="w-28 px-2 py-1 text-xs border rounded"
-                            />
-                          ) : (
-                            b.city
-                          )}
-                        </td>
-
-                        {/* Address */}
-                        <td className="py-3 px-4 text-slate-600 max-w-xs">
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              value={draft.address}
-                              onChange={(e) =>
-                                setBranchDrafts((prev) => ({
-                                  ...prev,
-                                  [b.id]: { ...draft, address: e.target.value },
-                                }))
-                              }
-                              className="w-full px-2 py-1 text-xs border rounded"
-                            />
-                          ) : (
-                            <span className="truncate block" title={b.address}>
-                              {b.address}
-                            </span>
-                          )}
-                        </td>
-
-                        {/* Printers count */}
-                        <td className="py-3 px-4 text-center font-mono font-bold text-slate-800">
-                          {b.printers.length} devices
-                        </td>
-
-                        {/* Actions */}
-                        <td className="py-3 px-4 text-right">
-                          <div className="flex items-center justify-end gap-1.5">
+                          <td className="py-3 px-4">
                             {isEditing ? (
-                              <button
-                                onClick={() => handleSaveBranch(b.id)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded transition-colors"
-                              >
-                                <Save className="w-3 h-3" />
-                                <span>Save</span>
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => startEditBranch(b)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-blue-600 bg-slate-100 hover:bg-blue-50 rounded transition-colors"
-                              >
-                                <Edit2 className="w-3 h-3" />
-                                <span>Edit</span>
-                              </button>
-                            )}
-
-                            <button
-                              onClick={() => {
-                                if (window.confirm(`Delete ${b.name}?`)) {
-                                  deleteBranch(b.id);
-                                  showToast('success', 'Branch deleted.');
+                              <input
+                                type="text"
+                                value={draft.name}
+                                onChange={(e) =>
+                                  setBranchDrafts((prev) => ({
+                                    ...prev,
+                                    [b.id]: { ...draft, name: e.target.value },
+                                  }))
                                 }
-                              }}
-                              className="p-1 text-slate-300 hover:text-rose-600 rounded transition-colors"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                                className="w-full px-2 py-1 text-xs font-bold border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-lg"
+                              />
+                            ) : (
+                              <span className="font-bold text-[#0B0F17] dark:text-white">{b.name}</span>
+                            )}
+                          </td>
+
+                          <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={draft.city}
+                                onChange={(e) =>
+                                  setBranchDrafts((prev) => ({
+                                    ...prev,
+                                    [b.id]: { ...draft, city: e.target.value },
+                                  }))
+                                }
+                                className="w-28 px-2 py-1 text-xs border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-lg"
+                              />
+                            ) : (
+                              b.city
+                            )}
+                          </td>
+
+                          <td className="py-3 px-4 text-slate-600 dark:text-slate-300 max-w-xs">
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={draft.address}
+                                onChange={(e) =>
+                                  setBranchDrafts((prev) => ({
+                                    ...prev,
+                                    [b.id]: { ...draft, address: e.target.value },
+                                  }))
+                                }
+                                className="w-full px-2 py-1 text-xs border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-lg"
+                              />
+                            ) : (
+                              <span className="truncate block" title={b.address}>
+                                {b.address}
+                              </span>
+                            )}
+                          </td>
+
+                          <td className="py-3 px-4 text-center font-mono font-bold text-slate-800 dark:text-slate-200">
+                            {b.printers.length} devices
+                          </td>
+
+                          <td className="py-3 px-4 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              {isEditing ? (
+                                <button
+                                  onClick={() => handleSaveBranch(b.id)}
+                                  className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-white dark:text-[#06090F] bg-blue-600 dark:bg-sky-400 hover:bg-blue-700 rounded-full transition-colors cursor-pointer"
+                                >
+                                  <Save className="w-3 h-3" />
+                                  <span>Save</span>
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => startEditBranch(b)}
+                                  className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 rounded-full transition-colors cursor-pointer"
+                                >
+                                  <Edit2 className="w-3 h-3" />
+                                  <span>Edit</span>
+                                </button>
+                              )}
+
+                              <button
+                                onClick={() => {
+                                  if (window.confirm(`Delete ${b.name}?`)) {
+                                    deleteBranch(b.id);
+                                    showToast('success', 'Branch deleted.');
+                                  }
+                                }}
+                                className="p-1.5 text-slate-300 dark:text-slate-600 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </table>
             </div>
@@ -767,158 +698,153 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
         </div>
       )}
 
-      {/* Tab 3: Data Export / Import Backup Hub */}
+      {/* Tab 3: Backup & Portability Hub */}
       {activeAdminTab === 'backup' && (
-        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-6">
+        <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 space-y-6">
           <div>
-            <h2 className="text-base font-bold text-slate-900">
+            <h2 className="text-base font-bold text-[#0B0F17] dark:text-white">
               Database Backup, Migration & Portability Hub
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Because you intend to host on Netlify via GitHub, this hub lets you export your complete data as a single JSON file and restore it on any computer or browser seamlessly.
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Export your complete inventory, branch allocations, and logs as a single JSON file and restore it on any computer or browser.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            {/* Export Card */}
-            <div className="p-5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3 flex flex-col justify-between">
+            <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-[#F6F8FC] dark:bg-white/[0.03] space-y-4 flex flex-col justify-between">
               <div>
-                <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
-                  <Download className="w-4 h-4 text-blue-600" />
+                <div className="flex items-center gap-2 text-[#0B0F17] dark:text-white font-bold text-sm">
+                  <Download className="w-4 h-4 text-blue-700 dark:text-sky-400" />
                   <span>Download Full JSON Backup</span>
                 </div>
-                <p className="text-xs text-slate-500 mt-1">
-                  Exports all cartridges, branches, deliveries, and usage records into a structured JSON file. Keep a copy in your GitHub repository or on your hard drive.
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                  Exports all cartridges, branches, deliveries, and usage records into a structured JSON file.
                 </p>
               </div>
 
               <button
                 onClick={handleDownloadBackup}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-colors shadow-xs"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 hover:bg-slate-800 dark:hover:bg-sky-300 rounded-full transition-colors cursor-pointer"
               >
-                <Download className="w-4 h-4 text-blue-300" />
+                <Download className="w-4 h-4" />
                 <span>Export & Download Database (.json)</span>
               </button>
             </div>
 
-            {/* Import Card */}
-            <div className="p-5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3 flex flex-col justify-between">
+            <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-[#F6F8FC] dark:bg-white/[0.03] space-y-4 flex flex-col justify-between">
               <div>
-                <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
-                  <Upload className="w-4 h-4 text-emerald-600" />
+                <div className="flex items-center gap-2 text-[#0B0F17] dark:text-white font-bold text-sm">
+                  <Upload className="w-4 h-4 text-blue-700 dark:text-sky-400" />
                   <span>Restore from JSON Backup</span>
                 </div>
-                <p className="text-xs text-slate-500 mt-1">
-                  Upload a previously saved JSON backup to immediately restore all your cartridge specifications, branch allocations, and logs.
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                  Upload a previously saved JSON backup to immediately restore all cartridge specifications, branch allocations, and logs.
                 </p>
               </div>
 
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-xs"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 hover:bg-slate-50 dark:hover:bg-white/15 border border-slate-200 dark:border-white/15 rounded-full transition-colors cursor-pointer"
               >
-                <Upload className="w-4 h-4" />
+                <Upload className="w-4 h-4 text-blue-700 dark:text-sky-400" />
                 <span>Select & Restore Backup File</span>
               </button>
             </div>
-
           </div>
 
-          {/* Wipe Clean Slate or Load Sample */}
-          <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="pt-4 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <span className="font-bold text-xs text-slate-800 block">Database Reset & Official AESL Locations</span>
-              <span className="text-[11px] text-slate-400">
-                Reload the 26 official AESL locations (20 regional branches + 6 headquarters offices), or start fresh.
+              <span className="font-bold text-xs text-slate-800 dark:text-white block">Database Reset & Official AESL Locations</span>
+              <span className="text-[11px] text-slate-400 dark:text-slate-500">
+                Reload the {branches.length} AESL locations, load sample data, or start fresh.
               </span>
             </div>
 
             <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
               {!isSuperAdmin ? (
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900">
-                  <Lock className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/25 rounded-xl text-xs text-amber-900 dark:text-amber-300">
+                  <Lock className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
                   <span>Clearing data or reloading locations requires <strong>IvanTheDon (Super Admin)</strong>.</span>
                 </div>
               ) : confirmAction === null ? (
                 <>
                   <button
                     onClick={() => setConfirmAction('branches')}
-                    className="px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors"
+                    className="px-3.5 py-1.5 text-xs font-semibold text-blue-800 dark:text-sky-300 bg-[#EFF6FF] dark:bg-blue-500/15 hover:bg-blue-100 dark:hover:bg-blue-500/25 border border-blue-200 dark:border-blue-500/30 rounded-full transition-colors cursor-pointer"
                   >
                     Restore 26 AESL Locations
                   </button>
 
                   <button
                     onClick={() => setConfirmAction('sample')}
-                    className="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg transition-colors"
+                    className="px-3.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 rounded-full transition-colors cursor-pointer"
                   >
                     Load Sample Template
                   </button>
 
                   <button
                     onClick={() => setConfirmAction('wipe')}
-                    className="px-3.5 py-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition-colors"
+                    className="px-3.5 py-1.5 text-xs font-semibold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-500/15 hover:bg-rose-100 dark:hover:bg-rose-500/25 border border-rose-200 dark:border-rose-500/30 rounded-full transition-colors cursor-pointer"
                   >
                     Clear All Data
                   </button>
                 </>
               ) : confirmAction === 'branches' ? (
-                <div className="flex items-center gap-2 bg-blue-50 p-1.5 rounded-lg border border-blue-200">
-                  <span className="text-xs text-blue-900 font-semibold px-1">Restore all 26 AESL locations?</span>
+                <div className="flex items-center gap-2 bg-[#EFF6FF] dark:bg-blue-500/15 p-1.5 rounded-full border border-blue-200 dark:border-blue-500/30">
+                  <span className="text-xs text-blue-950 dark:text-sky-200 font-semibold px-2">Restore all 26 AESL locations?</span>
                   <button
                     onClick={() => {
                       loadAESLBranches();
                       setConfirmAction(null);
                       showToast('success', 'Official AESL 26 locations restored successfully.');
                     }}
-                    className="px-2.5 py-1 bg-blue-600 text-white rounded text-xs font-semibold hover:bg-blue-700"
+                    className="px-3 py-1 bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] rounded-full text-xs font-semibold cursor-pointer"
                   >
                     Yes, Restore
                   </button>
                   <button
                     onClick={() => setConfirmAction(null)}
-                    className="px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded text-xs hover:bg-slate-50"
+                    className="px-2.5 py-1 bg-white dark:bg-white/10 text-slate-600 dark:text-slate-200 rounded-full text-xs cursor-pointer"
                   >
                     Cancel
                   </button>
                 </div>
               ) : confirmAction === 'sample' ? (
-                <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-lg border border-slate-300">
-                  <span className="text-xs text-slate-800 font-semibold px-1">Load sample records? (Replaces current)</span>
+                <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/10 p-1.5 rounded-full border border-slate-300 dark:border-white/15">
+                  <span className="text-xs text-slate-800 dark:text-white font-semibold px-2">Load sample records?</span>
                   <button
                     onClick={() => {
                       loadSampleTemplateData();
                       setConfirmAction(null);
                       showToast('success', 'Sample template loaded successfully.');
                     }}
-                    className="px-2.5 py-1 bg-slate-800 text-white rounded text-xs font-semibold hover:bg-slate-900"
+                    className="px-3 py-1 bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] rounded-full text-xs font-semibold cursor-pointer"
                   >
                     Yes, Load
                   </button>
                   <button
                     onClick={() => setConfirmAction(null)}
-                    className="px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded text-xs hover:bg-slate-50"
+                    className="px-2.5 py-1 bg-white dark:bg-white/10 text-slate-600 dark:text-slate-200 rounded-full text-xs cursor-pointer"
                   >
                     Cancel
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 bg-rose-50 p-1.5 rounded-lg border border-rose-200">
-                  <span className="text-xs text-rose-900 font-semibold px-1">Wipe all database records?</span>
+                <div className="flex items-center gap-2 bg-rose-50 dark:bg-rose-500/15 p-1.5 rounded-full border border-rose-200 dark:border-rose-500/30">
+                  <span className="text-xs text-rose-900 dark:text-rose-200 font-semibold px-2">Wipe all records?</span>
                   <button
                     onClick={() => {
                       clearAllData();
                       setConfirmAction(null);
                       showToast('success', 'All records cleared. Database is now completely empty.');
                     }}
-                    className="px-2.5 py-1 bg-rose-600 text-white rounded text-xs font-semibold hover:bg-rose-700"
+                    className="px-3 py-1 bg-rose-600 text-white rounded-full text-xs font-semibold hover:bg-rose-700 cursor-pointer"
                   >
                     Yes, Wipe Clean
                   </button>
                   <button
                     onClick={() => setConfirmAction(null)}
-                    className="px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded text-xs hover:bg-slate-50"
+                    className="px-2.5 py-1 bg-white dark:bg-white/10 text-slate-600 dark:text-slate-200 rounded-full text-xs cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -931,68 +857,63 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
 
       {/* Tab 4: Netlify & GitHub Hosting Helper */}
       {activeAdminTab === 'netlify' && (
-        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-5">
+        <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 space-y-5">
           <div>
-            <div className="flex items-center gap-2 text-slate-900 font-bold text-base">
-              <Globe className="w-5 h-5 text-blue-600" />
+            <div className="flex items-center gap-2 text-[#0B0F17] dark:text-white font-bold text-base">
+              <Globe className="w-5 h-5 text-blue-700 dark:text-sky-400" />
               <span>Hosting for Free on Netlify via GitHub</span>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               Your application is built with React 19 + Vite + Tailwind CSS and is 100% pre-configured for free static hosting on Netlify.
             </p>
           </div>
 
-          <div className="space-y-4">
-            
-            <div className="p-4 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">1</span>
+          <div className="space-y-3.5">
+            <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-[#F6F8FC] dark:bg-white/[0.03] flex items-start gap-3">
+              <span className="w-6 h-6 rounded-full bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] font-bold text-xs flex items-center justify-center shrink-0">1</span>
               <div>
-                <h3 className="text-xs font-bold text-slate-900">Push the Codebase to GitHub</h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Create a repository on GitHub (e.g. <code className="bg-slate-200 px-1 py-0.5 rounded font-mono text-[11px]">anointed-it-printflow</code>) and push the project files.
+                <h3 className="text-xs font-bold text-[#0B0F17] dark:text-white">Push the Codebase to GitHub</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Create a repository on GitHub (e.g. <code className="bg-slate-200 dark:bg-white/10 px-1.5 py-0.5 rounded font-mono text-[11px]">anointed-it-printflow</code>) and push the project files.
                 </p>
               </div>
             </div>
 
-            <div className="p-4 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">2</span>
+            <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-[#F6F8FC] dark:bg-white/[0.03] flex items-start gap-3">
+              <span className="w-6 h-6 rounded-full bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] font-bold text-xs flex items-center justify-center shrink-0">2</span>
               <div>
-                <h3 className="text-xs font-bold text-slate-900">Connect GitHub to Netlify (Free Account)</h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Sign in to <span className="font-semibold text-slate-700">netlify.com</span>, click <strong>"Add new site" → "Import an existing project"</strong>, and choose your GitHub repo.
+                <h3 className="text-xs font-bold text-[#0B0F17] dark:text-white">Connect GitHub to Netlify (Free Account)</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Sign in to <span className="font-semibold text-slate-700 dark:text-slate-200">netlify.com</span>, click <strong>&ldquo;Add new site&rdquo; → &ldquo;Import an existing project&rdquo;</strong>, and choose your GitHub repo.
                 </p>
               </div>
             </div>
 
-            <div className="p-4 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">3</span>
-              <div>
-                <h3 className="text-xs font-bold text-slate-900">Pre-Configured Build Settings</h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  The files <code className="font-mono text-[11px] bg-slate-200 px-1 py-0.5 rounded">netlify.toml</code> and <code className="font-mono text-[11px] bg-slate-200 px-1 py-0.5 rounded">public/_redirects</code> have already been generated in the project:
+            <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-[#F6F8FC] dark:bg-white/[0.03] flex items-start gap-3">
+              <span className="w-6 h-6 rounded-full bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] font-bold text-xs flex items-center justify-center shrink-0">3</span>
+              <div className="w-full">
+                <h3 className="text-xs font-bold text-[#0B0F17] dark:text-white">Pre-Configured Build Settings</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  The files <code className="font-mono text-[11px] bg-slate-200 dark:bg-white/10 px-1.5 py-0.5 rounded">netlify.toml</code> and <code className="font-mono text-[11px] bg-slate-200 dark:bg-white/10 px-1.5 py-0.5 rounded">public/_redirects</code> are already configured:
                 </p>
-                <div className="mt-2 font-mono text-xs bg-slate-900 text-slate-200 p-3 rounded-md space-y-1">
-                  <div>Build command: <span className="text-emerald-400">npm run build</span></div>
-                  <div>Publish directory: <span className="text-emerald-400">dist</span></div>
-                  <div>SPA Redirects: <span className="text-emerald-400">/* -&gt; /index.html 200</span></div>
+                <div className="mt-2 font-mono text-xs bg-[#0B0F17] text-slate-200 p-3.5 rounded-xl space-y-1 border border-white/10">
+                  <div>Build command: <span className="text-sky-400">npm run build</span></div>
+                  <div>Publish directory: <span className="text-sky-400">dist</span></div>
+                  <div>SPA Redirects: <span className="text-sky-400">/* -&gt; /index.html 200</span></div>
                 </div>
               </div>
             </div>
-
           </div>
 
-          <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900 flex items-center gap-2 font-medium">
-            <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
-            <span>Whenever you push changes or updates to your GitHub main branch, Netlify will automatically build and publish your app for free!</span>
+          <div className="p-3.5 bg-[#EFF6FF] dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl text-xs text-blue-950 dark:text-sky-200 flex items-center gap-2 font-medium">
+            <CheckCircle2 className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
+            <span>Whenever you push changes or updates to your GitHub main branch, Netlify will automatically build and publish your app for free.</span>
           </div>
         </div>
       )}
 
       {/* Tab 5: Admin Accounts & Tier Access Management */}
-      {activeAdminTab === 'users' && (
-        <AdminUserManagementTab />
-      )}
-
+      {activeAdminTab === 'users' && <AdminUserManagementTab />}
     </div>
   );
 };

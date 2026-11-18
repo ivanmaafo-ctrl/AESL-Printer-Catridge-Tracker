@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useInventory } from '../context/InventoryContext';
 import { useAdminAuth } from '../context/AdminAuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { ActiveTab } from './Navbar';
 import {
   Package,
@@ -17,9 +18,10 @@ import {
   Menu,
   X,
   ChevronRight,
-  User,
   FileSpreadsheet,
   BookOpen,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -41,6 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const { cartridges, branches, dispatches, usages, lowStockAlerts, criticalCount } = useInventory();
   const { isAuthenticated, currentUser, isSuperAdmin, logout } = useAdminAuth();
+  const { isDark, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleTabClick = (tab: ActiveTab) => {
@@ -60,7 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navControls = [
     {
       id: 'reorder' as ActiveTab,
-      label: '50-Gauge Alerts',
+      label: '15-Gauge Alerts',
       icon: AlertTriangle,
       alertCount: lowStockAlerts.length,
       critical: criticalCount > 0,
@@ -75,57 +78,73 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-slate-900 text-slate-300 border-r border-slate-800/80">
-      
-      {/* 1. Brand Workspace Header */}
-      <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+    <div className="flex flex-col h-full bg-[#F8FAFD] dark:bg-[#090E17]/95 dark:backdrop-blur-xl text-slate-700 dark:text-slate-300 border-r border-slate-200/80 dark:border-white/10">
+      {/* 1. Brand Workspace Header + Theme Switch */}
+      <div className="px-5 py-4 border-b border-slate-200/70 dark:border-white/10 flex items-center justify-between gap-2">
         <button
           onClick={() => handleTabClick('dashboard')}
-          className="flex items-center gap-3 text-left group focus:outline-none"
+          className="flex items-center gap-3 text-left group focus:outline-none cursor-pointer min-w-0"
         >
-          <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-extrabold text-xs tracking-wider shadow-sm transition-transform group-hover:scale-105 shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-[#0B0F17] dark:bg-sky-400 flex items-center justify-center text-white dark:text-[#06090F] font-extrabold text-xs tracking-wider shadow-xs transition-transform group-hover:scale-105 shrink-0">
             AESL
           </div>
           <div className="min-w-0">
-            <span className="text-sm font-bold text-white block leading-tight tracking-tight truncate">
+            <span className="text-sm font-bold text-[#0B0F17] dark:text-white block leading-tight tracking-tight truncate">
               Anointed Engineering
             </span>
-            <span className="text-[11px] font-medium text-slate-400 block leading-tight mt-0.5">
+            <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 block leading-tight mt-0.5 truncate">
               IT Fleet & Site Logistics
             </span>
           </div>
         </button>
 
-        {/* Close button on mobile */}
-        <button
-          onClick={() => setMobileMenuOpen(false)}
-          className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-          aria-label="Close menu"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            onClick={toggleTheme}
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            className="p-2 rounded-xl text-slate-500 dark:text-slate-300 hover:text-[#0B0F17] dark:hover:text-white bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200/80 dark:border-white/10 transition-colors cursor-pointer"
+          >
+            {isDark ? <Sun className="w-4 h-4 text-sky-400" /> : <Moon className="w-4 h-4" />}
+          </button>
+
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer"
+            aria-label="Close menu"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
-      {/* 2. Operations Task Bar (Fast Action Triggers) */}
-      <div className="p-4 border-b border-slate-800/90 bg-slate-950/40">
-        <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center justify-between">
-          <span>Task Operations</span>
-          <span className="text-[10px] text-slate-400">Direct Actions</span>
+      {/* 2. Operations Task Bar */}
+      <div className="p-4 border-b border-slate-200/70 dark:border-white/10 bg-white/70 dark:bg-white/[0.02]">
+        <div className="flex items-center justify-between mb-2.5 px-0.5">
+          <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            Quick Actions
+          </span>
+          <button
+            onClick={toggleTheme}
+            className="text-[10px] font-mono font-semibold text-blue-700 dark:text-sky-400 hover:underline cursor-pointer"
+          >
+            {isDark ? 'Dark Theme' : 'Light Theme'}
+          </button>
         </div>
 
-        {/* Primary Dispatch Action */}
+        {/* Primary Obsidian / Blue Pill Dispatch Action */}
         <button
           onClick={() => {
             onOpenDispatch();
             setMobileMenuOpen(false);
           }}
-          className="w-full mb-2 flex items-center justify-between px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white rounded-lg text-xs font-bold transition shadow-xs cursor-pointer group"
+          className="w-full mb-2.5 flex items-center justify-between px-4 py-2.5 bg-[#0B0F17] hover:bg-slate-800 dark:bg-sky-400 dark:hover:bg-sky-300 text-white dark:text-[#06090F] rounded-full text-xs font-semibold transition shadow-xs cursor-pointer group"
         >
           <div className="flex items-center gap-2">
-            <Truck className="w-4 h-4 text-blue-100" />
+            <Truck className="w-4 h-4 text-sky-400 dark:text-[#06090F]" />
             <span>Dispatch to Branch</span>
           </div>
-          <ChevronRight className="w-3.5 h-3.5 text-blue-200 transition-transform group-hover:translate-x-0.5" />
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-[#06090F]/70 transition-transform group-hover:translate-x-0.5" />
         </button>
 
         {/* Secondary Quick Action Row */}
@@ -135,11 +154,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onOpenRestock();
               setMobileMenuOpen(false);
             }}
-            className="flex items-center justify-center gap-1.5 px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold transition border border-slate-700/60"
+            className="flex items-center justify-center gap-1.5 px-2.5 py-2 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-800 dark:text-slate-100 rounded-xl text-xs font-semibold transition border border-slate-200/90 dark:border-white/10 cursor-pointer"
             title="Top up in-office stock"
           >
-            <Plus className="w-3.5 h-3.5 text-blue-400" />
-            <span>Top Up Stock</span>
+            <Plus className="w-3.5 h-3.5 text-blue-600 dark:text-sky-400" />
+            <span>Top Up</span>
           </button>
 
           <button
@@ -147,10 +166,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onOpenLogUsage();
               setMobileMenuOpen(false);
             }}
-            className="flex items-center justify-center gap-1.5 px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold transition border border-slate-700/60"
+            className="flex items-center justify-center gap-1.5 px-2.5 py-2 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-800 dark:text-slate-100 rounded-xl text-xs font-semibold transition border border-slate-200/90 dark:border-white/10 cursor-pointer"
             title="Log cartridge swap"
           >
-            <Send className="w-3.5 h-3.5 text-emerald-400" />
+            <Send className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
             <span>Log Swap</span>
           </button>
         </div>
@@ -158,17 +177,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Report Quick Button */}
         <button
           onClick={() => handleTabClick('reports')}
-          className={`w-full mt-2 flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition border cursor-pointer ${
+          className={`w-full mt-2 flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition border cursor-pointer ${
             activeTab === 'reports'
-              ? 'bg-blue-600/20 text-blue-300 border-blue-500/40'
-              : 'bg-slate-800/80 hover:bg-slate-700 text-slate-200 border-slate-700/60'
+              ? 'bg-[#E8F1FF] dark:bg-blue-500/20 text-[#0B0F17] dark:text-sky-300 border-blue-200 dark:border-blue-500/30'
+              : 'bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-800 dark:text-slate-100 border-slate-200/90 dark:border-white/10'
           }`}
         >
           <div className="flex items-center gap-2">
-            <FileSpreadsheet className="w-3.5 h-3.5 text-amber-400" />
+            <FileSpreadsheet className="w-3.5 h-3.5 text-slate-600 dark:text-sky-400" />
             <span>Generate Report</span>
           </div>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
         </button>
 
         {/* Prominent Beginner Guide Button */}
@@ -177,13 +196,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onOpenGuide();
             setMobileMenuOpen(false);
           }}
-          className="w-full mt-2 flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-200 border border-emerald-500/40 transition cursor-pointer"
+          className="w-full mt-2 flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold bg-[#EFF6FF] hover:bg-[#DBEAFE] dark:bg-blue-500/15 dark:hover:bg-blue-500/25 text-blue-950 dark:text-sky-300 border border-blue-200/80 dark:border-blue-500/30 transition cursor-pointer"
         >
           <div className="flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-emerald-400" />
+            <BookOpen className="w-3.5 h-3.5 text-blue-700 dark:text-sky-400" />
             <span>Beginner Guide</span>
           </div>
-          <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/25 text-emerald-200">
+          <span className="text-[10px] font-mono text-blue-700 dark:text-sky-300 font-semibold">
             7 Steps
           </span>
         </button>
@@ -191,13 +210,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* 3. Navigation Links */}
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
-        
         {/* Section A: Fleet & Logistics */}
         <div>
-          <div className="px-3 mb-2 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+          <div className="px-3 mb-2 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
             Fleet Operations
           </div>
-          <nav className="space-y-1">
+          <nav className="space-y-0.5">
             {navFleet.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -205,19 +223,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => handleTabClick(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer ${
                     isActive
-                      ? 'bg-blue-600/15 text-blue-400 font-semibold border border-blue-500/20'
-                      : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                      ? 'bg-[#E8F1FF] dark:bg-blue-500/20 text-[#0B0F17] dark:text-sky-300 font-bold'
+                      : 'text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-100/80 dark:hover:bg-white/5 hover:text-[#0B0F17] dark:hover:text-white'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-blue-400' : 'text-slate-400'}`} />
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-blue-700 dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}`} />
                     <span className="truncate">{item.label}</span>
                   </div>
 
                   {item.count !== null && item.count > 0 && (
-                    <span className="text-[11px] font-mono text-slate-400 bg-slate-800/80 px-1.5 py-0.2 rounded">
+                    <span className={`text-[11px] font-mono tabular-nums ${isActive ? 'text-blue-800 dark:text-sky-300 font-semibold' : 'text-slate-400 dark:text-slate-500'}`}>
                       {item.count}
                     </span>
                   )}
@@ -229,10 +247,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Section B: Controls & Security */}
         <div>
-          <div className="px-3 mb-2 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
-            Controls & Security
+          <div className="px-3 mb-2 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            Controls & Access
           </div>
-          <nav className="space-y-1">
+          <nav className="space-y-0.5">
             {navControls.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -241,24 +259,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => handleTabClick(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer ${
                     isActive
-                      ? 'bg-blue-600/15 text-blue-400 font-semibold border border-blue-500/20'
-                      : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                      ? 'bg-[#E8F1FF] dark:bg-blue-500/20 text-[#0B0F17] dark:text-sky-300 font-bold'
+                      : 'text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-100/80 dark:hover:bg-white/5 hover:text-[#0B0F17] dark:hover:text-white'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-blue-400' : 'text-slate-400'}`} />
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-blue-700 dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}`} />
                     <span className="truncate">{item.label}</span>
                   </div>
 
-                  {/* Badges for alert or auth */}
-                  {item.id === 'reorder' && item.alertCount && item.alertCount > 0 && (
+                  {item.id === 'reorder' && item.alertCount !== undefined && item.alertCount > 0 && (
                     <span
-                      className={`text-[11px] font-mono font-bold px-1.5 py-0.2 rounded ${
-                        item.critical
-                          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                          : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                      className={`text-[11px] font-mono font-bold tabular-nums ${
+                        item.critical ? 'text-rose-600 dark:text-rose-400' : 'text-amber-700 dark:text-amber-400'
                       }`}
                     >
                       {item.alertCount}
@@ -267,15 +282,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                   {item.id === 'admin' && (
                     item.isAuth ? (
-                      <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded border ${
-                        isSuperAdmin
-                          ? 'bg-amber-400/20 text-amber-300 border-amber-400/30'
-                          : 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+                      <span className={`text-[10px] font-mono font-semibold ${
+                        isSuperAdmin ? 'text-amber-700 dark:text-amber-400' : 'text-blue-700 dark:text-sky-400'
                       }`}>
                         {isSuperAdmin ? 'Super' : 'Admin'}
                       </span>
                     ) : (
-                      <Lock className="w-3.5 h-3.5 text-slate-400" />
+                      <Lock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                     )
                   )}
                 </button>
@@ -287,38 +300,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onOpenGuide();
                 setMobileMenuOpen(false);
               }}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800/80 hover:text-white transition-colors cursor-pointer"
+              className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-white/5 hover:text-[#0B0F17] dark:hover:text-white transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-2.5 min-w-0">
-                <BookOpen className="w-4 h-4 shrink-0 text-emerald-400" />
+                <BookOpen className="w-4 h-4 shrink-0 text-blue-600 dark:text-sky-400" />
                 <span className="truncate">Beginner Guide</span>
               </div>
-              <span className="text-[10px] font-mono text-slate-400">Tour</span>
+              <span className="text-[11px] text-slate-400 dark:text-slate-500">Tour</span>
             </button>
           </nav>
         </div>
-
       </div>
 
       {/* 4. Bottom User Profile & Auth Gateway */}
-      <div className="p-3 border-t border-slate-800 bg-slate-950/60">
+      <div className="p-3 border-t border-slate-200/70 dark:border-white/10 bg-white dark:bg-white/[0.02]">
         {isAuthenticated && currentUser ? (
-          <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-2">
+          <div className="p-2.5 rounded-xl bg-[#F6F8FC] dark:bg-white/5 border border-slate-200/80 dark:border-white/10 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2.5 min-w-0">
               <div
                 className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
                   isSuperAdmin
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                    : 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
+                    ? 'bg-[#0B0F17] dark:bg-amber-400 text-amber-300 dark:text-[#06090F]'
+                    : 'bg-blue-100 dark:bg-blue-500/20 text-blue-800 dark:text-sky-300'
                 }`}
               >
                 {currentUser.displayName ? currentUser.displayName.charAt(0).toUpperCase() : 'A'}
               </div>
               <div className="min-w-0">
-                <span className="text-xs font-bold text-slate-200 block truncate">
+                <span className="text-xs font-bold text-[#0B0F17] dark:text-white block truncate">
                   {currentUser.displayName}
                 </span>
-                <span className="text-[10px] text-slate-400 font-mono block truncate">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono block truncate">
                   @{currentUser.username} · {isSuperAdmin ? 'Super Admin' : 'Admin'}
                 </span>
               </div>
@@ -327,7 +339,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={logout}
               title="Sign out of Admin Portal"
-              className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition shrink-0"
+              className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition shrink-0 cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -335,31 +347,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
         ) : (
           <button
             onClick={() => handleTabClick('admin')}
-            className="w-full p-2.5 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-800 flex items-center justify-between text-left transition group"
+            className="w-full p-2.5 rounded-xl bg-[#F6F8FC] dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200/80 dark:border-white/10 flex items-center justify-between text-left transition group cursor-pointer"
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 shrink-0 group-hover:text-blue-400 transition">
+              <div className="w-8 h-8 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-300 shrink-0 group-hover:text-[#0B0F17] dark:group-hover:text-white transition">
                 <Lock className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <span className="text-xs font-bold text-slate-200 block">
+                <span className="text-xs font-bold text-[#0B0F17] dark:text-white block">
                   Admin Sign In
                 </span>
-                <span className="text-[10px] text-slate-400 block truncate">
-                  Secure Operations Access
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate">
+                  Operations & Master Controls
                 </span>
               </div>
             </div>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-200 group-hover:translate-x-0.5 transition" />
+            <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white group-hover:translate-x-0.5 transition" />
           </button>
         )}
-
-        <div className="mt-2.5 px-2 flex items-center justify-between text-[10px] text-slate-400 font-mono">
-          <span>AESL IT v2.4</span>
-          <span>Central Warehouse</span>
-        </div>
       </div>
-
     </div>
   );
 
@@ -371,45 +377,51 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </aside>
 
       {/* Mobile Top Header Strip */}
-      <div className="lg:hidden sticky top-0 z-40 bg-slate-900 border-b border-slate-800 text-white flex items-center justify-between px-4 h-15 shadow-sm print:hidden">
+      <div className="lg:hidden sticky top-0 z-40 bg-white/95 dark:bg-[#090E17]/90 backdrop-blur-md border-b border-slate-200 dark:border-white/10 text-[#0B0F17] dark:text-white flex items-center justify-between px-4 h-15 print:hidden">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-extrabold text-xs">
+          <div className="w-8 h-8 rounded-xl bg-[#0B0F17] dark:bg-sky-400 flex items-center justify-center text-white dark:text-[#06090F] font-extrabold text-xs">
             AESL
           </div>
           <div>
-            <span className="text-xs font-bold text-white block leading-tight">
+            <span className="text-xs font-bold text-[#0B0F17] dark:text-white block leading-tight">
               Anointed Engineering
             </span>
-            <span className="text-[10px] text-slate-400 block leading-tight">
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 block leading-tight">
               Print Fleet Logistics
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Quick Guide on mobile header */}
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={toggleTheme}
+            aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            className="p-2 rounded-full text-slate-600 dark:text-sky-400 bg-slate-100 dark:bg-white/10 transition cursor-pointer"
+          >
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+
           <button
             onClick={onOpenGuide}
-            className="p-2 text-emerald-200 bg-emerald-600/25 border border-emerald-500/40 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
+            className="px-2.5 py-1.5 text-blue-900 dark:text-sky-300 bg-[#EFF6FF] dark:bg-blue-500/15 border border-blue-200 dark:border-blue-500/30 rounded-full text-xs font-semibold flex items-center gap-1 cursor-pointer"
             title="Open Beginner Guide"
           >
-            <BookOpen className="w-4 h-4 text-emerald-400" />
+            <BookOpen className="w-3.5 h-3.5 text-blue-700 dark:text-sky-400" />
             <span className="hidden sm:inline">Guide</span>
           </button>
 
-          {/* Quick Dispatch on mobile header */}
           <button
             onClick={onOpenDispatch}
-            className="p-2 text-white bg-blue-600 rounded-lg text-xs font-semibold flex items-center gap-1"
+            className="px-3 py-1.5 text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full text-xs font-semibold flex items-center gap-1 cursor-pointer"
             title="Dispatch to branch"
           >
-            <Truck className="w-4 h-4" />
+            <Truck className="w-3.5 h-3.5 text-sky-400 dark:text-[#06090F]" />
             <span className="hidden sm:inline">Dispatch</span>
           </button>
 
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition"
+            className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:text-[#0B0F17] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer"
             aria-label="Open navigation menu"
           >
             <Menu className="w-5 h-5" />
@@ -420,14 +432,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Mobile Slide-over Drawer Backdrop & Drawer */}
       {mobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
-          {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
           />
-
-          {/* Drawer container */}
-          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-slate-900 shadow-2xl z-10 animate-in slide-in-from-left duration-200">
+          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-[#F8FAFD] dark:bg-[#090E17] shadow-2xl z-10 animate-in slide-in-from-left duration-200">
             {sidebarContent}
           </div>
         </div>

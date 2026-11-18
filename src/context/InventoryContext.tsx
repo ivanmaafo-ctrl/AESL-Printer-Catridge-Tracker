@@ -123,6 +123,7 @@ const STORAGE_KEYS = {
   RESTOCKS: 'aesl_printflow_clean_v1_restocks',
   ADMIN_MODE: 'aesl_printflow_clean_v1_admin',
   SYNC_V3_EXV: 'aesl_printflow_sync_v3_exv_adenta',
+  SYNC_V4_GAUGE15_1500A: 'aesl_printflow_sync_v4_gauge15_1500a',
 };
 
 export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -134,15 +135,39 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   })();
 
+  const needsV4Sync = (() => {
+    try {
+      return localStorage.getItem(STORAGE_KEYS.SYNC_V4_GAUGE15_1500A) !== 'done';
+    } catch {
+      return false;
+    }
+  })();
+
   const [cartridges, setCartridges] = useState<CartridgeSKU[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.CARTRIDGES);
       const base: CartridgeSKU[] = saved ? JSON.parse(saved) : INITIAL_CARTRIDGES;
-      if (!needsV3Sync || !Array.isArray(base)) return base;
+      if (!Array.isArray(base)) return INITIAL_CARTRIDGES;
 
-      const existingSkus = new Set(base.map((c) => c.sku.toUpperCase()));
-      const missing = INITIAL_CARTRIDGES.filter((c) => !existingSkus.has(c.sku.toUpperCase()));
-      return missing.length > 0 ? [...base, ...missing] : base;
+      let updated = base;
+      if (needsV4Sync) {
+        // Reduce universal 50-unit gauge to 15 across existing saved SKUs
+        updated = updated.map((c) =>
+          c.minThreshold === 50 || c.minThreshold === undefined
+            ? { ...c, minThreshold: 15 }
+            : c
+        );
+      }
+
+      if (needsV3Sync || needsV4Sync) {
+        const existingSkus = new Set(updated.map((c) => c.sku.toUpperCase()));
+        const missing = INITIAL_CARTRIDGES.filter((c) => !existingSkus.has(c.sku.toUpperCase()));
+        if (missing.length > 0) {
+          updated = [...updated, ...missing];
+        }
+      }
+
+      return updated;
     } catch {
       return INITIAL_CARTRIDGES;
     }
@@ -181,14 +206,17 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   });
 
   useEffect(() => {
-    if (needsV3Sync) {
-      try {
+    try {
+      if (needsV3Sync) {
         localStorage.setItem(STORAGE_KEYS.SYNC_V3_EXV, 'done');
-      } catch {
-        // ignore storage errors
       }
+      if (needsV4Sync) {
+        localStorage.setItem(STORAGE_KEYS.SYNC_V4_GAUGE15_1500A, 'done');
+      }
+    } catch {
+      // ignore storage errors
     }
-  }, [needsV3Sync]);
+  }, [needsV3Sync, needsV4Sync]);
 
   const [usages, setUsages] = useState<UsageRecord[]>(() => {
     try {
@@ -280,16 +308,17 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [restocks]);
 
-  // Low stock calculation: triggers whenever stock drops below threshold (default 50)
+  // Low stock calculation: triggers whenever stock drops below threshold (default 15)
   const lowStockAlerts = useMemo<LowStockAlert[]>(() => {
     const alerts: LowStockAlert[] = [];
     cartridges.forEach((cart) => {
-      const threshold = cart.minThreshold !== undefined ? cart.minThreshold : 50;
+      const threshold = cart.minThreshold !== undefined ? cart.minThreshold : 15;
       if (cart.centralStock < threshold) {
         const deficit = Math.max(0, threshold - cart.centralStock);
         const packMultiple = cart.reorderPackSize || 1;
         // round suggested up to multiple of pack size to bring back above threshold
         const suggestedReorder = Math.max(packMultiple, Math.ceil(deficit / packMultiple) * packMultiple);
+        const criticalCutoff = Math.max(1, Math.floor(threshold / 3));
 
         alerts.push({
           cartridge: cart,
@@ -297,7 +326,7 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           minThreshold: threshold,
           deficit: threshold - cart.centralStock,
           suggestedReorder,
-          severity: cart.centralStock <= 15 ? 'CRITICAL' : 'WARNING',
+          severity: cart.centralStock <= criticalCutoff ? 'CRITICAL' : 'WARNING',
         });
       }
     });
@@ -587,7 +616,7 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const addCartridge = (cartridge: Omit<CartridgeSKU, 'id'>) => {
     const newCart: CartridgeSKU = {
       ...cartridge,
-      minThreshold: cartridge.minThreshold !== undefined ? cartridge.minThreshold : 50, // default 50 gauge!
+      minThreshold: cartridge.minThreshold !== undefined ? cartridge.minThreshold : 15, // default 15 gauge!
       id: `cart-${Date.now()}`,
     };
     setCartridges((prev) => [...prev, newCart]);

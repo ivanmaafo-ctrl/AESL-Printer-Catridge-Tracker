@@ -1,14 +1,98 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
   body {
     font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    letter-spacing: -0.012em;
+    letter-spacing: -0.014em;
+    background-color: #ffffff;
+    color: #0b0f17;
+    transition: background-color 200ms ease, color 200ms ease;
   }
-  
+
+  .dark body {
+    background-color: #06090f;
+    color: #f1f5f9;
+    letter-spacing: -0.006em;
+  }
+
+  h1, h2, h3 {
+    letter-spacing: -0.025em;
+  }
+
   .font-mono {
     font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-feature-settings: "tnum" 1;
+  }
+}
+
+.bg-blue-hero {
+  background:
+    radial-gradient(circle at 82% 18%, rgba(37, 99, 235, 0.20) 0%, rgba(37, 99, 235, 0) 48%),
+    radial-gradient(circle at 15% 15%, rgba(147, 197, 253, 0.58) 0%, rgba(239, 246, 255, 0) 55%),
+    linear-gradient(160deg, #dbeafe 0%, #eff6ff 42%, #f8fafc 100%);
+}
+
+@keyframes dark-aurora-drift-a {
+  0% {
+    transform: translate3d(-6%, -4%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(8%, 6%, 0) scale(1.09);
+  }
+  100% {
+    transform: translate3d(-6%, -4%, 0) scale(1);
+  }
+}
+
+@keyframes dark-aurora-drift-b {
+  0% {
+    transform: translate3d(6%, 5%, 0) scale(1.04);
+  }
+  50% {
+    transform: translate3d(-8%, -5%, 0) scale(0.95);
+  }
+  100% {
+    transform: translate3d(6%, 5%, 0) scale(1.04);
+  }
+}
+
+@keyframes dark-hero-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.dark .bg-blue-hero {
+  background:
+    radial-gradient(circle at 85% 20%, rgba(56, 189, 248, 0.22) 0%, rgba(56, 189, 248, 0) 50%),
+    radial-gradient(circle at 15% 80%, rgba(37, 99, 235, 0.20) 0%, rgba(37, 99, 235, 0) 52%),
+    linear-gradient(135deg, #070e1c 0%, #0a1936 35%, #0c1f3d 70%, #071021 100%);
+  background-size: 200% 200%;
+  animation: dark-hero-flow 18s ease-in-out infinite;
+}
+
+.dark-ambient-orb-a {
+  animation: dark-aurora-drift-a 22s ease-in-out infinite;
+  will-change: transform;
+}
+
+.dark-ambient-orb-b {
+  animation: dark-aurora-drift-b 26s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dark .bg-blue-hero,
+  .dark-ambient-orb-a,
+  .dark-ambient-orb-b {
+    animation: none !important;
   }
 }
 
@@ -28,9 +112,17 @@
   background: #94a3b8;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
 @media print {
-  body {
+  html, body {
     background: #ffffff !important;
+    color: #0b0f17 !important;
   }
   .no-print {
     display: none !important;

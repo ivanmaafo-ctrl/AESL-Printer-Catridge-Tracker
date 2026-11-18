@@ -43,52 +43,47 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess }) => 
 
   return (
     <div className="max-w-md mx-auto py-8 sm:py-14 px-4">
-      {/* Portal Header */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white shadow-lg shadow-blue-500/20 mb-3 ring-4 ring-blue-50">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#0B0F17] dark:bg-sky-400 text-sky-400 dark:text-[#06090F] shadow-sm mb-3 ring-4 ring-blue-50 dark:ring-blue-500/15">
           <Shield className="w-7 h-7" />
         </div>
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 bg-blue-100 text-blue-800 rounded-full border border-blue-200">
-            Secure Access Gateway
-          </span>
-          <span className="text-xs font-mono text-slate-500">
-            AESL · IT Dept
-          </span>
+        <div className="flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+          <span className="font-semibold text-blue-800 dark:text-sky-400">Secure Access Gateway</span>
+          <span aria-hidden="true">·</span>
+          <span>AESL IT Department</span>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 mt-2.5">
+        <h1 className="text-2xl font-bold tracking-tight text-[#0B0F17] dark:text-white mt-2">
           Master Admin Portal
         </h1>
-        <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1.5 leading-relaxed">
+        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1.5 leading-relaxed">
           Sign in with authorized administrator credentials to manage warehouse stock levels, branch allocations, and system configurations.
         </p>
       </div>
 
-      {/* Login Card */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/50 p-6 sm:p-8">
-        <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
+      <div className="bg-white dark:bg-[#0B111B]/90 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-lg shadow-slate-200/50 dark:shadow-none p-6 sm:p-8">
+        <div className="flex items-center justify-between pb-5 border-b border-slate-100 dark:border-white/10 mb-6">
           <div>
-            <h2 className="text-base font-bold text-slate-900">Administrator Sign In</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Please provide your assigned credentials</p>
+            <h2 className="text-base font-bold text-[#0B0F17] dark:text-white">Administrator Sign In</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Please provide your assigned credentials</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500">
+          <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 dark:text-slate-400">
             <Lock className="w-4 h-4" />
           </div>
         </div>
 
         {errorMessage && (
-          <div className="mb-6 p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-3 text-rose-800 text-xs animate-in fade-in duration-200">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <div className="mb-6 p-3.5 bg-rose-50 dark:bg-rose-500/15 border border-rose-200 dark:border-rose-500/30 rounded-xl flex items-start gap-3 text-rose-800 dark:text-rose-300 text-xs animate-in fade-in duration-200">
+            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold">Authentication Failed</p>
-              <p className="mt-0.5 text-rose-700">{errorMessage}</p>
+              <p className="mt-0.5 text-rose-700 dark:text-rose-300">{errorMessage}</p>
             </div>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
               Username
             </label>
             <div className="relative">
@@ -101,14 +96,14 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess }) => 
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter admin username"
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-50/70 border border-slate-300 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition"
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-50/70 dark:bg-[#070B12] border border-slate-300 dark:border-white/15 rounded-xl text-sm text-[#0B0F17] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 transition"
                 autoComplete="username"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
               Password
             </label>
             <div className="relative">
@@ -121,13 +116,13 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess }) => 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
-                className="w-full pl-10 pr-11 py-2.5 bg-slate-50/70 border border-slate-300 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition font-mono"
+                className="w-full pl-10 pr-11 py-2.5 bg-slate-50/70 dark:bg-[#070B12] border border-slate-300 dark:border-white/15 rounded-xl text-sm text-[#0B0F17] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 transition font-mono"
                 autoComplete="current-password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"
                 tabIndex={-1}
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
@@ -140,7 +135,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess }) => 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 px-4 bg-gradient-to-r from-blue-700 to-indigo-600 hover:from-blue-800 hover:to-indigo-700 text-white font-bold text-sm rounded-xl shadow-md shadow-blue-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+              className="w-full py-3 px-4 bg-[#0B0F17] hover:bg-slate-800 dark:bg-sky-400 dark:hover:bg-sky-300 text-white dark:text-[#06090F] font-semibold text-sm rounded-full shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
             >
               {isSubmitting ? (
                 <span>Authenticating Credentials...</span>
@@ -155,11 +150,8 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess }) => 
           </div>
         </form>
 
-        <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-          <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            <span>AESL Security Active</span>
-          </span>
+        <div className="mt-6 pt-5 border-t border-slate-100 dark:border-white/10 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500">
+          <span>AESL Security Active</span>
           <span>Encrypted Session</span>
         </div>
       </div>

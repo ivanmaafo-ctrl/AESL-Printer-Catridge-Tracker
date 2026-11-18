@@ -12,7 +12,7 @@ export interface CartridgeSKU {
   color: CartridgeColor;
   compatiblePrinters: string[];
   centralStock: number; // In Office Stock at the moment (Warehouse)
-  minThreshold: number; // Gauge threshold (default 50)
+  minThreshold: number; // Gauge threshold (default 15)
   unitCost: number;
   supplier: string;
   pageYield: number;
@@ -101,5 +101,5 @@ export interface LowStockAlert {
   minThreshold: number;
   deficit: number;
   suggestedReorder: number;
-  severity: 'CRITICAL' | 'WARNING'; // CRITICAL: stock <= 1, WARNING: stock <= threshold
+  severity: 'CRITICAL' | 'WARNING'; // CRITICAL: stock <= 5 (1/3 of threshold), WARNING: stock < threshold
 }
