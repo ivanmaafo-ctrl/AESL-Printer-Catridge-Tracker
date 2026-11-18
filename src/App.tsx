@@ -4,7 +4,6 @@ import { AdminAuthProvider } from './context/AdminAuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Sidebar } from './components/Sidebar';
 import { ActiveTab } from './components/Navbar';
-import { AlertBanner } from './components/AlertBanner';
 import { DashboardView } from './components/DashboardView';
 import { CentralInventoryView } from './components/CentralInventoryView';
 import { BranchesView } from './components/BranchesView';
@@ -101,17 +100,6 @@ const AppContent: React.FC = () => {
       {/* Main Content Area offset by fixed desktop sidebar */}
       <div className="lg:pl-64 xl:pl-72 print:pl-0 flex-1 flex flex-col min-w-0">
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 print:p-0 print:max-w-none">
-          
-          {/* Low Stock Alert notification banner across views (except when already in reorder or reports tab) */}
-          {activeTab !== 'reorder' && activeTab !== 'reports' && (
-            <div className="print:hidden">
-              <AlertBanner
-                onNavigateToReorder={() => setActiveTab('reorder')}
-                onOpenRestock={() => handleOpenRestock()}
-              />
-            </div>
-          )}
-
           {/* View Switcher */}
           {activeTab === 'dashboard' && (
             <DashboardView
