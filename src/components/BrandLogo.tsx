@@ -150,7 +150,7 @@ export const BrandLoaderScreen: React.FC<BrandLoaderScreenProps> = ({
           <p className="text-sm font-bold tracking-tight text-[#0B0F17] dark:text-white">
             Anointed Engineering Services Limited
           </p>
-          <p className="text-xs font-mono text-blue-700 dark:text-sky-400">
+          <p className="text-xs font-medium text-blue-700 dark:text-sky-400">
             {label}
           </p>
         </div>

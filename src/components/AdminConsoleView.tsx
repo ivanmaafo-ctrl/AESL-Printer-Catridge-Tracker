@@ -423,7 +423,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                       </div>
 
                       <div>
-                        <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+                        <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
                           Specification / Notes
                         </label>
                         <input
@@ -437,7 +437,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
 
                       <div className="grid grid-cols-2 gap-2.5">
                         <div>
-                          <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+                          <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
                             In Office Stock
                           </label>
                           <input
@@ -451,12 +451,12 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                                 Math.max(0, parseInt(e.target.value) || 0)
                               )
                             }
-                            className="w-full min-h-[42px] px-2 py-1.5 text-base font-mono font-bold text-center border-2 border-blue-500/60 dark:border-sky-400/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white"
+                            className="w-full min-h-[42px] px-2 py-1.5 text-base font-display font-bold tabular-nums text-center border-2 border-blue-500/60 dark:border-sky-400/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white"
                           />
                         </div>
 
                         <div>
-                          <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+                          <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
                             Alert Trigger
                           </label>
                           <input
@@ -470,7 +470,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                                 Math.max(1, parseInt(e.target.value) || 1)
                               )
                             }
-                            className="w-full min-h-[42px] px-2 py-1.5 text-base font-mono text-center border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-xl focus:outline-none"
+                            className="w-full min-h-[42px] px-2 py-1.5 text-base font-medium tabular-nums text-center border border-slate-300 dark:border-white/15 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white rounded-xl focus:outline-none"
                           />
                         </div>
                       </div>
@@ -750,7 +750,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                           <div className="space-y-2.5">
                             <div className="grid grid-cols-2 gap-2">
                               <div>
-                                <label className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block mb-1">Code</label>
+                                <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">Code</label>
                                 <input
                                   type="text"
                                   value={draft.code}
@@ -764,7 +764,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                                 />
                               </div>
                               <div>
-                                <label className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block mb-1">City</label>
+                                <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">City</label>
                                 <input
                                   type="text"
                                   value={draft.city}
@@ -779,7 +779,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                               </div>
                             </div>
                             <div>
-                              <label className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block mb-1">Office / Branch Name</label>
+                              <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">Office / Branch Name</label>
                               <input
                                 type="text"
                                 value={draft.name}
@@ -793,7 +793,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                               />
                             </div>
                             <div>
-                              <label className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block mb-1">Address</label>
+                              <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">Address</label>
                               <input
                                 type="text"
                                 value={draft.address}
@@ -821,7 +821,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                               {b.name}
                             </div>
                             <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
-                              {b.address} · <span className="font-mono">{b.printers.length} devices</span>
+                              {b.address} · <span className="tabular-nums">{b.printers.length} devices</span>
                             </div>
                           </div>
                         )}

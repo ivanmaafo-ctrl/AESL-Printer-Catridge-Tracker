@@ -30,6 +30,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
     loginWithEmail,
     loginWithGoogle,
     sendPasswordReset,
+    authSyncing,
     needsVerification,
     firebaseUser,
     resendVerificationEmail,
@@ -49,6 +50,9 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [resetMode, setResetMode] = useState(false);
   const [verifyBusy, setVerifyBusy] = useState(false);
+
+  const emailBusy = isSubmitting || (authSyncing && !isGoogleLoading);
+  const googleBusy = isGoogleLoading || (authSyncing && !isSubmitting);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,7 +204,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
         </p>
       </div>
 
-      <div className="bg-white dark:bg-[#0B111B]/90 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-lg shadow-slate-200/50 dark:shadow-none p-5 sm:p-8">
+      <div className="bg-white dark:bg-[#0B111B] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-lg shadow-slate-200/50 dark:shadow-none p-5 sm:p-8">
         <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/10 mb-5">
           <div>
             <h2 className="text-base font-bold text-[#0B0F17] dark:text-white">
@@ -234,7 +238,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
               Work Email
             </label>
             <div className="relative">
@@ -256,7 +260,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
           {!resetMode && (
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Password
                 </label>
                 <button
@@ -281,7 +285,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full min-h-[46px] pl-10 pr-12 py-2.5 bg-slate-50/70 dark:bg-[#070B12] border border-slate-300 dark:border-white/15 rounded-xl text-base sm:text-sm text-[#0B0F17] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 transition font-mono"
+                  className="w-full min-h-[46px] pl-10 pr-12 py-2.5 bg-slate-50/70 dark:bg-[#070B12] border border-slate-300 dark:border-white/15 rounded-xl text-base sm:text-sm text-[#0B0F17] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 transition"
                   autoComplete="current-password"
                 />
                 <button
@@ -300,10 +304,10 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
           <div className="pt-1 space-y-2.5">
             <button
               type="submit"
-              disabled={isSubmitting || isGoogleLoading}
+              disabled={emailBusy || googleBusy}
               className="w-full min-h-[48px] py-3 px-4 bg-[#0B0F17] hover:bg-slate-800 dark:bg-sky-400 dark:hover:bg-sky-300 text-white dark:text-[#06090F] font-semibold text-sm rounded-full shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
             >
-              {isSubmitting ? (
+              {emailBusy ? (
                 <>
                   <BrandSpinner size="xs" />
                   <span>{resetMode ? 'Sending Reset Link...' : 'Signing In...'}</span>
@@ -339,17 +343,17 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
           <>
             <div className="my-5 flex items-center gap-3">
               <div className="h-px flex-1 bg-slate-200 dark:bg-white/10" />
-              <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">OR</span>
+              <span className="text-xs font-medium text-slate-400 dark:text-slate-500">or</span>
               <div className="h-px flex-1 bg-slate-200 dark:bg-white/10" />
             </div>
 
             <button
               type="button"
               onClick={handleGoogleLogin}
-              disabled={isGoogleLoading || isSubmitting}
+              disabled={googleBusy || emailBusy}
               className="w-full min-h-[46px] py-2.5 px-4 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-800 dark:text-white border border-slate-300 dark:border-white/15 rounded-full text-xs font-semibold transition flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-70"
             >
-              {isGoogleLoading ? (
+              {googleBusy ? (
                 <>
                   <BrandSpinner size="xs" />
                   <span>Connecting Google Account...</span>
@@ -397,24 +401,12 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
     <div className="min-h-screen bg-white dark:bg-[#06090F] text-[#0B0F17] dark:text-slate-100 font-sans flex flex-col relative isolate overflow-y-auto pb-safe">
       <div
         aria-hidden="true"
-        className="hidden dark:block fixed inset-0 -z-10 overflow-hidden pointer-events-none"
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-[#040814] via-[#071226] to-[#080F20]" />
-        <div
-          className="dark-ambient-orb-a absolute -top-40 -left-24 w-[680px] h-[680px] rounded-full opacity-45 blur-3xl"
-          style={{
-            background:
-              'radial-gradient(circle, rgba(37,99,235,0.32) 0%, rgba(14,165,233,0.14) 45%, rgba(6,9,15,0) 72%)',
-          }}
-        />
-        <div
-          className="dark-ambient-orb-b absolute -bottom-48 -right-24 w-[760px] h-[760px] rounded-full opacity-45 blur-3xl"
-          style={{
-            background:
-              'radial-gradient(circle, rgba(56,189,248,0.24) 0%, rgba(30,58,138,0.22) 45%, rgba(6,9,15,0) 72%)',
-          }}
-        />
-      </div>
+        className="hidden dark:block fixed inset-0 -z-10 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(680px circle at 8% 4%, rgba(37,99,235,0.16), transparent 60%), radial-gradient(720px circle at 94% 96%, rgba(56,189,248,0.12), transparent 60%), linear-gradient(135deg, #040814 0%, #071226 50%, #080F20 100%)',
+        }}
+      />
 
       <button
         type="button"

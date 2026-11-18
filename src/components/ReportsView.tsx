@@ -412,7 +412,7 @@ export const ReportsView: React.FC = () => {
               Report Filters — Include / Exclude
             </h2>
             {excludedCount > 0 && (
-              <span className="text-[11px] font-mono font-semibold text-amber-700 dark:text-amber-400">
+              <span className="text-[11px] font-semibold tabular-nums text-amber-700 dark:text-amber-400">
                 · {excludedCount} excluded
               </span>
             )}
@@ -439,7 +439,7 @@ export const ReportsView: React.FC = () => {
           {/* Left Column */}
           <div className="lg:col-span-4 space-y-4">
             <div>
-              <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                 1. Filter by Restock Need
               </label>
               <select
@@ -456,7 +456,7 @@ export const ReportsView: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                 2. Sort Report Order
               </label>
               <select
@@ -473,7 +473,7 @@ export const ReportsView: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-3 pt-1">
               <div>
-                <span className="block text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                <span className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                   Include Types
                 </span>
                 <div className="space-y-1.5">
@@ -500,7 +500,7 @@ export const ReportsView: React.FC = () => {
               </div>
 
               <div>
-                <span className="block text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                <span className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                   Include Brands
                 </span>
                 <div className="space-y-1.5">
@@ -529,7 +529,7 @@ export const ReportsView: React.FC = () => {
 
             <div className="pt-2 border-t border-slate-100 dark:border-white/10 space-y-2.5">
               <div>
-                <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Report Heading
                 </label>
                 <input
@@ -540,7 +540,7 @@ export const ReportsView: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Prepared By
                 </label>
                 <input
@@ -556,7 +556,7 @@ export const ReportsView: React.FC = () => {
           {/* Middle Column: Individual SKU Include / Exclude Checklist */}
           <div className="lg:col-span-4 border-t lg:border-t-0 lg:border-l border-slate-100 dark:border-white/10 pt-4 lg:pt-0 lg:pl-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                 3. Include / Exclude Specific SKUs
               </span>
               <div className="flex items-center gap-2 text-[11px]">
@@ -608,7 +608,7 @@ export const ReportsView: React.FC = () => {
                         </div>
                       </div>
                       <span
-                        className={`font-mono text-[11px] font-bold shrink-0 ml-2 ${
+                        className={`tabular-nums text-xs font-semibold shrink-0 ml-2 ${
                           cart.centralStock === 0
                             ? 'text-rose-600 dark:text-rose-400'
                             : cart.centralStock <= Math.max(1, Math.floor((cart.minThreshold || 15) / 3))
@@ -627,7 +627,7 @@ export const ReportsView: React.FC = () => {
 
           {/* Right Column: Report Fields */}
           <div className="lg:col-span-4 border-t lg:border-t-0 lg:border-l border-slate-100 dark:border-white/10 pt-4 lg:pt-0 lg:pl-6">
-            <span className="block text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+            <span className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
               4. Details to Include in Report
             </span>
 
@@ -698,7 +698,7 @@ export const ReportsView: React.FC = () => {
             <div className="flex items-start gap-3 sm:gap-3.5">
               <BrandLogo className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 mt-0.5" />
               <div className="min-w-0">
-                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap text-[11px] sm:text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-sky-400 print:text-blue-800">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap text-xs font-semibold text-blue-700 dark:text-sky-400 print:text-blue-800">
                   <span>Anointed Engineering Services Limited</span>
                   <span aria-hidden="true">·</span>
                   <span>IT Department</span>
@@ -715,7 +715,7 @@ export const ReportsView: React.FC = () => {
               </div>
             </div>
 
-            <div className="text-xs text-slate-600 dark:text-slate-300 print:text-slate-700 sm:text-right font-mono space-y-0.5">
+            <div className="text-xs text-slate-600 dark:text-slate-300 print:text-slate-700 sm:text-right tabular-nums space-y-0.5">
               <div>Generated: <strong className="text-[#0B0F17] dark:text-white print:text-slate-900">{activeDateStr}</strong></div>
               <div>Prepared By: <strong className="text-[#0B0F17] dark:text-white print:text-slate-900">{preparedBy || 'IT Department'}</strong></div>
               <div>Gauge Standard: <strong className="text-[#0B0F17] dark:text-white print:text-slate-900">15 units / SKU</strong></div>
@@ -724,33 +724,33 @@ export const ReportsView: React.FC = () => {
 
           <div className="mt-4 sm:mt-5 grid grid-cols-2 sm:grid-cols-5 print:grid-cols-5 gap-2.5 sm:gap-3">
             <div className="bg-white dark:bg-[#070B12] print:bg-white p-3 rounded-xl border border-slate-200 dark:border-white/10">
-              <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block">Included SKUs</span>
-              <span className="text-lg font-bold font-mono tabular-nums text-[#0B0F17] dark:text-white print:text-slate-900">
+              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 block">Included SKUs</span>
+              <span className="text-lg font-display font-bold tabular-nums text-[#0B0F17] dark:text-white print:text-slate-900">
                 {summaryStats.totalSkus}
               </span>
             </div>
             <div className="bg-white dark:bg-[#070B12] print:bg-white p-3 rounded-xl border border-slate-200 dark:border-white/10">
-              <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block">Qty Left (In Office)</span>
-              <span className="text-lg font-bold font-mono tabular-nums text-[#0B0F17] dark:text-white print:text-slate-900">
-                {summaryStats.totalUnitsLeft} <span className="text-xs font-normal text-slate-500">units</span>
+              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 block">Qty Left (In Office)</span>
+              <span className="text-lg font-display font-bold tabular-nums text-[#0B0F17] dark:text-white print:text-slate-900">
+                {summaryStats.totalUnitsLeft} <span className="text-xs font-sans font-normal text-slate-500">units</span>
               </span>
             </div>
             <div className="bg-white dark:bg-[#070B12] print:bg-white p-3 rounded-xl border border-slate-200 dark:border-white/10">
-              <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block">Need Restock</span>
-              <span className={`text-lg font-bold font-mono tabular-nums ${summaryStats.needingRestockCount > 0 ? 'text-amber-700 dark:text-amber-400' : 'text-blue-700 dark:text-sky-400'}`}>
-                {summaryStats.needingRestockCount} <span className="text-xs font-normal text-slate-500">SKUs</span>
+              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 block">Need Restock</span>
+              <span className={`text-lg font-display font-bold tabular-nums ${summaryStats.needingRestockCount > 0 ? 'text-amber-700 dark:text-amber-400' : 'text-blue-700 dark:text-sky-400'}`}>
+                {summaryStats.needingRestockCount} <span className="text-xs font-sans font-normal text-slate-500">SKUs</span>
               </span>
             </div>
             <div className="bg-white dark:bg-[#070B12] print:bg-white p-3 rounded-xl border border-slate-200 dark:border-white/10">
-              <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block">Out of Stock (0)</span>
-              <span className={`text-lg font-bold font-mono tabular-nums ${summaryStats.outOfStockCount > 0 ? 'text-rose-700 dark:text-rose-400' : 'text-slate-700 dark:text-slate-300'}`}>
-                {summaryStats.outOfStockCount} <span className="text-xs font-normal text-slate-500">SKUs</span>
+              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 block">Out of Stock (0)</span>
+              <span className={`text-lg font-display font-bold tabular-nums ${summaryStats.outOfStockCount > 0 ? 'text-rose-700 dark:text-rose-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                {summaryStats.outOfStockCount} <span className="text-xs font-sans font-normal text-slate-500">SKUs</span>
               </span>
             </div>
             <div className="col-span-2 sm:col-span-1 print:col-span-1 bg-white dark:bg-[#070B12] print:bg-white p-3 rounded-xl border border-slate-200 dark:border-white/10">
-              <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 block">Suggested Order</span>
-              <span className="text-lg font-bold font-mono tabular-nums text-blue-700 dark:text-sky-400">
-                +{summaryStats.totalSuggestedOrder} <span className="text-xs font-normal text-slate-500">units</span>
+              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 block">Suggested Order</span>
+              <span className="text-lg font-display font-bold tabular-nums text-blue-700 dark:text-sky-400">
+                +{summaryStats.totalSuggestedOrder} <span className="text-xs font-sans font-normal text-slate-500">units</span>
               </span>
             </div>
           </div>
@@ -800,7 +800,7 @@ export const ReportsView: React.FC = () => {
                       {columns.quantityLeft && (
                         <div className="text-right shrink-0">
                           <span
-                            className={`text-base font-bold font-mono tabular-nums block ${
+                            className={`text-base font-display font-bold tabular-nums block ${
                               cart.centralStock === 0
                                 ? 'text-rose-700 dark:text-rose-400'
                                 : cart.centralStock <= Math.max(1, Math.floor((cart.minThreshold || 15) / 3))
@@ -810,7 +810,7 @@ export const ReportsView: React.FC = () => {
                           >
                             {cart.centralStock}
                           </span>
-                          <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
+                          <span className="text-[11px] tabular-nums text-slate-400 dark:text-slate-500">
                             / {meta.threshold} min
                           </span>
                         </div>
@@ -823,7 +823,7 @@ export const ReportsView: React.FC = () => {
                           <div>
                             <span className="text-[10px] text-slate-400 block">Restock</span>
                             <span
-                              className={`font-mono font-bold ${
+                              className={`font-semibold ${
                                 meta.severity === 'OUT_OF_STOCK' || meta.severity === 'CRITICAL'
                                   ? 'text-rose-700 dark:text-rose-400'
                                   : meta.severity === 'LOW'
@@ -838,7 +838,7 @@ export const ReportsView: React.FC = () => {
                         {columns.suggestedOrder && (
                           <div>
                             <span className="text-[10px] text-slate-400 block">Order</span>
-                            <span className="font-mono font-bold text-[#0B0F17] dark:text-white">
+                            <span className="font-semibold tabular-nums text-[#0B0F17] dark:text-white">
                               {meta.suggestedOrder > 0 ? `+${meta.suggestedOrder}u` : '—'}
                             </span>
                           </div>
@@ -846,7 +846,7 @@ export const ReportsView: React.FC = () => {
                         {columns.sentOut && (
                           <div>
                             <span className="text-[10px] text-slate-400 block">Sent Out</span>
-                            <span className="font-mono font-bold text-[#0B0F17] dark:text-white">
+                            <span className="font-semibold tabular-nums text-[#0B0F17] dark:text-white">
                               {sentOut}u
                             </span>
                           </div>
@@ -862,7 +862,7 @@ export const ReportsView: React.FC = () => {
                     )}
 
                     {columns.supplierAndCost && (
-                      <div className="text-[11px] text-slate-600 dark:text-slate-300 font-mono">
+                      <div className="text-[11px] text-slate-600 dark:text-slate-300 tabular-nums">
                         {cart.supplier || '—'} · {cart.unitCost > 0 ? `$${cart.unitCost.toFixed(2)}/u` : 'Price unset'}
                       </div>
                     )}
@@ -905,7 +905,7 @@ export const ReportsView: React.FC = () => {
                         )}
                       </div>
                       <span className="text-slate-700 dark:text-slate-200 print:text-slate-800 font-medium block mt-0.5">{cart.model}</span>
-                      <span className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 tabular-nums">
                         {cart.brand} · {cart.pageYield ? `${cart.pageYield.toLocaleString()} pgs` : 'Std Yield'}
                       </span>
                     </td>
@@ -920,7 +920,7 @@ export const ReportsView: React.FC = () => {
                     {columns.quantityLeft && (
                       <td className="py-3.5 px-4 text-center whitespace-nowrap">
                         <span
-                          className={`text-sm font-bold font-mono tabular-nums ${
+                          className={`text-sm font-display font-bold tabular-nums ${
                             cart.centralStock === 0
                               ? 'text-rose-700 dark:text-rose-400'
                               : cart.centralStock <= Math.max(1, Math.floor((cart.minThreshold || 15) / 3))
@@ -930,7 +930,7 @@ export const ReportsView: React.FC = () => {
                         >
                           {cart.centralStock}
                         </span>
-                        <span className="block text-[10px] text-slate-400 dark:text-slate-500 font-mono">
+                        <span className="block text-[10px] text-slate-400 dark:text-slate-500 tabular-nums">
                           / {meta.threshold} min
                         </span>
                       </td>
@@ -939,28 +939,28 @@ export const ReportsView: React.FC = () => {
                     {columns.restockStatus && (
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         {meta.severity === 'OUT_OF_STOCK' ? (
-                          <div className="inline-flex items-center gap-1 text-rose-700 dark:text-rose-400 font-mono font-bold text-[11px]">
+                          <div className="inline-flex items-center gap-1 text-rose-700 dark:text-rose-400 font-semibold text-xs">
                             <ShieldAlert className="w-3.5 h-3.5" />
-                            <span>YES · OUT OF STOCK</span>
+                            <span>Yes · Out of Stock</span>
                           </div>
                         ) : meta.severity === 'CRITICAL' ? (
-                          <div className="inline-flex items-center gap-1 text-rose-700 dark:text-rose-400 font-mono font-bold text-[11px]">
+                          <div className="inline-flex items-center gap-1 text-rose-700 dark:text-rose-400 font-semibold text-xs">
                             <AlertTriangle className="w-3.5 h-3.5" />
-                            <span>YES · CRITICAL</span>
+                            <span>Yes · Critical</span>
                           </div>
                         ) : meta.severity === 'LOW' ? (
-                          <div className="inline-flex items-center gap-1 text-amber-800 dark:text-amber-400 font-mono font-bold text-[11px]">
+                          <div className="inline-flex items-center gap-1 text-amber-800 dark:text-amber-400 font-semibold text-xs">
                             <AlertTriangle className="w-3.5 h-3.5" />
-                            <span>YES · BELOW GAUGE</span>
+                            <span>Yes · Below Gauge</span>
                           </div>
                         ) : (
-                          <div className="inline-flex items-center gap-1 text-blue-700 dark:text-sky-400 font-mono font-bold text-[11px]">
+                          <div className="inline-flex items-center gap-1 text-blue-700 dark:text-sky-400 font-semibold text-xs">
                             <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>NO · ADEQUATE</span>
+                            <span>No · Adequate</span>
                           </div>
                         )}
                         {meta.deficit > 0 && (
-                          <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+                          <span className="block text-[11px] text-slate-500 dark:text-slate-400 tabular-nums mt-0.5">
                             Shortfall: -{meta.deficit} units
                           </span>
                         )}

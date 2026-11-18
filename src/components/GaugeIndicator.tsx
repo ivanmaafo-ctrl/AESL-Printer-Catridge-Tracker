@@ -40,9 +40,9 @@ export const GaugeIndicator: React.FC<GaugeIndicatorProps> = ({
   if (compact) {
     return (
       <div className="flex flex-col items-center gap-1 min-w-[120px]">
-        <div className="flex items-center justify-between w-full text-[11px] font-mono">
+        <div className="flex items-center justify-between w-full text-[11px] tabular-nums">
           <span
-            className={`font-bold tabular-nums ${
+            className={`font-semibold tabular-nums ${
               isBelowGauge
                 ? 'text-amber-700 dark:text-amber-400'
                 : 'text-slate-800 dark:text-slate-200'
@@ -61,7 +61,7 @@ export const GaugeIndicator: React.FC<GaugeIndicatorProps> = ({
         </div>
 
         {showText && isBelowGauge && (
-          <span className={`text-[10px] font-mono font-semibold ${statusTextClass}`}>
+          <span className={`text-[10px] font-semibold tabular-nums ${statusTextClass}`}>
             {currentStock === 0 ? 'EMPTY' : `ALERT (<${gaugeTarget})`}
           </span>
         )}
@@ -85,14 +85,14 @@ export const GaugeIndicator: React.FC<GaugeIndicatorProps> = ({
           </span>
         </div>
 
-        <span className={`text-[10px] font-mono font-bold ${statusTextClass}`}>
+        <span className={`text-[11px] font-semibold tabular-nums ${statusTextClass}`}>
           {textLabel}
         </span>
       </div>
 
-      <div className="flex items-baseline justify-between font-mono">
+      <div className="flex items-baseline justify-between tabular-nums">
         <div>
-          <span className="text-2xl font-bold tabular-nums text-slate-900 dark:text-white">
+          <span className="text-2xl font-display font-bold tabular-nums text-slate-900 dark:text-white">
             {currentStock}
           </span>
           <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">in office</span>
@@ -109,7 +109,7 @@ export const GaugeIndicator: React.FC<GaugeIndicatorProps> = ({
             style={{ width: `${Math.max(5, percentage)}%` }}
           />
         </div>
-        <div className="flex justify-between text-[10px] font-mono text-slate-400 dark:text-slate-500">
+        <div className="flex justify-between text-[11px] tabular-nums text-slate-400 dark:text-slate-500">
           <span>0 (Empty)</span>
           <span className="font-semibold text-slate-600 dark:text-slate-300">{gaugeTarget} (Gauge Safe Target)</span>
           <span>{gaugeTarget * 2}+</span>

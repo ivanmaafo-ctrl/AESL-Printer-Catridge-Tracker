@@ -105,7 +105,7 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
             <BrandLogo className="w-6 h-6 shrink-0" />
             <span className="font-semibold text-[#0B0F17] dark:text-white">AESL Location Directory</span>
             <span aria-hidden="true">·</span>
-            <span className="font-mono">{branches.length} Active Sites</span>
+            <span className="tabular-nums">{branches.length} Active Sites</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0B0F17] dark:text-white mt-1.5">
             Branch Network & Headquarters Offices
@@ -237,7 +237,7 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
 
                   <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-2 flex items-center justify-between pt-1.5 border-t border-slate-100 dark:border-white/10">
                     <span className="truncate max-w-[80px]">{b.city.split('-')[0].trim()}</span>
-                    <span className="font-mono font-medium text-slate-700 dark:text-slate-200 tabular-nums">{totalOnHand} u</span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-200 tabular-nums">{totalOnHand} u</span>
                   </div>
                 </button>
               );
@@ -284,7 +284,7 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
                       <span>Lead: {selectedBranch.managerName}</span>
                     </span>
                     <span className="hidden sm:inline" aria-hidden="true">·</span>
-                    <span className="flex items-center gap-1.5 font-mono">
+                    <span className="flex items-center gap-1.5 tabular-nums">
                       <Phone className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
                       <span>{selectedBranch.contactPhone}</span>
                     </span>

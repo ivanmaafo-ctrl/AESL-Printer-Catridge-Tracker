@@ -331,7 +331,7 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
-  // Seed initial AESL warehouse catalog & 27 branches if Firestore is empty
+  // Subscribe to live inventory collections and seed/sync once from server snapshots (zero duplicate getDocs)
   useEffect(() => {
     if (!authReady || !isAuthenticated || !auth.currentUser) {
       setInventoryLoading(false);
@@ -341,116 +341,116 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const uid = auth.currentUser.uid;
     setInventoryLoading(true);
 
-    const seedIfEmpty = async () => {
+    let latestCartServerEmpty: boolean | null = null;
+    let latestBranchServerEmpty: boolean | null = null;
+
+    const trySeedWhenBothEmpty = async () => {
       if (seededRef.current) return;
+      if (latestCartServerEmpty !== true || latestBranchServerEmpty !== true) return;
       seededRef.current = true;
 
       try {
-        const cartSnap = await getDocs(query(collection(db, 'cartridges'), where('orgId', '==', 'aesl')));
-        const branchSnap = await getDocs(query(collection(db, 'branches'), where('orgId', '==', 'aesl')));
+        const batch1 = writeBatch(db);
+        INITIAL_CARTRIDGES.forEach((c) => {
+          batch1.set(doc(db, 'cartridges', sanitizeId(c.id, 'cart')), buildCartridgeDoc(c, uid));
+        });
+        INITIAL_BRANCHES.forEach((b) => {
+          batch1.set(doc(db, 'branches', sanitizeId(b.id, 'branch')), buildBranchDoc(b, uid));
+        });
+        await batch1.commit();
 
-        if (cartSnap.empty && branchSnap.empty) {
-          const batch1 = writeBatch(db);
-          INITIAL_CARTRIDGES.forEach((c) => {
-            batch1.set(doc(db, 'cartridges', sanitizeId(c.id, 'cart')), buildCartridgeDoc(c, uid));
-          });
-          INITIAL_BRANCHES.forEach((b) => {
-            batch1.set(doc(db, 'branches', sanitizeId(b.id, 'branch')), buildBranchDoc(b, uid));
-          });
-          await batch1.commit();
-
-          // Seed initial dispatch after branches & cartridges exist so relational rules pass
-          const batch2 = writeBatch(db);
-          INITIAL_DISPATCHES.forEach((d) => {
-            batch2.set(doc(db, 'dispatches', sanitizeId(d.id, 'dsp')), buildDispatchDoc(d, uid));
-          });
-          await batch2.commit();
-          try {
-            localStorage.setItem('aesl_catalog_v2_synced', 'true');
-          } catch {
-            // ignore storage errors
-          }
-        } else if (!cartSnap.empty && isAdmin) {
-          let alreadySynced = false;
-          try {
-            alreadySynced = localStorage.getItem('aesl_catalog_v2_synced') === 'true';
-          } catch {
-            alreadySynced = false;
-          }
-
-          if (!alreadySynced) {
-            const existingMap = new Map<string, any>();
-            cartSnap.docs.forEach((d) => existingMap.set(d.id, d.data()));
-
-            const batchSync = writeBatch(db);
-            let opCount = 0;
-
-            const sku285a = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-285a');
-            const sku1107a = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-1107a');
-            const sku1500a = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-1500a');
-            const skuExv14 = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-exv14');
-
-            if (sku285a && !existingMap.has('cart-285a')) {
-              batchSync.set(doc(db, 'cartridges', 'cart-285a'), buildCartridgeDoc(sku285a, uid));
-              opCount += 1;
-            }
-            if (sku1107a && existingMap.has('cart-1107a')) {
-              const d1107 = existingMap.get('cart-1107a');
-              if (d1107.minThreshold === 15) {
-                batchSync.update(doc(db, 'cartridges', 'cart-1107a'), {
-                  minThreshold: 20,
-                  isBestSeller: true,
-                  specification: sku1107a.specification,
-                  notes: sku1107a.notes,
-                  updatedByUid: uid,
-                  updatedAt: serverTimestamp(),
-                });
-                opCount += 1;
-              }
-            }
-            if (sku1500a && existingMap.has('cart-1500a')) {
-              const d1500 = existingMap.get('cart-1500a');
-              if (d1500.minThreshold === 15 || !d1500.isBestSeller) {
-                batchSync.update(doc(db, 'cartridges', 'cart-1500a'), {
-                  minThreshold: 20,
-                  isBestSeller: true,
-                  specification: sku1500a.specification,
-                  notes: sku1500a.notes,
-                  updatedByUid: uid,
-                  updatedAt: serverTimestamp(),
-                });
-                opCount += 1;
-              }
-            }
-            if (skuExv14 && existingMap.has('cart-exv14')) {
-              const dExv14 = existingMap.get('cart-exv14');
-              if (dExv14.minThreshold === 15) {
-                batchSync.update(doc(db, 'cartridges', 'cart-exv14'), {
-                  minThreshold: 5,
-                  notes: skuExv14.notes,
-                  updatedByUid: uid,
-                  updatedAt: serverTimestamp(),
-                });
-                opCount += 1;
-              }
-            }
-
-            if (opCount > 0) {
-              await batchSync.commit();
-            }
-            try {
-              localStorage.setItem('aesl_catalog_v2_synced', 'true');
-            } catch {
-              // ignore storage errors
-            }
-          }
+        const batch2 = writeBatch(db);
+        INITIAL_DISPATCHES.forEach((d) => {
+          batch2.set(doc(db, 'dispatches', sanitizeId(d.id, 'dsp')), buildDispatchDoc(d, uid));
+        });
+        await batch2.commit();
+        try {
+          localStorage.setItem('aesl_catalog_v2_synced', 'true');
+        } catch {
+          // ignore storage errors
         }
       } catch (err) {
         console.warn('Initial seed check skipped or handled:', err);
       }
     };
 
-    void seedIfEmpty();
+    const runCatalogV2SyncIfNeeded = async (docsMap: Map<string, any>) => {
+      if (!isAdmin || seededRef.current) return;
+      let alreadySynced = false;
+      try {
+        alreadySynced = localStorage.getItem('aesl_catalog_v2_synced') === 'true';
+      } catch {
+        alreadySynced = false;
+      }
+      if (alreadySynced) return;
+      seededRef.current = true;
+
+      try {
+        const batchSync = writeBatch(db);
+        let opCount = 0;
+
+        const sku285a = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-285a');
+        const sku1107a = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-1107a');
+        const sku1500a = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-1500a');
+        const skuExv14 = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-exv14');
+
+        if (sku285a && !docsMap.has('cart-285a')) {
+          batchSync.set(doc(db, 'cartridges', 'cart-285a'), buildCartridgeDoc(sku285a, uid));
+          opCount += 1;
+        }
+        if (sku1107a && docsMap.has('cart-1107a')) {
+          const d1107 = docsMap.get('cart-1107a');
+          if (d1107.minThreshold === 15) {
+            batchSync.update(doc(db, 'cartridges', 'cart-1107a'), {
+              minThreshold: 20,
+              isBestSeller: true,
+              specification: sku1107a.specification,
+              notes: sku1107a.notes,
+              updatedByUid: uid,
+              updatedAt: serverTimestamp(),
+            });
+            opCount += 1;
+          }
+        }
+        if (sku1500a && docsMap.has('cart-1500a')) {
+          const d1500 = docsMap.get('cart-1500a');
+          if (d1500.minThreshold === 15 || !d1500.isBestSeller) {
+            batchSync.update(doc(db, 'cartridges', 'cart-1500a'), {
+              minThreshold: 20,
+              isBestSeller: true,
+              specification: sku1500a.specification,
+              notes: sku1500a.notes,
+              updatedByUid: uid,
+              updatedAt: serverTimestamp(),
+            });
+            opCount += 1;
+          }
+        }
+        if (skuExv14 && docsMap.has('cart-exv14')) {
+          const dExv14 = docsMap.get('cart-exv14');
+          if (dExv14.minThreshold === 15) {
+            batchSync.update(doc(db, 'cartridges', 'cart-exv14'), {
+              minThreshold: 5,
+              notes: skuExv14.notes,
+              updatedByUid: uid,
+              updatedAt: serverTimestamp(),
+            });
+            opCount += 1;
+          }
+        }
+
+        if (opCount > 0) {
+          await batchSync.commit();
+        }
+        try {
+          localStorage.setItem('aesl_catalog_v2_synced', 'true');
+        } catch {
+          // ignore storage errors
+        }
+      } catch (err) {
+        console.warn('Catalog sync skipped or handled:', err);
+      }
+    };
 
     const qCart = query(collection(db, 'cartridges'), where('orgId', '==', 'aesl'));
     const qBranch = query(collection(db, 'branches'), where('orgId', '==', 'aesl'));
@@ -461,8 +461,10 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const unsubCart = onSnapshot(
       qCart,
       (snap) => {
+        const docsMap = new Map<string, any>();
         const items: CartridgeSKU[] = snap.docs.map((d) => {
           const data = d.data() as any;
+          docsMap.set(d.id, data);
           createdAtCacheRef.current[`cartridges/${d.id}`] = data.createdAt;
           return {
             id: d.id,
@@ -486,6 +488,15 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         items.sort((a, b) => a.sku.localeCompare(b.sku));
         setCartridges(items);
         setInventoryLoading(false);
+
+        if (!snap.metadata.fromCache) {
+          latestCartServerEmpty = snap.empty;
+          if (snap.empty) {
+            void trySeedWhenBothEmpty();
+          } else {
+            void runCatalogV2SyncIfNeeded(docsMap);
+          }
+        }
       },
       (err) => {
         handleFirestoreError(err, OperationType.LIST, 'cartridges');
@@ -517,6 +528,13 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           return a.name.localeCompare(b.name);
         });
         setBranches(items);
+
+        if (!snap.metadata.fromCache) {
+          latestBranchServerEmpty = snap.empty;
+          if (snap.empty) {
+            void trySeedWhenBothEmpty();
+          }
+        }
       },
       (err) => {
         handleFirestoreError(err, OperationType.LIST, 'branches');
@@ -689,60 +707,83 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     [usages]
   );
 
+  const sentOutByCartridgeMap = useMemo(() => {
+    const counts = new Map<string, number>();
+    dispatches.forEach((d) => {
+      counts.set(d.cartridgeId, (counts.get(d.cartridgeId) || 0) + (Number(d.quantity) || 0));
+    });
+    return counts;
+  }, [dispatches]);
+
   const getSentOutCountForCartridge = (cartridgeId: string): number => {
-    return dispatches
-      .filter((d) => d.cartridgeId === cartridgeId)
-      .reduce((sum, d) => sum + (Number(d.quantity) || 0), 0);
+    return sentOutByCartridgeMap.get(cartridgeId) || 0;
   };
 
-  const getBranchStockDetails = (branchId: string): BranchInventoryItem[] => {
-    const map = new Map<string, BranchInventoryItem>();
+  const branchStockMap = useMemo(() => {
+    const byBranch = new Map<string, Map<string, BranchInventoryItem>>();
 
-    dispatches
-      .filter((d) => d.branchId === branchId)
-      .forEach((d) => {
-        if (!map.has(d.cartridgeId)) {
-          map.set(d.cartridgeId, {
-            cartridgeId: d.cartridgeId,
-            cartridgeModel: d.cartridgeModel,
-            cartridgeColor: d.cartridgeColor,
-            totalReceived: 0,
-            totalUsed: 0,
-            onHandCount: 0,
-            inTransitCount: 0,
-          });
-        }
-        const item = map.get(d.cartridgeId)!;
-        if (d.status === 'Delivered') {
-          item.totalReceived += d.quantity;
-        } else if (d.status === 'In Transit' || d.status === 'Pending') {
-          item.inTransitCount += d.quantity;
-        }
-      });
+    const ensureBranchMap = (branchId: string) => {
+      let m = byBranch.get(branchId);
+      if (!m) {
+        m = new Map<string, BranchInventoryItem>();
+        byBranch.set(branchId, m);
+      }
+      return m;
+    };
 
-    usages
-      .filter((u) => u.branchId === branchId)
-      .forEach((u) => {
-        if (!map.has(u.cartridgeId)) {
-          map.set(u.cartridgeId, {
-            cartridgeId: u.cartridgeId,
-            cartridgeModel: u.cartridgeModel,
-            cartridgeColor: u.cartridgeColor,
-            totalReceived: 0,
-            totalUsed: 0,
-            onHandCount: 0,
-            inTransitCount: 0,
-          });
-        }
-        const item = map.get(u.cartridgeId)!;
-        item.totalUsed += u.quantity;
-      });
-
-    map.forEach((item) => {
-      item.onHandCount = Math.max(0, item.totalReceived - item.totalUsed);
+    dispatches.forEach((d) => {
+      const m = ensureBranchMap(d.branchId);
+      let item = m.get(d.cartridgeId);
+      if (!item) {
+        item = {
+          cartridgeId: d.cartridgeId,
+          cartridgeModel: d.cartridgeModel,
+          cartridgeColor: d.cartridgeColor,
+          totalReceived: 0,
+          totalUsed: 0,
+          onHandCount: 0,
+          inTransitCount: 0,
+        };
+        m.set(d.cartridgeId, item);
+      }
+      if (d.status === 'Delivered') {
+        item.totalReceived += d.quantity;
+      } else if (d.status === 'In Transit' || d.status === 'Pending') {
+        item.inTransitCount += d.quantity;
+      }
     });
 
-    return Array.from(map.values());
+    usages.forEach((u) => {
+      const m = ensureBranchMap(u.branchId);
+      let item = m.get(u.cartridgeId);
+      if (!item) {
+        item = {
+          cartridgeId: u.cartridgeId,
+          cartridgeModel: u.cartridgeModel,
+          cartridgeColor: u.cartridgeColor,
+          totalReceived: 0,
+          totalUsed: 0,
+          onHandCount: 0,
+          inTransitCount: 0,
+        };
+        m.set(u.cartridgeId, item);
+      }
+      item.totalUsed += u.quantity;
+    });
+
+    const result = new Map<string, BranchInventoryItem[]>();
+    byBranch.forEach((m, branchId) => {
+      const arr = Array.from(m.values());
+      arr.forEach((item) => {
+        item.onHandCount = Math.max(0, item.totalReceived - item.totalUsed);
+      });
+      result.set(branchId, arr);
+    });
+    return result;
+  }, [dispatches, usages]);
+
+  const getBranchStockDetails = (branchId: string): BranchInventoryItem[] => {
+    return branchStockMap.get(branchId) || [];
   };
 
   const getActorName = (fallback?: string) => {

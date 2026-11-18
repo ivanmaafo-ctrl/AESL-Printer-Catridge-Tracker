@@ -134,7 +134,7 @@ export const CentralInventoryView: React.FC<CentralInventoryViewProps> = ({
         <div className="col-span-2 sm:col-span-1 bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-sm rounded-2xl p-4 sm:p-5 border border-slate-200/70 dark:border-white/10">
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">In Office at the Moment</span>
           <div className="mt-1.5 sm:mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-semibold tracking-tight font-mono tabular-nums text-[#0B0F17] dark:text-white">
+            <span className="text-3xl font-display font-bold tracking-tight tabular-nums text-[#0B0F17] dark:text-white">
               {totalUnitsInOffice}
             </span>
             <span className="text-xs text-slate-500 dark:text-slate-400">units on shelf</span>
@@ -144,7 +144,7 @@ export const CentralInventoryView: React.FC<CentralInventoryViewProps> = ({
         <div className="bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-sm rounded-2xl p-4 sm:p-5 border border-slate-200/70 dark:border-white/10">
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Below Gauge</span>
           <div className="mt-1.5 sm:mt-2 flex items-baseline gap-1.5 flex-wrap">
-            <span className={`text-2xl sm:text-3xl font-semibold tracking-tight font-mono tabular-nums ${belowGaugeCount > 0 ? 'text-amber-700 dark:text-amber-400' : 'text-blue-700 dark:text-sky-400'}`}>
+            <span className={`text-2xl sm:text-3xl font-display font-bold tracking-tight tabular-nums ${belowGaugeCount > 0 ? 'text-amber-700 dark:text-amber-400' : 'text-blue-700 dark:text-sky-400'}`}>
               {belowGaugeCount}
             </span>
             <span className="text-xs text-slate-500 dark:text-slate-400">of {cartridges.length}</span>
@@ -154,7 +154,7 @@ export const CentralInventoryView: React.FC<CentralInventoryViewProps> = ({
         <div className="bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-sm rounded-2xl p-4 sm:p-5 border border-slate-200/70 dark:border-white/10">
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Sent Out</span>
           <div className="mt-1.5 sm:mt-2 flex items-baseline gap-1.5 flex-wrap">
-            <span className="text-2xl sm:text-3xl font-semibold tracking-tight font-mono tabular-nums text-[#0B0F17] dark:text-white">
+            <span className="text-2xl sm:text-3xl font-display font-bold tracking-tight tabular-nums text-[#0B0F17] dark:text-white">
               {totalSentOut}
             </span>
             <span className="text-xs text-slate-500 dark:text-slate-400">units</span>

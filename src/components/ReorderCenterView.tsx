@@ -138,7 +138,7 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
           <div className="text-xs font-medium text-blue-950/75 dark:text-slate-400 flex items-center gap-2">
             <span className="font-semibold text-[#0B0F17] dark:text-white">15-Unit Buffer Surveillance</span>
             <span aria-hidden="true">·</span>
-            <span className="font-mono">{lowStockAlerts.length} SKUs Flagged</span>
+            <span className="tabular-nums">{lowStockAlerts.length} SKUs Flagged</span>
           </div>
           <h1 className="text-xl sm:text-3xl font-bold tracking-tight text-[#0B0F17] dark:text-white mt-1.5">
             Low Stock Alerts & Top-Up Manager
@@ -192,7 +192,7 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
             </span>
             <ShieldAlert className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
           </div>
-          <div className="text-2xl sm:text-3xl font-semibold font-mono tabular-nums text-rose-700 dark:text-rose-300 mt-1.5 sm:mt-2">
+          <div className="text-2xl sm:text-3xl font-display font-bold tabular-nums text-rose-700 dark:text-rose-300 mt-1.5 sm:mt-2">
             {criticalCount} <span className="text-xs font-sans font-normal">SKUs</span>
           </div>
           <span className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 mt-1 block">
@@ -207,7 +207,7 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
             </span>
             <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
           </div>
-          <div className="text-2xl sm:text-3xl font-semibold font-mono tabular-nums text-amber-800 dark:text-amber-300 mt-1.5 sm:mt-2">
+          <div className="text-2xl sm:text-3xl font-display font-bold tabular-nums text-amber-800 dark:text-amber-300 mt-1.5 sm:mt-2">
             {warningCount} <span className="text-xs font-sans font-normal">SKUs</span>
           </div>
           <span className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 mt-1 block">
@@ -222,7 +222,7 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
             </span>
             <CheckCircle2 className="w-4 h-4 text-blue-600 dark:text-sky-400" />
           </div>
-          <div className="text-2xl sm:text-3xl font-semibold font-mono tabular-nums text-blue-700 dark:text-sky-400 mt-1.5 sm:mt-2">
+          <div className="text-2xl sm:text-3xl font-display font-bold tabular-nums text-blue-700 dark:text-sky-400 mt-1.5 sm:mt-2">
             {cartridges.length - lowStockAlerts.length} <span className="text-xs font-sans font-normal">SKUs</span>
           </div>
           <span className="text-xs text-slate-600 dark:text-slate-300 mt-1 block">
@@ -250,8 +250,8 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
             <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3">
               <div className="text-left md:text-right">
                 <span className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 block">Est. PO Total</span>
-                <span className="text-sm font-bold font-mono text-[#0B0F17] dark:text-white">
-                  ${totalEstimatedCost.toFixed(2)} ({totalSuggestedUnits} units)
+                <span className="text-sm font-display font-bold tabular-nums text-[#0B0F17] dark:text-white">
+                  ${totalEstimatedCost.toFixed(2)} <span className="font-sans text-xs font-medium text-slate-500 dark:text-slate-400">({totalSuggestedUnits} units)</span>
                 </span>
               </div>
 
@@ -302,23 +302,23 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
                       </div>
 
                       <span
-                        className={`text-[11px] font-mono font-bold shrink-0 ${
+                        className={`text-xs font-semibold shrink-0 ${
                           alert.severity === 'CRITICAL'
                             ? 'text-rose-600 dark:text-rose-400'
                             : 'text-amber-700 dark:text-amber-400'
                         }`}
                       >
-                        {alert.currentStock === 0 ? 'OUT OF STOCK' : alert.severity}
+                        {alert.currentStock === 0 ? 'Out of Stock' : alert.severity === 'CRITICAL' ? 'Critical' : 'Low Stock'}
                       </span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 items-center p-2.5 rounded-xl bg-[#F6F8FC] dark:bg-white/[0.03] border border-slate-200/60 dark:border-white/10">
                       <div>
-                        <span className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+                        <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 block">
                           In Office Now
                         </span>
                         <span
-                          className={`font-mono font-bold text-base tabular-nums ${
+                          className={`font-display font-bold text-base tabular-nums ${
                             alert.currentStock === 0
                               ? 'text-rose-600 dark:text-rose-400'
                               : 'text-amber-700 dark:text-amber-400'

@@ -37,6 +37,7 @@ interface AdminAuthContextType {
   currentUser: AdminUser | null;
   firebaseUser: User | null;
   authReady: boolean;
+  authSyncing: boolean;
   isAuthenticated: boolean;
   needsVerification: boolean;
   accessDeniedReason: string | null;
@@ -107,6 +108,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
   const [authReady, setAuthReady] = useState(false);
+  const [authSyncing, setAuthSyncing] = useState(false);
   const [accessDeniedReason, setAccessDeniedReason] = useState<string | null>(null);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [staffInvites, setStaffInvites] = useState<StaffInvite[]>([]);
@@ -119,149 +121,151 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     if (!fbUser.emailVerified) {
       setCurrentUser(null);
+      setAuthSyncing(false);
       setAuthReady(true);
       return;
     }
 
-    // Check authorization: bootstrapped super admin, corporate email, password account, or active invite
-    let invitedDoc: { displayName?: string; role?: AdminTier; active?: boolean } | null = null;
-    if (email) {
-      const inviteKey = encodeEmailKey(email);
-      try {
-        const invSnap = await getDoc(doc(db, 'staffInvites', inviteKey));
-        if (invSnap.exists()) {
-          invitedDoc = invSnap.data() as { displayName?: string; role?: AdminTier; active?: boolean };
-        }
-      } catch {
-        // Ignore if no invite exists
-      }
-    }
+    setAuthSyncing(true);
 
-    const hasActiveInvite = invitedDoc !== null && invitedDoc.active === true;
-    if (!isBootstrapped && !isCorporateDomain && !isPasswordUser && !hasActiveInvite) {
-      await signOut(auth);
-      setCurrentUser(null);
-      setAccessDeniedReason(
-        `Access restricted. "${email || 'This account'}" is not an authorized AESL IT Team account. Ask the Super Admin to invite your email.`
-      );
-      setAuthReady(true);
-      return;
-    }
-
-    if (invitedDoc && invitedDoc.active === false && !isBootstrapped) {
-      await signOut(auth);
-      setCurrentUser(null);
-      setAccessDeniedReason('Your AESL IT Team invitation has been deactivated by the Super Admin.');
-      setAuthReady(true);
-      return;
-    }
-
-    const userRef = doc(db, 'users', fbUser.uid);
-    const privateRef = doc(db, 'users', fbUser.uid, 'private', 'info');
-
-    let profileSnap;
     try {
-      profileSnap = await getDoc(userRef);
-    } catch (err) {
-      handleFirestoreError(err, OperationType.GET, `users/${fbUser.uid}`);
-    }
+      const userRef = doc(db, 'users', fbUser.uid);
+      const privateRef = doc(db, 'users', fbUser.uid, 'private', 'info');
+      const needsInviteCheck = Boolean(email && !isBootstrapped && !isCorporateDomain && !isPasswordUser);
+      const inviteKey = email ? encodeEmailKey(email) : '';
 
-    const fallbackName =
-      clampStr(fbUser.displayName, 100) ||
-      clampStr(invitedDoc?.displayName, 100) ||
-      clampStr(email.split('@')[0], 100) ||
-      'AESL IT Staff';
+      // Fetch user profile and (when needed) staff invite in parallel — single round trip
+      const invitePromise =
+        inviteKey && (needsInviteCheck || !fbUser.displayName)
+          ? getDoc(doc(db, 'staffInvites', inviteKey)).catch(() => null)
+          : Promise.resolve(null);
 
-    if (!profileSnap.exists()) {
-      const initialRole: AdminTier = isBootstrapped ? 'SUPER_ADMIN' : 'STAFF';
-      try {
-        await setDoc(userRef, {
-          uid: fbUser.uid,
-          displayName: fallbackName,
-          role: initialRole,
-          department: 'IT Department',
-          status: 'active',
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        });
-      } catch (err) {
-        handleFirestoreError(err, OperationType.CREATE, `users/${fbUser.uid}`);
-      }
-
-      try {
-        await setDoc(privateRef, {
-          uid: fbUser.uid,
-          email: clampStr(email, 160),
-          lastLogin: serverTimestamp(),
-        });
-      } catch (err) {
-        handleFirestoreError(err, OperationType.WRITE, `users/${fbUser.uid}/private/info`);
-      }
-
-      if (isBootstrapped) {
-        try {
-          await setDoc(doc(db, 'admins', fbUser.uid), {
-            uid: fbUser.uid,
-            role: 'SUPER_ADMIN',
-            grantedAt: serverTimestamp(),
-          });
-        } catch (err) {
-          handleFirestoreError(err, OperationType.CREATE, `admins/${fbUser.uid}`);
-        }
-      }
-
-      setCurrentUser({
-        id: fbUser.uid,
-        uid: fbUser.uid,
-        email,
-        username: email || fallbackName,
-        displayName: fallbackName,
-        department: 'IT Department',
-        role: initialRole,
-        status: 'active',
-        createdAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString(),
+      const profilePromise = getDoc(userRef).catch((err) => {
+        handleFirestoreError(err, OperationType.GET, `users/${fbUser.uid}`);
       });
-    } else {
-      const data = profileSnap.data() as any;
-      if (data.status === 'disabled' && !isBootstrapped) {
+
+      const [invSnap, profileSnap] = await Promise.all([invitePromise, profilePromise]);
+
+      const invitedDoc: { displayName?: string; role?: AdminTier; active?: boolean } | null =
+        invSnap && invSnap.exists()
+          ? (invSnap.data() as { displayName?: string; role?: AdminTier; active?: boolean })
+          : null;
+
+      const hasActiveInvite = invitedDoc !== null && invitedDoc.active === true;
+      if (!isBootstrapped && !isCorporateDomain && !isPasswordUser && !hasActiveInvite) {
         await signOut(auth);
         setCurrentUser(null);
-        setAccessDeniedReason('Your AESL IT Team account has been disabled by a Super Admin.');
+        setAccessDeniedReason(
+          `Access restricted. "${email || 'This account'}" is not an authorized AESL IT Team account. Ask the Super Admin to invite your email.`
+        );
+        setAuthSyncing(false);
         setAuthReady(true);
         return;
       }
 
-      const resolvedRole: AdminTier = isBootstrapped
-        ? 'SUPER_ADMIN'
-        : (data.role as AdminTier) || 'STAFF';
+      if (invitedDoc && invitedDoc.active === false && !isBootstrapped) {
+        await signOut(auth);
+        setCurrentUser(null);
+        setAccessDeniedReason('Your AESL IT Team invitation has been deactivated by the Super Admin.');
+        setAuthSyncing(false);
+        setAuthReady(true);
+        return;
+      }
 
-      try {
-        await setDoc(privateRef, {
+      const fallbackName =
+        clampStr(fbUser.displayName, 100) ||
+        clampStr(invitedDoc?.displayName, 100) ||
+        clampStr(email.split('@')[0], 100) ||
+        'AESL IT Staff';
+
+      if (!profileSnap.exists()) {
+        const initialRole: AdminTier = isBootstrapped ? 'SUPER_ADMIN' : 'STAFF';
+
+        // Provision user profile, private info, and admin marker in parallel (1 round trip)
+        const createTasks: Array<Promise<void>> = [
+          setDoc(userRef, {
+            uid: fbUser.uid,
+            displayName: fallbackName,
+            role: initialRole,
+            department: 'IT Department',
+            status: 'active',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }).catch((err) => handleFirestoreError(err, OperationType.CREATE, `users/${fbUser.uid}`)),
+          setDoc(privateRef, {
+            uid: fbUser.uid,
+            email: clampStr(email, 160),
+            lastLogin: serverTimestamp(),
+          }).catch((err) => handleFirestoreError(err, OperationType.WRITE, `users/${fbUser.uid}/private/info`)),
+        ];
+
+        if (isBootstrapped) {
+          createTasks.push(
+            setDoc(doc(db, 'admins', fbUser.uid), {
+              uid: fbUser.uid,
+              role: 'SUPER_ADMIN',
+              grantedAt: serverTimestamp(),
+            }).catch((err) => handleFirestoreError(err, OperationType.CREATE, `admins/${fbUser.uid}`))
+          );
+        }
+
+        await Promise.all(createTasks);
+
+        setCurrentUser({
+          id: fbUser.uid,
+          uid: fbUser.uid,
+          email,
+          username: email || fallbackName,
+          displayName: fallbackName,
+          department: 'IT Department',
+          role: initialRole,
+          status: 'active',
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+        });
+      } else {
+        const data = profileSnap.data() as any;
+        if (data.status === 'disabled' && !isBootstrapped) {
+          await signOut(auth);
+          setCurrentUser(null);
+          setAccessDeniedReason('Your AESL IT Team account has been disabled by a Super Admin.');
+          setAuthSyncing(false);
+          setAuthReady(true);
+          return;
+        }
+
+        const resolvedRole: AdminTier = isBootstrapped
+          ? 'SUPER_ADMIN'
+          : (data.role as AdminTier) || 'STAFF';
+
+        // Enter portal immediately; record lastLogin in background without blocking UI
+        setCurrentUser({
+          id: fbUser.uid,
+          uid: fbUser.uid,
+          email,
+          username: email || fallbackName,
+          displayName: data.displayName || fallbackName,
+          department: data.department || 'IT Department',
+          role: resolvedRole,
+          status: data.status || 'active',
+          createdAt: formatTs(data.createdAt),
+          lastLogin: new Date().toISOString(),
+        });
+
+        void setDoc(privateRef, {
           uid: fbUser.uid,
           email: clampStr(email, 160),
           lastLogin: serverTimestamp(),
+        }).catch((err) => {
+          console.warn('Could not update lastLogin timestamp:', err);
         });
-      } catch (err) {
-        handleFirestoreError(err, OperationType.WRITE, `users/${fbUser.uid}/private/info`);
       }
 
-      setCurrentUser({
-        id: fbUser.uid,
-        uid: fbUser.uid,
-        email,
-        username: email || fallbackName,
-        displayName: data.displayName || fallbackName,
-        department: data.department || 'IT Department',
-        role: resolvedRole,
-        status: data.status || 'active',
-        createdAt: formatTs(data.createdAt),
-        lastLogin: new Date().toISOString(),
-      });
+      setAccessDeniedReason(null);
+    } finally {
+      setAuthSyncing(false);
+      setAuthReady(true);
     }
-
-    setAccessDeniedReason(null);
-    setAuthReady(true);
   }, []);
 
   useEffect(() => {
@@ -271,6 +275,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setCurrentUser(null);
         setUsers([]);
         setStaffInvites([]);
+        setAuthSyncing(false);
         setAuthReady(true);
         return;
       }
@@ -279,6 +284,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         await syncSignedInUser(fbUser);
       } catch (err) {
         console.error('Error syncing authenticated user:', err);
+        setAuthSyncing(false);
         setAuthReady(true);
       }
     });
@@ -286,7 +292,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return () => unsub();
   }, [syncSignedInUser]);
 
-  // Listen to users & invites for Super Admin team management
+  // Listen to users & invites for Super Admin team management (parallel private-info reads)
   useEffect(() => {
     if (!authReady || !firebaseUser || !firebaseUser.emailVerified || !currentUser) {
       return;
@@ -303,35 +309,36 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const unsubUsers = onSnapshot(
       collection(db, 'users'),
       async (snapshot) => {
-        const list: AdminUser[] = [];
-        for (const docSnap of snapshot.docs) {
-          const d = docSnap.data() as any;
-          let userEmail = '';
-          let lastLoginStr: string | undefined;
-          try {
-            const pSnap = await getDoc(doc(db, 'users', docSnap.id, 'private', 'info'));
-            if (pSnap.exists()) {
-              const pData = pSnap.data() as any;
-              userEmail = pData.email || '';
-              if (pData.lastLogin) lastLoginStr = formatTs(pData.lastLogin);
+        const list = await Promise.all(
+          snapshot.docs.map(async (docSnap) => {
+            const d = docSnap.data() as any;
+            let userEmail = '';
+            let lastLoginStr: string | undefined;
+            try {
+              const pSnap = await getDoc(doc(db, 'users', docSnap.id, 'private', 'info'));
+              if (pSnap.exists()) {
+                const pData = pSnap.data() as any;
+                userEmail = pData.email || '';
+                if (pData.lastLogin) lastLoginStr = formatTs(pData.lastLogin);
+              }
+            } catch {
+              // Private info optional if not yet created
             }
-          } catch {
-            // Private info optional if not yet created
-          }
 
-          list.push({
-            id: docSnap.id,
-            uid: d.uid || docSnap.id,
-            email: userEmail || (docSnap.id === firebaseUser.uid ? emailLower : ''),
-            username: userEmail || d.displayName || docSnap.id,
-            displayName: d.displayName || 'AESL IT Staff',
-            department: d.department || 'IT Department',
-            role: (d.role as AdminTier) || 'STAFF',
-            status: d.status || 'active',
-            createdAt: formatTs(d.createdAt),
-            lastLogin: lastLoginStr,
-          });
-        }
+            return {
+              id: docSnap.id,
+              uid: d.uid || docSnap.id,
+              email: userEmail || (docSnap.id === firebaseUser.uid ? emailLower : ''),
+              username: userEmail || d.displayName || docSnap.id,
+              displayName: d.displayName || 'AESL IT Staff',
+              department: d.department || 'IT Department',
+              role: (d.role as AdminTier) || 'STAFF',
+              status: d.status || 'active',
+              createdAt: formatTs(d.createdAt),
+              lastLogin: lastLoginStr,
+            } as AdminUser;
+          })
+        );
         setUsers(list);
       },
       (err) => {
@@ -374,9 +381,11 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return { success: false, error: 'Please enter both your work email and password.' };
     }
     try {
+      setAuthSyncing(true);
       await signInWithEmailAndPassword(auth, trimmed, password);
       return { success: true };
     } catch (err: any) {
+      setAuthSyncing(false);
       return { success: false, error: mapFirebaseAuthError(err) };
     }
   };
@@ -384,9 +393,11 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const loginWithGoogle = async () => {
     setAccessDeniedReason(null);
     try {
+      setAuthSyncing(true);
       await signInWithPopup(auth, googleProvider);
       return { success: true };
     } catch (err: any) {
+      setAuthSyncing(false);
       return { success: false, error: mapFirebaseAuthError(err) };
     }
   };
@@ -431,6 +442,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const logout = async () => {
     setCurrentUser(null);
     setAccessDeniedReason(null);
+    setAuthSyncing(false);
     await signOut(auth);
   };
 
@@ -567,6 +579,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         currentUser,
         firebaseUser,
         authReady,
+        authSyncing,
         isAuthenticated,
         needsVerification,
         accessDeniedReason,

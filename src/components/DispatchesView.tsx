@@ -114,7 +114,7 @@ export const DispatchesView: React.FC<DispatchesViewProps> = ({ onOpenDispatch }
           <div className="text-xs font-medium text-blue-950/75 dark:text-slate-400 flex items-center gap-2">
             <span className="font-semibold text-[#0B0F17] dark:text-white">Logistics Ledger</span>
             <span aria-hidden="true">·</span>
-            <span className="font-mono">{dispatches.length} Shipments</span>
+            <span className="tabular-nums">{dispatches.length} Shipments</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0B0F17] dark:text-white mt-1.5">
             Branch Deliveries & Dispatch Ledger
@@ -149,7 +149,7 @@ export const DispatchesView: React.FC<DispatchesViewProps> = ({ onOpenDispatch }
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
             Total Dispatches Recorded
           </span>
-          <div className="text-2xl sm:text-3xl font-semibold font-mono tabular-nums text-[#0B0F17] dark:text-white mt-1.5 sm:mt-2">
+          <div className="text-2xl sm:text-3xl font-display font-bold tabular-nums text-[#0B0F17] dark:text-white mt-1.5 sm:mt-2">
             {dispatches.length} <span className="text-xs font-sans font-normal text-slate-500 dark:text-slate-400">shipments</span>
           </div>
           <span className="text-xs text-slate-500 dark:text-slate-400 mt-1 block">
@@ -161,7 +161,7 @@ export const DispatchesView: React.FC<DispatchesViewProps> = ({ onOpenDispatch }
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
             In Transit
           </span>
-          <div className="text-2xl sm:text-3xl font-semibold font-mono tabular-nums text-amber-700 dark:text-amber-400 mt-1.5 sm:mt-2">
+          <div className="text-2xl sm:text-3xl font-display font-bold tabular-nums text-amber-700 dark:text-amber-400 mt-1.5 sm:mt-2">
             {totalInTransit} <span className="text-xs font-sans font-normal text-slate-500 dark:text-slate-400">units</span>
           </div>
           <span className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1 block">
@@ -173,7 +173,7 @@ export const DispatchesView: React.FC<DispatchesViewProps> = ({ onOpenDispatch }
           <span className="text-xs font-semibold text-slate-600 dark:text-sky-300 block">
             Delivered
           </span>
-          <div className="text-2xl sm:text-3xl font-semibold font-mono tabular-nums text-blue-700 dark:text-sky-400 mt-1.5 sm:mt-2">
+          <div className="text-2xl sm:text-3xl font-display font-bold tabular-nums text-blue-700 dark:text-sky-400 mt-1.5 sm:mt-2">
             {totalDelivered} <span className="text-xs font-sans font-normal text-slate-500 dark:text-slate-400">units</span>
           </div>
           <span className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 mt-1 block">

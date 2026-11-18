@@ -95,7 +95,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                   {isAdminTab && (
                     isAuthenticated ? (
-                      <span className={`ml-1 px-1.5 py-0.2 text-[10px] font-mono font-bold rounded ${
+                      <span className={`ml-1 px-1.5 py-0.2 text-[10px] font-semibold rounded ${
                         isSuperAdmin
                           ? 'bg-amber-100 text-amber-900 border border-amber-300'
                           : isAdmin
@@ -111,7 +111,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                   {isAlertTab && alertCount > 0 && (
                     <span
-                      className={`ml-1 px-1.5 py-0.2 text-[11px] font-mono font-semibold rounded ${
+                      className={`ml-1 px-1.5 py-0.2 text-[11px] font-semibold tabular-nums rounded ${
                         criticalCount > 0
                           ? 'bg-rose-100 text-rose-700'
                           : 'bg-amber-100 text-amber-800'
@@ -155,7 +155,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }`}
                   title={`Logged in as ${currentUser?.displayName} (${currentUser?.email || currentUser?.username})`}
                 >
-                  <span className="font-mono text-[11px] truncate max-w-[115px]">
+                  <span className="text-xs truncate max-w-[115px]">
                     {currentUser?.displayName || currentUser?.email}
                   </span>
                 </button>

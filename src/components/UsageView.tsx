@@ -104,7 +104,7 @@ export const UsageView: React.FC<UsageViewProps> = ({ onOpenLogUsage }) => {
           <div className="text-xs font-medium text-blue-950/75 dark:text-slate-400 flex items-center gap-2">
             <span className="font-semibold text-[#0B0F17] dark:text-white">Consumption Audit</span>
             <span aria-hidden="true">·</span>
-            <span className="font-mono">{usages.length} Events</span>
+            <span className="tabular-nums">{usages.length} Events</span>
           </div>
           <h1 className="text-xl sm:text-3xl font-bold tracking-tight text-[#0B0F17] dark:text-white mt-1.5">
             Branch Cartridge Consumption & Usage
@@ -139,7 +139,7 @@ export const UsageView: React.FC<UsageViewProps> = ({ onOpenLogUsage }) => {
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
             Total Cartridges Used
           </span>
-          <div className="text-2xl sm:text-3xl font-semibold font-mono tabular-nums text-[#0B0F17] dark:text-white mt-1.5 sm:mt-2">
+          <div className="text-2xl sm:text-3xl font-display font-bold tabular-nums text-[#0B0F17] dark:text-white mt-1.5 sm:mt-2">
             {totalUsedUnits} <span className="text-xs font-sans font-normal text-slate-500 dark:text-slate-400">units</span>
           </div>
           <span className="text-xs text-slate-500 dark:text-slate-400 mt-1 block">
@@ -151,10 +151,10 @@ export const UsageView: React.FC<UsageViewProps> = ({ onOpenLogUsage }) => {
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
             Highest Usage Branch
           </span>
-          <div className="text-base sm:text-xl font-bold text-[#0B0F17] dark:text-white mt-1.5 sm:mt-2 line-clamp-1">
+          <div className="text-base sm:text-xl font-display font-bold text-[#0B0F17] dark:text-white mt-1.5 sm:mt-2 line-clamp-1">
             {topBranch ? topBranch[0] : 'None'}
           </div>
-          <span className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1 block font-mono">
+          <span className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1 block tabular-nums">
             {topBranch ? `${topBranch[1]} swapped` : '0 events'}
           </span>
         </div>
@@ -163,7 +163,7 @@ export const UsageView: React.FC<UsageViewProps> = ({ onOpenLogUsage }) => {
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
             Avg Pages / Unit
           </span>
-          <div className="text-2xl sm:text-3xl font-semibold font-mono tabular-nums text-[#0B0F17] dark:text-white mt-1.5 sm:mt-2">
+          <div className="text-2xl sm:text-3xl font-display font-bold tabular-nums text-[#0B0F17] dark:text-white mt-1.5 sm:mt-2">
             {avgPages > 0 ? avgPages.toLocaleString() : 'N/A'} <span className="text-xs font-sans font-normal text-slate-500 dark:text-slate-400">{avgPages > 0 ? 'pgs' : ''}</span>
           </div>
           <span className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1 block">

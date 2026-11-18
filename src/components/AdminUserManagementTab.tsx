@@ -136,7 +136,7 @@ export const AdminUserManagementTab: React.FC = () => {
   const getRoleBadge = (role: AdminTier) => {
     if (role === 'SUPER_ADMIN') {
       return (
-        <span className="inline-flex items-center gap-1 text-[11px] font-bold font-mono text-amber-700 dark:text-amber-400">
+        <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 dark:text-amber-400">
           <ShieldCheck className="w-3.5 h-3.5" />
           <span>Super Admin</span>
         </span>
@@ -144,14 +144,14 @@ export const AdminUserManagementTab: React.FC = () => {
     }
     if (role === 'ADMIN') {
       return (
-        <span className="inline-flex items-center gap-1 text-[11px] font-bold font-mono text-blue-700 dark:text-sky-400">
+        <span className="inline-flex items-center gap-1 text-xs font-semibold text-blue-700 dark:text-sky-400">
           <Shield className="w-3.5 h-3.5" />
           <span>Admin</span>
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1 text-[11px] font-bold font-mono text-slate-600 dark:text-slate-300">
+      <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
         <UserCheck className="w-3.5 h-3.5" />
         <span>IT Staff</span>
       </span>
@@ -219,11 +219,11 @@ export const AdminUserManagementTab: React.FC = () => {
       {isSuperAdmin && (
         <div className="bg-[#EFF6FF] dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/25 rounded-2xl p-5 space-y-3">
           <div className="flex items-center justify-between gap-2 flex-wrap">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-blue-900 dark:text-sky-300">
+            <h3 className="text-xs font-bold text-blue-900 dark:text-sky-300">
               How to Add a New IT Team Member (2 Simple Steps)
             </h3>
-            <span className="text-[11px] font-mono text-blue-700 dark:text-sky-400">
-              Project: {FIREBASE_PROJECT_ID}
+            <span className="text-[11px] text-blue-700 dark:text-sky-400">
+              Project: <code className="font-mono">{FIREBASE_PROJECT_ID}</code>
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
@@ -260,7 +260,7 @@ export const AdminUserManagementTab: React.FC = () => {
         <div className="px-4 sm:px-5 py-3.5 border-b border-slate-100 dark:border-white/10 bg-[#F6F8FC] dark:bg-white/[0.03] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <h3 className="text-xs font-bold text-slate-700 dark:text-slate-300">
               Registered IT Team Members ({users.length})
             </h3>
           </div>
@@ -550,7 +550,7 @@ export const AdminUserManagementTab: React.FC = () => {
           <div className="px-4 sm:px-5 py-3.5 border-b border-slate-100 dark:border-white/10 bg-[#F6F8FC] dark:bg-white/[0.03] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" />
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              <h3 className="text-xs font-bold text-slate-700 dark:text-slate-300">
                 Pre-Approved Staff Invites ({staffInvites.length})
               </h3>
             </div>
@@ -731,17 +731,17 @@ export const AdminUserManagementTab: React.FC = () => {
               </div>
               <div className="grid grid-cols-3 gap-1.5 text-[11px] text-center">
                 <div className="py-1 px-1.5 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/10">
-                  <span className="block text-[10px] text-amber-700 dark:text-amber-400 font-mono">Super</span>
+                  <span className="block text-[10px] font-semibold text-amber-700 dark:text-amber-400">Super</span>
                   <span className="font-bold text-blue-600 dark:text-sky-400">{superAccess ? '✓ Full' : '✕ No'}</span>
                 </div>
                 <div className="py-1 px-1.5 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/10">
-                  <span className="block text-[10px] text-blue-700 dark:text-sky-400 font-mono">Admin</span>
+                  <span className="block text-[10px] font-semibold text-blue-700 dark:text-sky-400">Admin</span>
                   <span className={`font-bold ${adminAccess ? 'text-blue-600 dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}`}>
                     {adminAccess ? '✓ Full' : '✕ No'}
                   </span>
                 </div>
                 <div className="py-1 px-1.5 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/10">
-                  <span className="block text-[10px] text-slate-600 dark:text-slate-400 font-mono">Staff</span>
+                  <span className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400">Staff</span>
                   <span className={`font-bold ${staffAccess ? 'text-blue-600 dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}`}>
                     {staffAccess ? '✓ Full' : '✕ No'}
                   </span>
@@ -757,13 +757,13 @@ export const AdminUserManagementTab: React.FC = () => {
             <thead className="bg-[#F8FAFD] dark:bg-white/[0.03] text-slate-700 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-white/10">
               <tr>
                 <th className="px-4 py-2.5">Feature & Operation</th>
-                <th className="px-4 py-2.5 text-center font-mono text-amber-700 dark:text-amber-400">
+                <th className="px-4 py-2.5 text-center font-semibold text-amber-700 dark:text-amber-400">
                   Super Admin
                 </th>
-                <th className="px-4 py-2.5 text-center font-mono text-blue-700 dark:text-sky-400">
+                <th className="px-4 py-2.5 text-center font-semibold text-blue-700 dark:text-sky-400">
                   Operations Admin
                 </th>
-                <th className="px-4 py-2.5 text-center font-mono text-slate-600 dark:text-slate-300">
+                <th className="px-4 py-2.5 text-center font-semibold text-slate-600 dark:text-slate-300">
                   IT Staff
                 </th>
               </tr>
@@ -784,10 +784,10 @@ export const AdminUserManagementTab: React.FC = () => {
                   <td className="px-4 py-2.5 text-center text-blue-600 dark:text-sky-400 font-bold">
                     {superAccess ? '✓ Full' : '✕ Restricted'}
                   </td>
-                  <td className={`px-4 py-2.5 text-center font-bold ${adminAccess ? 'text-blue-600 dark:text-sky-400' : 'text-slate-400 dark:text-slate-500 font-mono font-normal'}`}>
+                  <td className={`px-4 py-2.5 text-center font-bold ${adminAccess ? 'text-blue-600 dark:text-sky-400' : 'text-slate-400 dark:text-slate-500 font-normal'}`}>
                     {adminAccess ? '✓ Full' : '✕ Restricted'}
                   </td>
-                  <td className={`px-4 py-2.5 text-center font-bold ${staffAccess ? 'text-blue-600 dark:text-sky-400' : 'text-slate-400 dark:text-slate-500 font-mono font-normal'}`}>
+                  <td className={`px-4 py-2.5 text-center font-bold ${staffAccess ? 'text-blue-600 dark:text-sky-400' : 'text-slate-400 dark:text-slate-500 font-normal'}`}>
                     {staffAccess ? '✓ Full' : '✕ Restricted'}
                   </td>
                 </tr>

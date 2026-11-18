@@ -120,12 +120,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* 2. Operations Task Bar */}
       <div className="p-4 border-b border-slate-200/70 dark:border-white/10 bg-white/70 dark:bg-white/[0.02]">
         <div className="flex items-center justify-between mb-2.5 px-0.5">
-          <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
             Quick Actions
           </span>
           <button
             onClick={toggleTheme}
-            className="text-[10px] font-mono font-semibold text-blue-700 dark:text-sky-400 hover:underline cursor-pointer"
+            className="text-[11px] font-medium text-blue-700 dark:text-sky-400 hover:underline cursor-pointer"
           >
             {isDark ? 'Dark Theme' : 'Light Theme'}
           </button>
@@ -201,7 +201,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <BookOpen className="w-3.5 h-3.5 text-blue-700 dark:text-sky-400" />
             <span>Beginner Guide</span>
           </div>
-          <span className="text-[10px] font-mono text-blue-700 dark:text-sky-300 font-semibold">
+          <span className="text-[11px] text-blue-700 dark:text-sky-300 font-semibold">
             7 Steps
           </span>
         </button>
@@ -211,7 +211,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
         {/* Section A: Fleet & Logistics */}
         <div>
-          <div className="px-3 mb-2 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+          <div className="px-3 mb-2 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
             Fleet Operations
           </div>
           <nav className="space-y-0.5">
@@ -234,7 +234,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </div>
 
                   {item.count !== null && item.count > 0 && (
-                    <span className={`text-[11px] font-mono tabular-nums ${isActive ? 'text-blue-800 dark:text-sky-300 font-semibold' : 'text-slate-400 dark:text-slate-500'}`}>
+                    <span className={`text-[11px] tabular-nums ${isActive ? 'text-blue-800 dark:text-sky-300 font-semibold' : 'text-slate-400 dark:text-slate-500'}`}>
                       {item.count}
                     </span>
                   )}
@@ -246,7 +246,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Section B: Controls & Security */}
         <div>
-          <div className="px-3 mb-2 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+          <div className="px-3 mb-2 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
             Controls & Access
           </div>
           <nav className="space-y-0.5">
@@ -271,7 +271,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                   {item.id === 'reorder' && item.alertCount !== undefined && item.alertCount > 0 && (
                     <span
-                      className={`text-[11px] font-mono font-bold tabular-nums ${
+                      className={`text-[11px] font-bold tabular-nums ${
                         item.critical ? 'text-rose-600 dark:text-rose-400' : 'text-amber-700 dark:text-amber-400'
                       }`}
                     >
@@ -281,7 +281,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                   {item.id === 'admin' && (
                     item.isAuth ? (
-                      <span className={`text-[10px] font-mono font-semibold ${
+                      <span className={`text-[11px] font-semibold ${
                         isSuperAdmin
                           ? 'text-amber-700 dark:text-amber-400'
                           : isAdmin
@@ -333,7 +333,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <span className="text-xs font-bold text-[#0B0F17] dark:text-white block truncate">
                   {currentUser.displayName}
                 </span>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono block truncate">
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 block truncate">
                   {currentUser.email || currentUser.username} · {isSuperAdmin ? 'Super Admin' : isAdmin ? 'Admin' : 'IT Staff'}
                 </span>
               </div>

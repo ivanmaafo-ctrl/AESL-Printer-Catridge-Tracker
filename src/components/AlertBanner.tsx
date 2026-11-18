@@ -46,7 +46,7 @@ export const AlertBanner: React.FC<AlertBannerProps> = ({
                   : `${lowStockAlerts.length} SKU${lowStockAlerts.length > 1 ? 's' : ''} below 15-unit gauge`}
               </h2>
               <span className="text-xs text-slate-400 dark:text-slate-600">·</span>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                 15-Unit Buffer Monitor
               </span>
             </div>

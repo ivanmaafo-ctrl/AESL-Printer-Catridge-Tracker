@@ -199,16 +199,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   />
                 </svg>
                 <div className="-mt-8 text-center">
-                  <span className="text-2xl font-bold font-mono tabular-nums text-[#0B0F17] dark:text-white">
+                  <span className="text-2xl font-display font-bold tabular-nums text-[#0B0F17] dark:text-white">
                     {readinessPct}%
                   </span>
-                  <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                  <span className="block text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                     Shelf Capacity
                   </span>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-slate-100 dark:border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400">
+              <div className="pt-2 border-t border-slate-100 dark:border-white/10 flex items-center justify-between text-[11px] tabular-nums text-slate-500 dark:text-slate-400">
                 <span>{totalCentralStockUnits} on shelf</span>
                 <span>{totalTargetUnits} target</span>
               </div>
@@ -235,8 +235,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     return (
                       <div key={sku.id} className="space-y-1">
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="font-mono font-bold text-[#0B0F17] dark:text-white truncate">{sku.sku}</span>
-                          <span className="font-mono font-semibold text-slate-600 dark:text-slate-300 tabular-nums">
+                          <span className="font-mono font-semibold text-[#0B0F17] dark:text-white truncate">{sku.sku}</span>
+                          <span className="font-semibold text-slate-600 dark:text-slate-300 tabular-nums">
                             {sku.centralStock}
                           </span>
                         </div>
@@ -312,7 +312,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <Package className="w-4 h-4 text-slate-400 dark:text-slate-500" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl sm:text-4xl font-semibold tracking-tight font-mono tabular-nums text-[#0B0F17] dark:text-white">
+            <span className="text-3xl sm:text-4xl font-display font-bold tracking-tight tabular-nums text-[#0B0F17] dark:text-white">
               {totalCentralStockUnits}
             </span>
             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">units left</span>
@@ -334,13 +334,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <Truck className="w-4 h-4 text-slate-400 dark:text-slate-500" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl sm:text-4xl font-semibold tracking-tight font-mono tabular-nums text-[#0B0F17] dark:text-white">
+            <span className="text-3xl sm:text-4xl font-display font-bold tracking-tight tabular-nums text-[#0B0F17] dark:text-white">
               {totalDispatchedUnits}
             </span>
             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">dispatched</span>
           </div>
           <div className="mt-3 pt-3 border-t border-slate-200/70 dark:border-white/10 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-            <span className="font-mono text-amber-700 dark:text-amber-400 font-medium">{inTransitCount} in transit</span>
+            <span className="tabular-nums text-amber-700 dark:text-amber-400 font-medium">{inTransitCount} in transit</span>
             <button
               onClick={() => setActiveTab('dispatches')}
               className="text-[#0B0F17] dark:text-sky-400 hover:text-blue-700 font-semibold inline-flex items-center gap-0.5 cursor-pointer"
@@ -356,7 +356,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <Send className="w-4 h-4 text-slate-400 dark:text-slate-500" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl sm:text-4xl font-semibold tracking-tight font-mono tabular-nums text-[#0B0F17] dark:text-white">
+            <span className="text-3xl sm:text-4xl font-display font-bold tracking-tight tabular-nums text-[#0B0F17] dark:text-white">
               {totalUsedUnits}
             </span>
             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">consumed</span>
@@ -388,7 +388,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span
-              className={`text-3xl sm:text-4xl font-semibold tracking-tight font-mono tabular-nums ${
+              className={`text-3xl sm:text-4xl font-display font-bold tracking-tight tabular-nums ${
                 criticalCount > 0
                   ? 'text-rose-700 dark:text-rose-400'
                   : lowStockAlerts.length > 0
@@ -460,23 +460,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     </div>
 
                     <span
-                      className={`text-[10px] font-mono font-bold shrink-0 ${
+                      className={`text-[11px] font-semibold shrink-0 ${
                         alert.currentStock === 0 || alert.severity === 'CRITICAL'
                           ? 'text-rose-600 dark:text-rose-400'
                           : 'text-amber-700 dark:text-amber-400'
                       }`}
                     >
                       {alert.currentStock === 0
-                        ? 'OUT OF STOCK'
+                        ? 'Out of Stock'
                         : alert.severity === 'CRITICAL'
-                        ? 'CRITICAL'
-                        : 'LOW'}
+                        ? 'Critical'
+                        : 'Low'}
                     </span>
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-slate-200/70 dark:border-white/10 flex items-center justify-between text-xs">
-                  <div className="font-mono">
+                <div className="mt-4 pt-3 border-t border-slate-200/70 dark:border-white/10 flex items-center justify-between text-xs tabular-nums">
+                  <div>
                     <span className="text-slate-500 dark:text-slate-400">Left: </span>
                     <strong className={alert.currentStock === 0 ? 'text-rose-600 dark:text-rose-400' : 'text-[#0B0F17] dark:text-white'}>
                       {alert.currentStock}
@@ -742,12 +742,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     </span>
                   </div>
 
-                  <div className="mt-2 flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                  <div className="mt-2 flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 tabular-nums">
                     <span>{dsp.dispatchDate}</span>
                     <span aria-hidden="true">·</span>
                     <span>{dsp.carrier}</span>
                     <span aria-hidden="true">·</span>
-                    <span>{dsp.trackingNumber}</span>
+                    <span className="font-mono">{dsp.trackingNumber}</span>
                   </div>
                 </div>
               ))
@@ -787,13 +787,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         {usg.quantity} unit into <span className="font-medium">{usg.printerName}</span>
                       </div>
                     </div>
-                    <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                    <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                       {usg.cartridgeColor}
                     </span>
                   </div>
 
                   <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                    <div className="flex items-center gap-2 font-mono">
+                    <div className="flex items-center gap-2 tabular-nums">
                       <span>{usg.installedDate}</span>
                       <span aria-hidden="true">·</span>
                       <span>{usg.installedBy}</span>
@@ -831,7 +831,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               onClick={item.action}
               className="text-left p-4 rounded-xl bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/10 hover:border-slate-300 dark:hover:border-sky-400/30 transition-colors cursor-pointer group"
             >
-              <span className="font-mono text-xs font-semibold text-blue-700 dark:text-sky-400 block mb-1.5">
+              <span className="font-display text-xs font-bold tabular-nums text-blue-700 dark:text-sky-400 block mb-1.5">
                 {item.num}
               </span>
               <span className="text-xs font-bold text-[#0B0F17] dark:text-white block group-hover:text-blue-800 dark:group-hover:text-sky-300">

@@ -198,7 +198,7 @@ export const WalkthroughModal: React.FC<WalkthroughModalProps> = ({
             <button
               key={step.title}
               onClick={() => setStepIndex(idx)}
-              className={`min-h-[36px] px-3 py-1.5 rounded-full text-[11px] font-mono font-semibold whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
+              className={`min-h-[36px] px-3 py-1.5 rounded-full text-xs font-semibold tabular-nums whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
                 idx === stepIndex
                   ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] shadow-xs'
                   : idx < stepIndex
@@ -242,7 +242,7 @@ export const WalkthroughModal: React.FC<WalkthroughModalProps> = ({
           </p>
 
           <div>
-            <h4 className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2.5">
+            <h4 className="text-xs font-semibold text-slate-600 dark:text-slate-300 mb-2.5">
               How It Works
             </h4>
             <ul className="space-y-2.5">
