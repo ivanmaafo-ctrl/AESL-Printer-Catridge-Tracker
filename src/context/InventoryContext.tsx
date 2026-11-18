@@ -124,6 +124,7 @@ const STORAGE_KEYS = {
   ADMIN_MODE: 'aesl_printflow_clean_v1_admin',
   SYNC_V3_EXV: 'aesl_printflow_sync_v3_exv_adenta',
   SYNC_V4_GAUGE15_1500A: 'aesl_printflow_sync_v4_gauge15_1500a',
+  SYNC_V5_SAKAMAN: 'aesl_printflow_sync_v5_sakaman',
 };
 
 export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -138,6 +139,14 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const needsV4Sync = (() => {
     try {
       return localStorage.getItem(STORAGE_KEYS.SYNC_V4_GAUGE15_1500A) !== 'done';
+    } catch {
+      return false;
+    }
+  })();
+
+  const needsV5Sync = (() => {
+    try {
+      return localStorage.getItem(STORAGE_KEYS.SYNC_V5_SAKAMAN) !== 'done';
     } catch {
       return false;
     }
@@ -179,7 +188,7 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (saved) {
         const parsed: Branch[] = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          if (!needsV3Sync) return parsed;
+          if (!needsV3Sync && !needsV5Sync) return parsed;
           const existingIds = new Set(parsed.map((b) => b.id));
           const missing = INITIAL_BRANCHES.filter((b) => !existingIds.has(b.id));
           return missing.length > 0 ? [...parsed, ...missing] : parsed;
@@ -213,10 +222,13 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (needsV4Sync) {
         localStorage.setItem(STORAGE_KEYS.SYNC_V4_GAUGE15_1500A, 'done');
       }
+      if (needsV5Sync) {
+        localStorage.setItem(STORAGE_KEYS.SYNC_V5_SAKAMAN, 'done');
+      }
     } catch {
       // ignore storage errors
     }
-  }, [needsV3Sync, needsV4Sync]);
+  }, [needsV3Sync, needsV4Sync, needsV5Sync]);
 
   const [usages, setUsages] = useState<UsageRecord[]>(() => {
     try {

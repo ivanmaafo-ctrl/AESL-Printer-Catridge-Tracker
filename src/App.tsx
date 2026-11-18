@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { InventoryProvider } from './context/InventoryContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -13,6 +13,7 @@ import { UsageView } from './components/UsageView';
 import { ReorderCenterView } from './components/ReorderCenterView';
 import { ReportsView } from './components/ReportsView';
 import { AdminConsoleView } from './components/AdminConsoleView';
+import { BrandLogo, BrandLoaderScreen } from './components/BrandLogo';
 
 import { DispatchModal } from './components/Modals/DispatchModal';
 import { RestockModal } from './components/Modals/RestockModal';
@@ -23,6 +24,12 @@ import { WalkthroughModal } from './components/Modals/WalkthroughModal';
 
 const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
+  const [isBooting, setIsBooting] = useState(true);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsBooting(false), 550);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   // Modals state
   const [dispatchModalOpen, setDispatchModalOpen] = useState(false);
@@ -58,6 +65,7 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#06090F] text-[#0B0F17] dark:text-slate-100 font-sans flex flex-col relative isolate">
+      {isBooting && <BrandLoaderScreen />}
       {/* Moving Dark Mode Atmospheric Color Gradient Layer */}
       <div
         aria-hidden="true"
@@ -163,7 +171,8 @@ const AppContent: React.FC = () => {
         {/* Quiet Corporate Footer */}
         <footer className="border-t border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#070B12]/80 backdrop-blur-sm py-4 mt-auto print:hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-2">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
+              <BrandLogo className="w-6 h-6" />
               <span className="font-bold text-slate-800 dark:text-slate-100">Anointed Engineering Services Limited</span>
               <span aria-hidden="true">·</span>
               <span>IT Department · Multi-Branch Printer Cartridge Logistics</span>

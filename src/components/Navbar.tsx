@@ -1,6 +1,7 @@
 import React from 'react';
 import { useInventory } from '../context/InventoryContext';
 import { useAdminAuth } from '../context/AdminAuthContext';
+import { BrandLogo } from './BrandLogo';
 import {
   Package,
   Send,
@@ -58,9 +59,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => setActiveTab('dashboard')}
               className="flex items-center gap-2.5 text-left group focus:outline-none"
             >
-              <div className="w-9 h-9 rounded-lg bg-blue-700 flex items-center justify-center text-white font-black text-xs tracking-wider shadow-sm transition-transform group-hover:scale-105">
-                AESL
-              </div>
+              <BrandLogo className="w-10 h-10 transition-transform group-hover:scale-105" />
               <div className="max-w-[240px] lg:max-w-xs">
                 <span className="text-sm sm:text-base font-bold tracking-tight text-slate-900 block leading-tight truncate">
                   Anointed Engineering Services Ltd

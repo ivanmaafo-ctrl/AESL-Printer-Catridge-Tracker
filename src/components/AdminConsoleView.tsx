@@ -24,6 +24,8 @@ import {
 } from 'lucide-react';
 import { CartridgeSKU, Branch } from '../types/inventory';
 import { GaugeIndicator } from './GaugeIndicator';
+import { AESL_LOCATIONS } from '../data/aeslLocations';
+import { BrandLogo } from './BrandLogo';
 
 interface AdminConsoleViewProps {
   onOpenAddCartridge: () => void;
@@ -181,15 +183,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
       <section className="bg-blue-hero rounded-3xl p-6 sm:p-8 border border-blue-200/70 dark:border-blue-500/20">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
           <div className="flex items-start gap-3.5">
-            <div
-              className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
-                isSuperAdmin
-                  ? 'bg-[#0B0F17] dark:bg-amber-400 text-amber-400 dark:text-[#06090F]'
-                  : 'bg-[#0B0F17] dark:bg-sky-400 text-sky-400 dark:text-[#06090F]'
-              }`}
-            >
-              {isSuperAdmin ? <ShieldCheck className="w-6 h-6" /> : <Shield className="w-6 h-6" />}
-            </div>
+            <BrandLogo className="w-12 h-12 shrink-0" />
             <div>
               <div className="flex items-center gap-2 flex-wrap text-xs">
                 <span className={`font-semibold ${isSuperAdmin ? 'text-amber-700 dark:text-amber-400' : 'text-blue-800 dark:text-sky-400'}`}>
@@ -223,6 +217,15 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                 <span>Sign Out</span>
               </button>
             </div>
+
+            <button
+              onClick={onOpenAddBranch}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 hover:bg-slate-50 dark:hover:bg-white/15 border border-slate-200/90 dark:border-white/15 rounded-full transition-colors cursor-pointer whitespace-nowrap"
+              title="Add a new AESL office, workshop, or branch location"
+            >
+              <Plus className="w-4 h-4 text-blue-700 dark:text-sky-400" />
+              <span>Add Location</span>
+            </button>
 
             <button
               onClick={handleDownloadBackup}
@@ -772,7 +775,7 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                     onClick={() => setConfirmAction('branches')}
                     className="px-3.5 py-1.5 text-xs font-semibold text-blue-800 dark:text-sky-300 bg-[#EFF6FF] dark:bg-blue-500/15 hover:bg-blue-100 dark:hover:bg-blue-500/25 border border-blue-200 dark:border-blue-500/30 rounded-full transition-colors cursor-pointer"
                   >
-                    Restore 26 AESL Locations
+                    Restore {AESL_LOCATIONS.length} AESL Locations
                   </button>
 
                   <button
@@ -791,12 +794,12 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                 </>
               ) : confirmAction === 'branches' ? (
                 <div className="flex items-center gap-2 bg-[#EFF6FF] dark:bg-blue-500/15 p-1.5 rounded-full border border-blue-200 dark:border-blue-500/30">
-                  <span className="text-xs text-blue-950 dark:text-sky-200 font-semibold px-2">Restore all 26 AESL locations?</span>
+                  <span className="text-xs text-blue-950 dark:text-sky-200 font-semibold px-2">Restore all {AESL_LOCATIONS.length} AESL locations?</span>
                   <button
                     onClick={() => {
                       loadAESLBranches();
                       setConfirmAction(null);
-                      showToast('success', 'Official AESL 26 locations restored successfully.');
+                      showToast('success', `Official AESL ${AESL_LOCATIONS.length} locations restored successfully.`);
                     }}
                     className="px-3 py-1 bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] rounded-full text-xs font-semibold cursor-pointer"
                   >

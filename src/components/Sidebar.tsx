@@ -3,6 +3,7 @@ import { useInventory } from '../context/InventoryContext';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { ActiveTab } from './Navbar';
+import { BrandLogo } from './BrandLogo';
 import {
   Package,
   Send,
@@ -85,9 +86,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={() => handleTabClick('dashboard')}
           className="flex items-center gap-3 text-left group focus:outline-none cursor-pointer min-w-0"
         >
-          <div className="w-9 h-9 rounded-xl bg-[#0B0F17] dark:bg-sky-400 flex items-center justify-center text-white dark:text-[#06090F] font-extrabold text-xs tracking-wider shadow-xs transition-transform group-hover:scale-105 shrink-0">
-            AESL
-          </div>
+          <BrandLogo className="w-10 h-10 transition-transform group-hover:scale-105" />
           <div className="min-w-0">
             <span className="text-sm font-bold text-[#0B0F17] dark:text-white block leading-tight tracking-tight truncate">
               Anointed Engineering
@@ -379,9 +378,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Mobile Top Header Strip */}
       <div className="lg:hidden sticky top-0 z-40 bg-white/95 dark:bg-[#090E17]/90 backdrop-blur-md border-b border-slate-200 dark:border-white/10 text-[#0B0F17] dark:text-white flex items-center justify-between px-4 h-15 print:hidden">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-[#0B0F17] dark:bg-sky-400 flex items-center justify-center text-white dark:text-[#06090F] font-extrabold text-xs">
-            AESL
-          </div>
+          <BrandLogo className="w-9 h-9" />
           <div>
             <span className="text-xs font-bold text-[#0B0F17] dark:text-white block leading-tight">
               Anointed Engineering

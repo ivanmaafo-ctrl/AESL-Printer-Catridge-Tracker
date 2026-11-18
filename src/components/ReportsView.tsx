@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useInventory } from '../context/InventoryContext';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { CartridgeSKU, CartridgeType } from '../types/inventory';
+import { BrandLogo } from './BrandLogo';
 import {
   Printer,
   Download,
@@ -692,21 +693,24 @@ export const ReportsView: React.FC = () => {
       <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden print:border-0 print:bg-white print:text-slate-900">
         <div className="p-6 border-b border-slate-200 dark:border-white/10 bg-[#F6F8FC] dark:bg-white/[0.03] print:bg-white">
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-sky-400 print:text-blue-800">
-                <span>Anointed Engineering Services Limited</span>
-                <span aria-hidden="true">·</span>
-                <span>IT Department</span>
-              </div>
-              <h2 className="text-lg sm:text-xl font-bold text-[#0B0F17] dark:text-white print:text-slate-900 mt-1">
-                {reportTitle || 'Printer Toner & Warehouse Inventory Report'}
-              </h2>
+            <div className="flex items-start gap-3.5">
+              <BrandLogo className="w-11 h-11 shrink-0 mt-0.5" />
+              <div>
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-sky-400 print:text-blue-800">
+                  <span>Anointed Engineering Services Limited</span>
+                  <span aria-hidden="true">·</span>
+                  <span>IT Department</span>
+                </div>
+                <h2 className="text-lg sm:text-xl font-bold text-[#0B0F17] dark:text-white print:text-slate-900 mt-1">
+                  {reportTitle || 'Printer Toner & Warehouse Inventory Report'}
+                </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 print:text-slate-600 mt-1">
                 Showing <strong>{summaryStats.totalSkus}</strong> of {cartridges.length} total SKUs
                 {restockFilter !== 'ALL' && (
                   <> · Filter: <span className="font-semibold text-slate-700 dark:text-slate-200">{restockFilter.replace(/_/g, ' ')}</span></>
                 )}
               </p>
+              </div>
             </div>
 
             <div className="text-xs text-slate-600 dark:text-slate-300 print:text-slate-700 sm:text-right font-mono space-y-0.5">

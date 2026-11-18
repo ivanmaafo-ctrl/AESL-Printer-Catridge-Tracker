@@ -14,6 +14,7 @@ import {
   EyeOff,
 } from 'lucide-react';
 import { AdminTier } from '../types/auth';
+import { AESL_LOCATIONS } from '../data/aeslLocations';
 
 export const AdminUserManagementTab: React.FC = () => {
   const {
@@ -392,10 +393,10 @@ export const AdminUserManagementTab: React.FC = () => {
               {[
                 ['Direct Master In-Office Stock Adjustments', true, true],
                 ['15-Gauge Reorder Minimum Threshold Setup', true, true],
-                ['Offices & 26 Branches Information Management', true, true],
+                ['Offices & Locations Information Management (Add / Edit Branches)', true, true],
                 ['Download Full JSON Database Backups', true, true],
                 ['Restore Database from JSON Backup File', true, false],
-                ['Reload Official 26 AESL Regional & HQ Locations', true, false],
+                [`Reload Official ${AESL_LOCATIONS.length} AESL Regional & HQ Locations`, true, false],
                 ['Wipe / Clear Entire Database Tables', true, false],
                 ['Manage Administrator Passwords & Create Accounts', true, false],
               ].map(([label, superAccess, adminAccess], idx) => (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useInventory } from '../../context/InventoryContext';
 import { X, Building2, Plus, Trash2 } from 'lucide-react';
 import { PrinterDevice } from '../../types/inventory';
@@ -32,6 +32,28 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
       cartridgeSkuId: cartridges[0]?.id || '',
     },
   ]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setCode('');
+      setName('');
+      setCategory('Regional Branch');
+      setCity('');
+      setAddress('');
+      setManagerName('');
+      setContactPhone('');
+      setEmail('');
+      setPrinters([
+        {
+          id: `pr-${Date.now()}-1`,
+          name: 'Main Office Printer',
+          model: 'HP LaserJet Pro M404n',
+          location: 'Front Reception',
+          cartridgeSkuId: cartridges[0]?.id || '',
+        },
+      ]);
+    }
+  }, [isOpen, cartridges]);
 
   if (!isOpen) return null;
 
@@ -89,10 +111,10 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
             </div>
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
-                Add New Company Branch
+                Add New Location / Branch
               </h2>
               <p className="text-xs text-slate-600 dark:text-slate-400">
-                Register a branch to receive and consume cartridges
+                Register an office, workshop, or branch to receive and consume cartridges
               </p>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAdminAuth } from '../context/AdminAuthContext';
+import { BrandLogo, BrandSpinner } from './BrandLogo';
 import {
-  Shield,
   Lock,
   User,
   KeyRound,
@@ -44,9 +44,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess }) => 
   return (
     <div className="max-w-md mx-auto py-8 sm:py-14 px-4">
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#0B0F17] dark:bg-sky-400 text-sky-400 dark:text-[#06090F] shadow-sm mb-3 ring-4 ring-blue-50 dark:ring-blue-500/15">
-          <Shield className="w-7 h-7" />
-        </div>
+        <BrandLogo className="w-18 h-18 mx-auto mb-3 drop-shadow-sm" />
         <div className="flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-slate-400">
           <span className="font-semibold text-blue-800 dark:text-sky-400">Secure Access Gateway</span>
           <span aria-hidden="true">·</span>
@@ -138,7 +136,10 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess }) => 
               className="w-full py-3 px-4 bg-[#0B0F17] hover:bg-slate-800 dark:bg-sky-400 dark:hover:bg-sky-300 text-white dark:text-[#06090F] font-semibold text-sm rounded-full shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
             >
               {isSubmitting ? (
-                <span>Authenticating Credentials...</span>
+                <>
+                  <BrandSpinner size="xs" />
+                  <span>Authenticating Credentials...</span>
+                </>
               ) : (
                 <>
                   <Lock className="w-4 h-4" />

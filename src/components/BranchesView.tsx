@@ -18,6 +18,8 @@ import {
   Briefcase,
 } from 'lucide-react';
 import { EditBranchModal } from './Modals/EditBranchModal';
+import { AESL_LOCATIONS } from '../data/aeslLocations';
+import { BrandLogo } from './BrandLogo';
 
 interface BranchesViewProps {
   onOpenAddBranch: () => void;
@@ -100,6 +102,7 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
       <section className="bg-blue-hero rounded-3xl p-6 sm:p-8 border border-blue-200/70 dark:border-blue-500/20 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
         <div>
           <div className="text-xs font-medium text-blue-950/75 dark:text-slate-400 flex items-center gap-2">
+            <BrandLogo className="w-6 h-6" />
             <span className="font-semibold text-[#0B0F17] dark:text-white">AESL Location Directory</span>
             <span aria-hidden="true">·</span>
             <span className="font-mono">{branches.length} Active Sites</span>
@@ -116,13 +119,13 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
           <button
             onClick={() => {
               loadAESLBranches();
-              showToast('Official AESL 26 locations restored successfully.');
+              showToast(`Official AESL ${AESL_LOCATIONS.length} locations restored successfully.`);
             }}
             title="Reload official Anointed Engineering Services locations"
             className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 border border-slate-200/90 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/15 transition-colors cursor-pointer whitespace-nowrap"
           >
             <RotateCcw className="w-3.5 h-3.5 text-blue-700 dark:text-sky-400" />
-            <span>Reload AESL 26 Locations</span>
+            <span>Reload AESL {AESL_LOCATIONS.length} Locations</span>
           </button>
 
           <button

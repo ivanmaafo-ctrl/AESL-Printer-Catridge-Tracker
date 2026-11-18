@@ -227,8 +227,8 @@ export const INITIAL_CARTRIDGES: CartridgeSKU[] = [
   },
 ];
 
-// Pre-configured with all 26 Anointed Engineering Services locations:
-// (20 Regional Branches across Ghana incl. Adenta + 6 Headquarters Offices at Anointed House incl. Workshop)
+// Pre-configured with all 27 Anointed Engineering Services locations:
+// (21 Regional Branches across Ghana incl. Adenta & Autoworkshop Sakaman + 6 Headquarters Offices at Anointed House incl. Workshop)
 export const INITIAL_BRANCHES: Branch[] = AESL_LOCATIONS;
 
 export const INITIAL_DISPATCHES: DispatchRecord[] = [

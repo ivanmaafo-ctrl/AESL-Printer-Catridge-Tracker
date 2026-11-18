@@ -88,10 +88,63 @@
   will-change: transform;
 }
 
+@keyframes aesl-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes aesl-spin-reverse {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes aesl-breathe {
+  0%, 100% {
+    transform: scale(0.95);
+    opacity: 0.92;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+.aesl-orbit-ring {
+  animation: aesl-spin 0.95s linear infinite;
+  will-change: transform;
+}
+
+.aesl-orbit-ring-slow {
+  animation: aesl-spin 1.6s linear infinite;
+  will-change: transform;
+}
+
+.aesl-orbit-ring-reverse {
+  animation: aesl-spin-reverse 2.2s linear infinite;
+  will-change: transform;
+}
+
+.aesl-logo-breathe {
+  animation: aesl-breathe 1.8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .dark .bg-blue-hero,
   .dark-ambient-orb-a,
-  .dark-ambient-orb-b {
+  .dark-ambient-orb-b,
+  .aesl-orbit-ring,
+  .aesl-orbit-ring-slow,
+  .aesl-orbit-ring-reverse,
+  .aesl-logo-breathe {
     animation: none !important;
   }
 }

@@ -15,6 +15,8 @@ import {
   ArrowUpRight,
   CheckCircle2,
 } from 'lucide-react';
+import { AESL_LOCATIONS } from '../../data/aeslLocations';
+import { BrandLogo } from '../BrandLogo';
 
 interface WalkthroughModalProps {
   isOpen: boolean;
@@ -36,7 +38,7 @@ interface GuideStep {
 const GUIDE_STEPS: GuideStep[] = [
   {
     title: '1. Understanding the Dashboard',
-    subtitle: 'Your live snapshot of warehouse stock & 26 AESL locations',
+    subtitle: `Your live snapshot of warehouse stock & ${AESL_LOCATIONS.length} AESL locations`,
     icon: Activity,
     tab: 'dashboard',
     tabLabel: 'Go to Overview',
@@ -166,9 +168,7 @@ export const WalkthroughModal: React.FC<WalkthroughModalProps> = ({
         {/* Header */}
         <div className="px-6 py-4 bg-blue-hero border-b border-blue-900/10 dark:border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-2xl bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] flex items-center justify-center shadow-xs">
-              <BookOpen className="w-4 h-4" />
-            </div>
+            <BrandLogo className="w-10 h-10" />
             <div>
               <h2 className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">
                 Beginner Walkthrough Guide

@@ -524,4 +524,24 @@ export const AESL_LOCATIONS: Branch[] = [
       },
     ],
   },
+  {
+    id: 'br-sakaman-autoworkshop',
+    code: 'BR-SAK',
+    name: 'Autoworkshop Sakaman',
+    category: 'Regional Branch',
+    city: 'Sakaman, Accra',
+    address: 'Autoworkshop Sakaman, Greater Accra',
+    managerName: 'Sakaman Autoworkshop Supervisor',
+    contactPhone: '+233 30 254 0121',
+    email: 'sakaman@anointedengineering.com',
+    printers: [
+      {
+        id: 'pr-br-sak-1',
+        name: 'Sakaman Autoworkshop Printer',
+        model: 'HP LaserJet Pro M404n',
+        location: 'Autoworkshop Office',
+        cartridgeSkuId: '',
+      },
+    ],
+  },
 ];

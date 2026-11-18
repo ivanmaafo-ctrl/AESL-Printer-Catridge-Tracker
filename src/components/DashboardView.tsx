@@ -15,6 +15,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { ActiveTab } from './Navbar';
+import { BrandLogo } from './BrandLogo';
 
 interface DashboardViewProps {
   setActiveTab: (tab: ActiveTab) => void;
@@ -111,7 +112,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-7 items-center">
           {/* Left Column: Editorial Headline & Crisp Pill CTAs */}
           <div className="xl:col-span-7 space-y-5">
-            <div className="text-xs font-medium text-blue-950/75 dark:text-slate-400 flex items-center gap-2">
+            <div className="text-xs font-medium text-blue-950/75 dark:text-slate-400 flex items-center gap-2.5">
+              <BrandLogo className="w-7 h-7" />
               <span className="font-semibold text-[#0B0F17] dark:text-white">Anointed Engineering Services Limited</span>
               <span aria-hidden="true">·</span>
               <span>IT Department Fleet Portal</span>
