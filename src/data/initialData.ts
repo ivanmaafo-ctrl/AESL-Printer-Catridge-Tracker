@@ -1,13 +1,13 @@
 import { CartridgeSKU, Branch, DispatchRecord, UsageRecord, RestockRecord } from '../types/inventory';
 import { AESL_LOCATIONS } from './aeslLocations';
 
-// Current AESL Central Office / Warehouse Inventory (11 SKUs; 15-unit default gauge with custom thresholds for 1107A/1500A=20 & EXV14=5)
+// Current AESL Central Office / Warehouse Inventory (12 SKUs; 15-unit default gauge with custom thresholds for 1107A/1500A=20 & EXV14=5)
 export const INITIAL_CARTRIDGES: CartridgeSKU[] = [
   {
     id: 'cart-1107a',
     sku: '1107A',
     model: 'HP 107A (W1107A / 1107A) Black',
-    specification: 'Best Seller (#1 Most In-Demand) · Currently Finished',
+    specification: 'Best Seller (#1 Most In-Demand) · Standard Yield Black LaserJet Toner (W1107A)',
     brand: 'HP',
     type: 'Toner',
     color: 'Black',
@@ -18,7 +18,7 @@ export const INITIAL_CARTRIDGES: CartridgeSKU[] = [
       'HP Laser MFP 135w',
       'HP Laser MFP 137fnw',
     ],
-    centralStock: 0,
+    centralStock: 15,
     minThreshold: 20,
     unitCost: 0,
     supplier: 'Primary IT Supplies',
@@ -217,7 +217,7 @@ export const INITIAL_CARTRIDGES: CartridgeSKU[] = [
       'HP LaserJet MFP M141a',
       'HP LaserJet MFP M141w',
     ],
-    centralStock: 6,
+    centralStock: 52,
     minThreshold: 20,
     unitCost: 0,
     supplier: 'Primary IT Supplies',
@@ -241,7 +241,7 @@ export const INITIAL_CARTRIDGES: CartridgeSKU[] = [
       'HP LaserJet Pro M1212nf MFP',
       'HP LaserJet Pro M1217nfw MFP',
     ],
-    centralStock: 10,
+    centralStock: 1,
     minThreshold: 15,
     unitCost: 0,
     supplier: 'Primary IT Supplies',
@@ -249,6 +249,29 @@ export const INITIAL_CARTRIDGES: CartridgeSKU[] = [
     reorderPackSize: 10,
     isBestSeller: true,
     notes: '3rd most in-demand toner cartridge across AESL branches (HP CE285A / 285A); suggested reorder 40 units when below gauge.',
+  },
+  {
+    id: 'cart-1106a',
+    sku: 'W1106A',
+    model: 'HP 106A (W1106A / 1106A) Black',
+    specification: 'Standard Yield Black LaserJet Toner (W1106A)',
+    brand: 'HP',
+    type: 'Toner',
+    color: 'Black',
+    compatiblePrinters: [
+      'HP Laser 107a',
+      'HP Laser 107w',
+      'HP Laser MFP 135a',
+      'HP Laser MFP 135w',
+      'HP Laser MFP 137fnw',
+    ],
+    centralStock: 10,
+    minThreshold: 15,
+    unitCost: 0,
+    supplier: 'Primary IT Supplies',
+    pageYield: 1000,
+    reorderPackSize: 10,
+    notes: 'HP 106A (W1106A) Black LaserJet toner cartridge added from warehouse stock count.',
   },
 ];
 

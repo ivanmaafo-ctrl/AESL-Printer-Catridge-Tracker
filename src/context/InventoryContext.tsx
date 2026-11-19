@@ -365,7 +365,7 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         });
         await batch2.commit();
         try {
-          localStorage.setItem('aesl_catalog_v2_synced', 'true');
+          localStorage.setItem('aesl_catalog_v3_synced', 'true');
         } catch {
           // ignore storage errors
         }
@@ -374,76 +374,146 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     };
 
-    const runCatalogV2SyncIfNeeded = async (docsMap: Map<string, any>) => {
-      if (!isAdmin || seededRef.current) return;
-      let alreadySynced = false;
-      try {
-        alreadySynced = localStorage.getItem('aesl_catalog_v2_synced') === 'true';
-      } catch {
-        alreadySynced = false;
-      }
-      if (alreadySynced) return;
+    const runCatalogSyncIfNeeded = async (docsMap: Map<string, any>) => {
+      if (seededRef.current) return;
+
+      const needsWarehouseV3Sync = !docsMap.has('cart-1106a');
+      const d1107Existing = docsMap.get('cart-1107a');
+      const needsSpecCleanup =
+        isAdmin &&
+        typeof d1107Existing?.specification === 'string' &&
+        d1107Existing.specification.includes('Currently Finished');
+
+      if (!needsWarehouseV3Sync && !needsSpecCleanup) return;
       seededRef.current = true;
 
       try {
         const batchSync = writeBatch(db);
         let opCount = 0;
 
+        const sku1106a = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-1106a');
         const sku285a = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-285a');
         const sku1107a = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-1107a');
         const sku1500a = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-1500a');
         const skuExv14 = INITIAL_CARTRIDGES.find((c) => c.id === 'cart-exv14');
 
-        if (sku285a && !docsMap.has('cart-285a')) {
-          batchSync.set(doc(db, 'cartridges', 'cart-285a'), buildCartridgeDoc(sku285a, uid));
+        if (needsWarehouseV3Sync) {
+          // 1. Add W1106A (10 units) — also serves as the shared Firestore marker that v3 sync has run
+          if (sku1106a && !docsMap.has('cart-1106a')) {
+            batchSync.set(doc(db, 'cartridges', 'cart-1106a'), buildCartridgeDoc(sku1106a, uid));
+            opCount += 1;
+          }
+
+          // 2. Update W1107A -> 15 units
+          if (sku1107a) {
+            if (docsMap.has('cart-1107a')) {
+              batchSync.update(
+                doc(db, 'cartridges', 'cart-1107a'),
+                isAdmin
+                  ? {
+                      centralStock: 15,
+                      minThreshold: 20,
+                      isBestSeller: true,
+                      specification: sku1107a.specification,
+                      notes: sku1107a.notes,
+                      updatedByUid: uid,
+                      updatedAt: serverTimestamp(),
+                    }
+                  : {
+                      centralStock: 15,
+                      updatedByUid: uid,
+                      updatedAt: serverTimestamp(),
+                    }
+              );
+              opCount += 1;
+            } else {
+              batchSync.set(doc(db, 'cartridges', 'cart-1107a'), buildCartridgeDoc(sku1107a, uid));
+              opCount += 1;
+            }
+          }
+
+          // 3. Update W1500A -> 52 units
+          if (sku1500a) {
+            if (docsMap.has('cart-1500a')) {
+              batchSync.update(
+                doc(db, 'cartridges', 'cart-1500a'),
+                isAdmin
+                  ? {
+                      centralStock: 52,
+                      minThreshold: 20,
+                      isBestSeller: true,
+                      specification: sku1500a.specification,
+                      notes: sku1500a.notes,
+                      updatedByUid: uid,
+                      updatedAt: serverTimestamp(),
+                    }
+                  : {
+                      centralStock: 52,
+                      updatedByUid: uid,
+                      updatedAt: serverTimestamp(),
+                    }
+              );
+              opCount += 1;
+            } else {
+              batchSync.set(doc(db, 'cartridges', 'cart-1500a'), buildCartridgeDoc(sku1500a, uid));
+              opCount += 1;
+            }
+          }
+
+          // 4. Update CE285A -> 1 unit
+          if (sku285a) {
+            if (docsMap.has('cart-285a')) {
+              batchSync.update(
+                doc(db, 'cartridges', 'cart-285a'),
+                isAdmin
+                  ? {
+                      centralStock: 1,
+                      isBestSeller: true,
+                      specification: sku285a.specification,
+                      notes: sku285a.notes,
+                      updatedByUid: uid,
+                      updatedAt: serverTimestamp(),
+                    }
+                  : {
+                      centralStock: 1,
+                      updatedByUid: uid,
+                      updatedAt: serverTimestamp(),
+                    }
+              );
+              opCount += 1;
+            } else {
+              batchSync.set(doc(db, 'cartridges', 'cart-285a'), buildCartridgeDoc(sku285a, uid));
+              opCount += 1;
+            }
+          }
+
+          // Preserve EXV14 threshold adjustment if still at 15
+          if (isAdmin && skuExv14 && docsMap.has('cart-exv14')) {
+            const dExv14 = docsMap.get('cart-exv14');
+            if (dExv14.minThreshold === 15) {
+              batchSync.update(doc(db, 'cartridges', 'cart-exv14'), {
+                minThreshold: 5,
+                notes: skuExv14.notes,
+                updatedByUid: uid,
+                updatedAt: serverTimestamp(),
+              });
+              opCount += 1;
+            }
+          }
+        } else if (needsSpecCleanup && sku1107a) {
+          batchSync.update(doc(db, 'cartridges', 'cart-1107a'), {
+            specification: sku1107a.specification,
+            updatedByUid: uid,
+            updatedAt: serverTimestamp(),
+          });
           opCount += 1;
-        }
-        if (sku1107a && docsMap.has('cart-1107a')) {
-          const d1107 = docsMap.get('cart-1107a');
-          if (d1107.minThreshold === 15) {
-            batchSync.update(doc(db, 'cartridges', 'cart-1107a'), {
-              minThreshold: 20,
-              isBestSeller: true,
-              specification: sku1107a.specification,
-              notes: sku1107a.notes,
-              updatedByUid: uid,
-              updatedAt: serverTimestamp(),
-            });
-            opCount += 1;
-          }
-        }
-        if (sku1500a && docsMap.has('cart-1500a')) {
-          const d1500 = docsMap.get('cart-1500a');
-          if (d1500.minThreshold === 15 || !d1500.isBestSeller) {
-            batchSync.update(doc(db, 'cartridges', 'cart-1500a'), {
-              minThreshold: 20,
-              isBestSeller: true,
-              specification: sku1500a.specification,
-              notes: sku1500a.notes,
-              updatedByUid: uid,
-              updatedAt: serverTimestamp(),
-            });
-            opCount += 1;
-          }
-        }
-        if (skuExv14 && docsMap.has('cart-exv14')) {
-          const dExv14 = docsMap.get('cart-exv14');
-          if (dExv14.minThreshold === 15) {
-            batchSync.update(doc(db, 'cartridges', 'cart-exv14'), {
-              minThreshold: 5,
-              notes: skuExv14.notes,
-              updatedByUid: uid,
-              updatedAt: serverTimestamp(),
-            });
-            opCount += 1;
-          }
         }
 
         if (opCount > 0) {
           await batchSync.commit();
         }
         try {
-          localStorage.setItem('aesl_catalog_v2_synced', 'true');
+          localStorage.setItem('aesl_catalog_v3_synced', 'true');
         } catch {
           // ignore storage errors
         }
@@ -494,7 +564,7 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           if (snap.empty) {
             void trySeedWhenBothEmpty();
           } else {
-            void runCatalogV2SyncIfNeeded(docsMap);
+            void runCatalogSyncIfNeeded(docsMap);
           }
         }
       },
