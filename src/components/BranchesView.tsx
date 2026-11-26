@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useInventory } from '../context/InventoryContext';
 import {
-  Building2,
   Plus,
   Truck,
   Send,
@@ -19,7 +18,6 @@ import {
 } from 'lucide-react';
 import { EditBranchModal } from './Modals/EditBranchModal';
 import { AESL_LOCATIONS } from '../data/aeslLocations';
-import { BrandLogo } from './BrandLogo';
 
 interface BranchesViewProps {
   onOpenAddBranch: () => void;
@@ -90,64 +88,57 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
   const regionalCount = branches.length - hqCount;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       {toastMessage && (
-        <div className="fixed top-4 right-4 z-50 p-3 rounded-xl shadow-lg bg-blue-600 text-white text-xs font-semibold flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
+        <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg bg-blue-700 text-white text-sm font-semibold flex items-center gap-2">
+          <CheckCircle2 className="w-5 h-5 shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Modern Blue / Moving Dark Gradient Header */}
-      <section className="bg-blue-hero rounded-3xl p-4 sm:p-8 border border-blue-200/70 dark:border-blue-500/20 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-5">
+      {/* Clean Flat Header */}
+      <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 border-b border-slate-200 dark:border-white/10">
         <div>
-          <div className="text-xs font-medium text-blue-950/75 dark:text-slate-400 flex items-center gap-2">
-            <BrandLogo className="w-6 h-6 shrink-0" />
-            <span className="font-semibold text-[#0B0F17] dark:text-white">AESL Location Directory</span>
-            <span aria-hidden="true">·</span>
-            <span className="tabular-nums">{branches.length} Active Sites</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0B0F17] dark:text-white mt-1.5">
-            Branch Network & Headquarters Offices
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0B0F17] dark:text-white">
+            Offices & Branches
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-2xl">
-            {regionalCount} regional branches across Ghana and {hqCount} headquarters offices at Anointed House.
+          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-1.5">
+            {regionalCount} regional branches and {hqCount} headquarters offices at Anointed House.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2.5 sm:flex-wrap shrink-0">
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           <button
             onClick={() => {
               loadAESLBranches();
-              showToast(`Official AESL ${AESL_LOCATIONS.length} locations restored successfully.`);
+              showToast(`Official ${AESL_LOCATIONS.length} AESL locations restored.`);
             }}
-            title="Reload official Anointed Engineering Services locations"
-            className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 border border-slate-200/90 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/15 transition-colors cursor-pointer whitespace-nowrap"
+            className="min-h-[46px] inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl hover:bg-slate-50 dark:hover:bg-white/15 transition-colors cursor-pointer whitespace-nowrap"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-blue-700 dark:text-sky-400 shrink-0" />
-            <span className="truncate">Reload {AESL_LOCATIONS.length} Sites</span>
+            <RotateCcw className="w-4 h-4 text-blue-700 dark:text-sky-400 shrink-0" />
+            <span>Reload {AESL_LOCATIONS.length} Sites</span>
           </button>
 
           <button
             onClick={onOpenAddBranch}
-            className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
+            className="min-h-[46px] inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-xl hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
           >
             <Plus className="w-4 h-4 shrink-0" />
             <span>Add Location</span>
           </button>
         </div>
-      </section>
+      </header>
 
-      {/* Category Tabs & Quick Search */}
-      <div className="bg-[#F6F8FC] dark:bg-white/[0.04] dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 p-4 space-y-4">
+      {/* Spacious Location Selector */}
+      <section className="bg-white dark:bg-[#0D131F] rounded-2xl border border-slate-200 dark:border-white/10 p-4 sm:p-5 space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
             <button
               onClick={() => setCategoryFilter('all')}
-              className={`min-h-[36px] px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+              className={`min-h-[42px] px-4 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                 categoryFilter === 'all'
                   ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F]'
-                  : 'bg-white dark:bg-white/5 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-white/10 hover:text-[#0B0F17] dark:hover:text-white'
+                  : 'bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10'
               }`}
             >
               All ({branches.length})
@@ -155,42 +146,41 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
 
             <button
               onClick={() => setCategoryFilter('Headquarters')}
-              className={`min-h-[36px] inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+              className={`min-h-[42px] px-4 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                 categoryFilter === 'Headquarters'
                   ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F]'
-                  : 'bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-white/10 hover:text-[#0B0F17] dark:hover:text-white'
+                  : 'bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10'
               }`}
             >
-              <Briefcase className="w-3.5 h-3.5" />
-              <span>HQ Offices ({hqCount})</span>
+              HQ Offices ({hqCount})
             </button>
 
             <button
               onClick={() => setCategoryFilter('Regional Branch')}
-              className={`min-h-[36px] inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+              className={`min-h-[42px] px-4 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                 categoryFilter === 'Regional Branch'
                   ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F]'
-                  : 'bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-white/10 hover:text-[#0B0F17] dark:hover:text-white'
+                  : 'bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10'
               }`}
             >
-              <MapPin className="w-3.5 h-3.5" />
-              <span>Regional ({regionalCount})</span>
+              Regional ({regionalCount})
             </button>
           </div>
 
-          <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <div className="relative w-full md:w-80">
+            <Search className="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search Adenta, Bolga, Workshop, HR..."
-              className="w-full pl-9 pr-8 py-2 text-base sm:text-xs bg-white dark:bg-[#0B111B] border border-slate-200 dark:border-white/15 rounded-xl text-[#0B0F17] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500"
+              placeholder="Search office or city..."
+              className="w-full min-h-[44px] pl-11 pr-9 py-2 text-base bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-white/15 rounded-xl text-[#0B0F17] dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white text-xs cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-800 dark:hover:text-white text-sm cursor-pointer"
+                aria-label="Clear search"
               >
                 ✕
               </button>
@@ -198,13 +188,13 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
           </div>
         </div>
 
-        {/* Grid of Location Cards */}
+        {/* Roomier 3-Column Location Grid */}
         {filteredBranches.length === 0 ? (
-          <div className="py-8 text-center text-slate-400 text-xs">
-            No offices or branches match your search criteria.
+          <div className="py-8 text-center text-slate-500 dark:text-slate-400 text-sm">
+            No offices or branches match your search.
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 pt-1 max-h-60 overflow-y-auto pr-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-72 overflow-y-auto pr-1">
             {filteredBranches.map((b) => {
               const isSelected = b.id === effectiveSelectedBranchId;
               const isHq = b.category === 'Headquarters' || b.code.startsWith('HQ');
@@ -215,123 +205,100 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
                 <button
                   key={b.id}
                   onClick={() => setSelectedBranchId(b.id)}
-                  className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
+                  className={`p-3.5 rounded-xl border text-left transition-colors flex items-center justify-between gap-3 cursor-pointer ${
                     isSelected
-                      ? 'bg-[#E8F1FF] dark:bg-blue-500/20 border-blue-400 dark:border-sky-400/70 text-[#0B0F17] dark:text-white'
-                      : 'bg-white dark:bg-[#0B111B]/80 border-slate-200/80 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-white/25'
+                      ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-500 dark:border-sky-400 text-[#0B0F17] dark:text-white'
+                      : 'bg-slate-50/70 dark:bg-white/[0.03] border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-200 hover:bg-slate-100/80 dark:hover:bg-white/[0.06]'
                   }`}
                 >
-                  <div>
-                    <div className="flex items-center justify-between gap-1 mb-1">
-                      <span className="font-mono text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                        {b.code}
-                      </span>
-                      <span className={`text-[10px] font-mono font-semibold ${isHq ? 'text-blue-700 dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}`}>
-                        {isHq ? 'HQ' : 'BR'}
-                      </span>
-                    </div>
-                    <div className="font-semibold text-xs truncate text-[#0B0F17] dark:text-white" title={b.name}>
+                  <div className="min-w-0">
+                    <div className="font-bold text-sm truncate text-[#0B0F17] dark:text-white">
                       {b.name}
                     </div>
+                    <div className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 truncate">
+                      <span className="font-mono font-semibold">{b.code}</span> · {isHq ? 'HQ' : b.city.split('-')[0].trim()}
+                    </div>
                   </div>
-
-                  <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-2 flex items-center justify-between pt-1.5 border-t border-slate-100 dark:border-white/10">
-                    <span className="truncate max-w-[80px]">{b.city.split('-')[0].trim()}</span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-200 tabular-nums">{totalOnHand} u</span>
-                  </div>
+                  <span className="text-xs font-bold tabular-nums text-slate-700 dark:text-slate-200 shrink-0">
+                    {totalOnHand} on site
+                  </span>
                 </button>
               );
             })}
           </div>
         )}
-      </div>
+      </section>
 
-      {/* Selected Branch Detail Card */}
+      {/* Selected Branch Detail Section */}
       {selectedBranch && (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 sm:p-6">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-              <div className="flex items-start gap-3.5">
-                <div
-                  className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold font-mono text-sm shrink-0 ${
-                    selectedBranch.category === 'Headquarters' || selectedBranch.code.startsWith('HQ')
-                      ? 'bg-blue-600 dark:bg-sky-400 text-white dark:text-[#06090F]'
-                      : 'bg-[#0B0F17] dark:bg-white/15 text-white'
-                  }`}
-                >
-                  {selectedBranch.code}
+          <div className="bg-white dark:bg-[#0D131F] rounded-2xl border border-slate-200 dark:border-white/10 p-5 sm:p-6">
+            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="font-mono text-sm font-bold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/10 text-[#0B0F17] dark:text-white">
+                    {selectedBranch.code}
+                  </span>
+                  <h2 className="text-xl font-bold text-[#0B0F17] dark:text-white">
+                    {selectedBranch.name}
+                  </h2>
                 </div>
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h2 className="text-lg font-bold text-[#0B0F17] dark:text-white">
-                      {selectedBranch.name}
-                    </h2>
-                    <span className="text-xs font-medium text-blue-700 dark:text-sky-400">
-                      · {selectedBranch.category === 'Headquarters' || selectedBranch.code.startsWith('HQ')
-                        ? 'Headquarters (Anointed House)'
-                        : 'Regional Branch Office'}
-                    </span>
-                  </div>
 
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 text-xs text-slate-500 dark:text-slate-400 mt-2 sm:flex-wrap">
-                    <span className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
-                      <span>{selectedBranch.address}</span>
-                    </span>
-                    <span className="hidden sm:inline" aria-hidden="true">·</span>
-                    <span className="flex items-center gap-1.5 font-semibold text-slate-700 dark:text-slate-200">
-                      <Briefcase className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
-                      <span>Lead: {selectedBranch.managerName}</span>
-                    </span>
-                    <span className="hidden sm:inline" aria-hidden="true">·</span>
-                    <span className="flex items-center gap-1.5 tabular-nums">
-                      <Phone className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
-                      <span>{selectedBranch.contactPhone}</span>
-                    </span>
-                    <span className="hidden sm:inline" aria-hidden="true">·</span>
-                    <span className="flex items-center gap-1.5 break-all">
-                      <Mail className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
-                      <span>{selectedBranch.email}</span>
-                    </span>
-                  </div>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-slate-600 dark:text-slate-300 sm:flex-wrap">
+                  <span className="flex items-center gap-1.5">
+                    <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span>{selectedBranch.address}</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 font-semibold text-slate-800 dark:text-slate-200">
+                    <Briefcase className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span>Lead: {selectedBranch.managerName}</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 tabular-nums">
+                    <Phone className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span>{selectedBranch.contactPhone}</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 break-all">
+                    <Mail className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span>{selectedBranch.email}</span>
+                  </span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 sm:flex sm:items-center gap-2 w-full lg:w-auto shrink-0">
+              <div className="flex flex-wrap items-center gap-2.5 shrink-0">
                 <button
                   onClick={() => setEditModalOpen(true)}
-                  className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/10 transition-colors cursor-pointer whitespace-nowrap"
+                  className="min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-white/5 border border-slate-300 dark:border-white/15 rounded-xl hover:bg-slate-50 dark:hover:bg-white/10 transition-colors cursor-pointer"
                 >
-                  <Edit2 className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0" />
+                  <Edit2 className="w-4 h-4 shrink-0" />
                   <span>Edit</span>
                 </button>
 
                 <button
                   onClick={() => onOpenLogUsageForBranch(selectedBranch.id)}
-                  className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-2 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/5 border border-slate-200 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/10 transition-colors cursor-pointer whitespace-nowrap"
+                  className="min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/5 border border-slate-300 dark:border-white/15 rounded-xl hover:bg-slate-50 dark:hover:bg-white/10 transition-colors cursor-pointer"
                 >
-                  <Send className="w-3.5 h-3.5 text-blue-600 dark:text-sky-400 shrink-0" />
-                  <span>Log Usage</span>
+                  <Send className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
+                  <span>Log Swap</span>
                 </button>
 
                 <button
                   onClick={() => onOpenDispatchForBranch(selectedBranch.id)}
-                  className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
+                  className="min-h-[44px] inline-flex items-center justify-center gap-2 px-5 py-2 text-sm font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-xl hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer"
                 >
-                  <Truck className="w-3.5 h-3.5 text-sky-400 dark:text-[#06090F] shrink-0" />
-                  <span>Dispatch</span>
+                  <Truck className="w-4 h-4 text-sky-400 dark:text-[#06090F] shrink-0" />
+                  <span>Send Toner</span>
                 </button>
               </div>
             </div>
 
             {/* Sub-tab selection */}
-            <div className="mt-5 pt-4 border-t border-slate-100 dark:border-white/10 flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-2 overflow-x-auto no-scrollbar">
               <button
                 onClick={() => setActiveSubTab('inventory')}
-                className={`min-h-[38px] px-3.5 py-1.5 text-xs font-semibold rounded-full transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                className={`min-h-[42px] px-4 py-2 text-sm font-semibold rounded-xl transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                   activeSubTab === 'inventory'
                     ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F]'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
+                    : 'bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10'
                 }`}
               >
                 On-Site Stock ({branchStock.length})
@@ -339,21 +306,21 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
 
               <button
                 onClick={() => setActiveSubTab('history')}
-                className={`min-h-[38px] px-3.5 py-1.5 text-xs font-semibold rounded-full transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                className={`min-h-[42px] px-4 py-2 text-sm font-semibold rounded-xl transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                   activeSubTab === 'history'
                     ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F]'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
+                    : 'bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10'
                 }`}
               >
-                Ledger ({branchDispatches.length + branchUsages.length})
+                History ({branchDispatches.length + branchUsages.length})
               </button>
 
               <button
                 onClick={() => setActiveSubTab('printers')}
-                className={`min-h-[38px] px-3.5 py-1.5 text-xs font-semibold rounded-full transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                className={`min-h-[42px] px-4 py-2 text-sm font-semibold rounded-xl transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                   activeSubTab === 'printers'
                     ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F]'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
+                    : 'bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10'
                 }`}
               >
                 Printers ({selectedBranch.printers.length})
@@ -363,76 +330,81 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
 
           {/* Subtab 1: On-Site Cartridge Inventory */}
           {activeSubTab === 'inventory' && (
-            <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden">
-              <div className="px-5 py-4 border-b border-slate-100 dark:border-white/10 flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-bold text-[#0B0F17] dark:text-white">
-                    Cartridges Allocated to {selectedBranch.name}
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Calculated from total shipments delivered minus documented printer usage
-                  </p>
-                </div>
+            <div className="bg-white dark:bg-[#0D131F] rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+              <div className="px-5 sm:px-6 py-4 border-b border-slate-200/80 dark:border-white/10">
+                <h3 className="text-base font-bold text-[#0B0F17] dark:text-white">
+                  Toners at {selectedBranch.name}
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300 mt-0.5">
+                  Delivered shipments minus recorded printer swaps
+                </p>
               </div>
 
               {branchStock.length === 0 ? (
-                <div className="p-12 text-center text-slate-500 dark:text-slate-400">
-                  <Package className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-                  <p className="font-semibold text-slate-700 dark:text-slate-200">No cartridges dispatched to this location yet.</p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 max-w-md mx-auto">
-                    Click &ldquo;Dispatch Here&rdquo; to issue cartridges from the central office warehouse at Anointed House.
+                <div className="p-10 text-center text-slate-600 dark:text-slate-300">
+                  <Package className="w-9 h-9 text-slate-300 dark:text-slate-600 mx-auto mb-2.5" />
+                  <p className="text-base font-bold text-[#0B0F17] dark:text-white">
+                    No toners sent to this location yet.
                   </p>
                   <button
                     onClick={() => onOpenDispatchForBranch(selectedBranch.id)}
-                    className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer"
+                    className="mt-4 min-h-[44px] inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-xl hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer"
                   >
-                    <Truck className="w-3.5 h-3.5" />
-                    <span>Send Initial Dispatch</span>
+                    <Truck className="w-4 h-4" />
+                    <span>Send First Delivery</span>
                   </button>
                 </div>
               ) : (
                 <>
                   {/* Mobile Stock Cards */}
-                  <div className="md:hidden divide-y divide-slate-100 dark:divide-white/5">
+                  <div className="md:hidden divide-y divide-slate-200 dark:divide-white/10">
                     {branchStock.map((item) => (
-                      <div key={item.cartridgeId} className="p-4 space-y-3">
+                      <div key={item.cartridgeId} className="p-5 space-y-3">
                         <div className="flex items-start justify-between gap-2">
                           <div>
-                            <h4 className="font-bold text-sm text-[#0B0F17] dark:text-white">{item.cartridgeModel}</h4>
-                            <span className="text-[11px] text-slate-500 dark:text-slate-400">{item.cartridgeColor}</span>
+                            <h4 className="font-bold text-base text-[#0B0F17] dark:text-white">
+                              {item.cartridgeModel}
+                            </h4>
+                            <span className="text-sm text-slate-600 dark:text-slate-300">{item.cartridgeColor}</span>
                           </div>
-                          <span className={`font-mono text-sm font-bold ${item.onHandCount <= 1 ? 'text-rose-600 dark:text-rose-400' : 'text-blue-700 dark:text-sky-400'}`}>
-                            {item.onHandCount} units left
+                          <span
+                            className={`font-mono text-base font-bold ${
+                              item.onHandCount <= 1
+                                ? 'text-rose-700 dark:text-rose-400'
+                                : 'text-blue-700 dark:text-sky-400'
+                            }`}
+                          >
+                            {item.onHandCount} left
                           </span>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                          <div className="bg-[#F8FAFD] dark:bg-white/[0.03] rounded-xl py-1.5">
-                            <span className="text-[10px] text-slate-400 block">Delivered</span>
+                        <div className="grid grid-cols-3 gap-2 text-center text-sm bg-slate-50 dark:bg-white/[0.03] rounded-xl p-2.5">
+                          <div>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 block">Delivered</span>
                             <span className="font-mono font-bold text-[#0B0F17] dark:text-white">{item.totalReceived}</span>
                           </div>
-                          <div className="bg-[#F8FAFD] dark:bg-white/[0.03] rounded-xl py-1.5">
-                            <span className="text-[10px] text-slate-400 block">In Transit</span>
-                            <span className={`font-mono font-bold ${item.inTransitCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}`}>{item.inTransitCount}</span>
+                          <div>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 block">In Transit</span>
+                            <span className="font-mono font-bold text-amber-700 dark:text-amber-400">{item.inTransitCount}</span>
                           </div>
-                          <div className="bg-[#F8FAFD] dark:bg-white/[0.03] rounded-xl py-1.5">
-                            <span className="text-[10px] text-slate-400 block">Consumed</span>
+                          <div>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 block">Used</span>
                             <span className="font-mono font-bold text-[#0B0F17] dark:text-white">{item.totalUsed}</span>
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2 pt-1">
+                        <div className="grid grid-cols-2 gap-2.5 pt-1">
                           <button
                             onClick={() => onOpenLogUsageForBranch(selectedBranch.id)}
-                            className="min-h-[40px] px-3 py-1.5 text-xs font-semibold text-blue-700 dark:text-sky-300 bg-[#EFF6FF] dark:bg-blue-500/15 rounded-full cursor-pointer"
+                            className="min-h-[42px] px-3 py-2 text-sm font-semibold text-blue-800 dark:text-sky-300 bg-blue-50 dark:bg-blue-500/15 rounded-xl cursor-pointer"
                           >
-                            Log Used
+                            Log Swap
                           </button>
                           <button
                             onClick={() => onOpenDispatchForBranch(selectedBranch.id)}
-                            className="min-h-[40px] px-3 py-1.5 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full cursor-pointer"
+                            className="min-h-[42px] px-3 py-2 text-sm font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-xl cursor-pointer"
                           >
-                            Dispatch More
+                            Send More
                           </button>
                         </div>
                       </div>
@@ -441,58 +413,64 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
 
                   {/* Desktop Table */}
                   <div className="hidden md:block overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-[#F6F8FC] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-slate-50 dark:bg-white/[0.03] border-b border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-xs uppercase font-semibold">
                         <tr>
-                          <th className="py-3 px-4">Cartridge Model</th>
-                          <th className="py-3 px-4">Color</th>
-                          <th className="py-3 px-4 text-right">Total Delivered</th>
-                          <th className="py-3 px-4 text-right">In Transit</th>
-                          <th className="py-3 px-4 text-right">Consumed</th>
-                          <th className="py-3 px-4 text-right">On-Site Reserve</th>
-                          <th className="py-3 px-4 text-right">Quick Action</th>
+                          <th className="py-3.5 px-5">Toner Model</th>
+                          <th className="py-3.5 px-5 text-right">Delivered</th>
+                          <th className="py-3.5 px-5 text-right">In Transit</th>
+                          <th className="py-3.5 px-5 text-right">Used</th>
+                          <th className="py-3.5 px-5 text-right">On Site Now</th>
+                          <th className="py-3.5 px-5 text-right">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                      <tbody className="divide-y divide-slate-200/80 dark:divide-white/10">
                         {branchStock.map((item) => (
-                          <tr key={item.cartridgeId} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
-                            <td className="py-3 px-4 font-semibold text-[#0B0F17] dark:text-white">
-                              {item.cartridgeModel}
+                          <tr key={item.cartridgeId} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.02] transition-colors">
+                            <td className="py-4 px-5">
+                              <span className="font-bold text-[#0B0F17] dark:text-white block">
+                                {item.cartridgeModel}
+                              </span>
+                              <span className="text-xs text-slate-600 dark:text-slate-300">
+                                {item.cartridgeColor}
+                              </span>
                             </td>
-                            <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
-                              {item.cartridgeColor}
-                            </td>
-                            <td className="py-3 px-4 text-right font-mono tabular-nums text-slate-700 dark:text-slate-200">
+                            <td className="py-4 px-5 text-right font-mono tabular-nums text-slate-800 dark:text-slate-200">
                               {item.totalReceived}
                             </td>
-                            <td className="py-3 px-4 text-right font-mono tabular-nums">
+                            <td className="py-4 px-5 text-right font-mono tabular-nums">
                               {item.inTransitCount > 0 ? (
-                                <span className="text-amber-700 dark:text-amber-400 font-semibold">{item.inTransitCount}</span>
+                                <span className="text-amber-700 dark:text-amber-400 font-bold">{item.inTransitCount}</span>
                               ) : (
                                 <span className="text-slate-400 dark:text-slate-600">0</span>
                               )}
                             </td>
-                            <td className="py-3 px-4 text-right font-mono tabular-nums text-slate-700 dark:text-slate-200">
+                            <td className="py-4 px-5 text-right font-mono tabular-nums text-slate-800 dark:text-slate-200">
                               {item.totalUsed}
                             </td>
-                            <td className="py-3 px-4 text-right font-mono tabular-nums">
-                              <span className={`font-semibold ${item.onHandCount <= 1 ? 'text-rose-600 dark:text-rose-400' : 'text-blue-700 dark:text-sky-400'}`}>
-                                {item.onHandCount} units
+                            <td className="py-4 px-5 text-right font-mono tabular-nums">
+                              <span
+                                className={`font-bold text-base ${
+                                  item.onHandCount <= 1
+                                    ? 'text-rose-700 dark:text-rose-400'
+                                    : 'text-blue-700 dark:text-sky-400'
+                                }`}
+                              >
+                                {item.onHandCount}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-right space-x-2">
+                            <td className="py-4 px-5 text-right space-x-3">
                               <button
                                 onClick={() => onOpenLogUsageForBranch(selectedBranch.id)}
-                                className="text-xs font-semibold text-blue-700 dark:text-sky-400 hover:underline cursor-pointer"
+                                className="text-sm font-semibold text-blue-700 dark:text-sky-400 hover:underline cursor-pointer"
                               >
-                                Log Used
+                                Log Swap
                               </button>
-                              <span className="text-slate-300 dark:text-slate-600">·</span>
                               <button
                                 onClick={() => onOpenDispatchForBranch(selectedBranch.id)}
-                                className="text-xs font-semibold text-[#0B0F17] dark:text-white hover:underline cursor-pointer"
+                                className="text-sm font-semibold text-[#0B0F17] dark:text-white hover:underline cursor-pointer"
                               >
-                                Dispatch More
+                                Send More
                               </button>
                             </td>
                           </tr>
@@ -505,127 +483,125 @@ export const BranchesView: React.FC<BranchesViewProps> = ({
             </div>
           )}
 
-          {/* Subtab 2: Ledger of Dispatches & Usage */}
+          {/* Subtab 2: History */}
           {activeSubTab === 'history' && (
-            <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden p-5 sm:p-6 space-y-4">
-              <h3 className="text-sm font-bold text-[#0B0F17] dark:text-white">
-                Logistics & Utilization History for {selectedBranch.name}
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="border border-slate-200/80 dark:border-white/10 rounded-2xl p-4 bg-[#F6F8FC] dark:bg-white/[0.03]">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="font-bold text-xs text-[#0B0F17] dark:text-white flex items-center gap-1.5">
-                      <Truck className="w-3.5 h-3.5 text-blue-600 dark:text-sky-400" />
-                      Shipments Dispatched ({branchDispatches.length})
-                    </span>
-                  </div>
-
-                  {branchDispatches.length === 0 ? (
-                    <p className="text-xs text-slate-400 py-4 text-center">No shipments recorded yet</p>
-                  ) : (
-                    <div className="space-y-2 max-h-80 overflow-y-auto">
-                      {branchDispatches.map((d) => (
-                        <div key={d.id} className="p-3 bg-white dark:bg-[#0B111B] rounded-xl border border-slate-200/80 dark:border-white/10 text-xs flex justify-between items-start">
-                          <div>
-                            <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500 block">{d.dispatchCode}</span>
-                            <span className="font-semibold text-[#0B0F17] dark:text-white">{d.cartridgeModel}</span>
-                            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                              {d.dispatchDate} via {d.carrier}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <span className="font-mono font-bold text-[#0B0F17] dark:text-white block">{d.quantity} units</span>
-                            <span className={`text-[10px] font-semibold ${d.status === 'Delivered' ? 'text-blue-700 dark:text-sky-400' : 'text-amber-700 dark:text-amber-400'}`}>
-                              {d.status}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <div className="bg-white dark:bg-[#0D131F] rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-200/80 dark:border-white/10 flex items-center gap-2">
+                  <Truck className="w-5 h-5 text-blue-600 dark:text-sky-400" />
+                  <h3 className="text-base font-bold text-[#0B0F17] dark:text-white">
+                    Deliveries ({branchDispatches.length})
+                  </h3>
                 </div>
-
-                <div className="border border-slate-200/80 dark:border-white/10 rounded-2xl p-4 bg-[#F6F8FC] dark:bg-white/[0.03]">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="font-bold text-xs text-[#0B0F17] dark:text-white flex items-center gap-1.5">
-                      <History className="w-3.5 h-3.5 text-blue-600 dark:text-sky-400" />
-                      Depletion & Usage Records ({branchUsages.length})
-                    </span>
-                  </div>
-
-                  {branchUsages.length === 0 ? (
-                    <p className="text-xs text-slate-400 py-4 text-center">No cartridge installations logged yet</p>
-                  ) : (
-                    <div className="space-y-2 max-h-80 overflow-y-auto">
-                      {branchUsages.map((u) => (
-                        <div key={u.id} className="p-3 bg-white dark:bg-[#0B111B] rounded-xl border border-slate-200/80 dark:border-white/10 text-xs flex justify-between items-start">
-                          <div>
-                            <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500 block">{u.usageCode}</span>
-                            <span className="font-semibold text-[#0B0F17] dark:text-white">{u.cartridgeModel}</span>
-                            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                              Installed into {u.printerName} on {u.installedDate}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <span className="font-mono font-bold text-[#0B0F17] dark:text-white block">{u.quantity} installed</span>
-                            <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                              by {u.installedBy}
-                            </span>
-                          </div>
+                {branchDispatches.length === 0 ? (
+                  <p className="text-sm text-slate-500 dark:text-slate-400 p-8 text-center">
+                    No deliveries recorded yet.
+                  </p>
+                ) : (
+                  <div className="divide-y divide-slate-200/80 dark:divide-white/10 max-h-96 overflow-y-auto">
+                    {branchDispatches.map((d) => (
+                      <div key={d.id} className="p-4 flex justify-between items-start gap-3 text-sm">
+                        <div>
+                          <span className="font-bold text-[#0B0F17] dark:text-white block">{d.cartridgeModel}</span>
+                          <span className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 block">
+                            {d.dispatchDate} · {d.carrier}
+                          </span>
                         </div>
-                      ))}
-                    </div>
-                  )}
+                        <div className="text-right shrink-0">
+                          <span className="font-mono font-bold text-[#0B0F17] dark:text-white block">{d.quantity} units</span>
+                          <span
+                            className={`text-xs font-semibold ${
+                              d.status === 'Delivered'
+                                ? 'text-blue-700 dark:text-sky-400'
+                                : 'text-amber-700 dark:text-amber-400'
+                            }`}
+                          >
+                            {d.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-white dark:bg-[#0D131F] rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-200/80 dark:border-white/10 flex items-center gap-2">
+                  <History className="w-5 h-5 text-blue-600 dark:text-sky-400" />
+                  <h3 className="text-base font-bold text-[#0B0F17] dark:text-white">
+                    Printer Swaps ({branchUsages.length})
+                  </h3>
                 </div>
+                {branchUsages.length === 0 ? (
+                  <p className="text-sm text-slate-500 dark:text-slate-400 p-8 text-center">
+                    No printer swaps logged yet.
+                  </p>
+                ) : (
+                  <div className="divide-y divide-slate-200/80 dark:divide-white/10 max-h-96 overflow-y-auto">
+                    {branchUsages.map((u) => (
+                      <div key={u.id} className="p-4 flex justify-between items-start gap-3 text-sm">
+                        <div>
+                          <span className="font-bold text-[#0B0F17] dark:text-white block">{u.cartridgeModel}</span>
+                          <span className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 block">
+                            {u.printerName} · {u.installedDate}
+                          </span>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className="font-mono font-bold text-[#0B0F17] dark:text-white block">{u.quantity} used</span>
+                          <span className="text-xs text-slate-600 dark:text-slate-300">by {u.installedBy}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
 
           {/* Subtab 3: Printers */}
           {activeSubTab === 'printers' && (
-            <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 sm:p-6 space-y-4">
-              <div className="flex items-center justify-between">
+            <div className="bg-white dark:bg-[#0D131F] rounded-2xl border border-slate-200 dark:border-white/10 p-5 sm:p-6 space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-bold text-[#0B0F17] dark:text-white">
-                    Printers Assigned to {selectedBranch.name}
+                  <h3 className="text-base font-bold text-[#0B0F17] dark:text-white">
+                    Printers at {selectedBranch.name}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Track hardware models and assign compatible toner cartridges
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
+                    Assigned office printers and locations
                   </p>
                 </div>
                 <button
                   onClick={() => setEditModalOpen(true)}
-                  className="px-3.5 py-1.5 text-xs font-semibold text-[#0B0F17] dark:text-sky-300 bg-[#EFF6FF] dark:bg-blue-500/15 hover:bg-blue-100 dark:hover:bg-blue-500/25 rounded-full transition-colors border border-blue-200 dark:border-blue-500/30 cursor-pointer"
+                  className="min-h-[42px] px-4 py-2 text-sm font-semibold text-[#0B0F17] dark:text-sky-300 bg-blue-50 dark:bg-blue-500/15 hover:bg-blue-100 dark:hover:bg-blue-500/25 rounded-xl border border-blue-200 dark:border-blue-500/30 transition-colors cursor-pointer self-start sm:self-auto"
                 >
-                  Configure Hardware
+                  Edit Printers
                 </button>
               </div>
 
               {selectedBranch.printers.length === 0 ? (
-                <div className="p-8 text-center text-slate-400 text-xs border border-dashed border-slate-200 dark:border-white/15 rounded-2xl">
-                  No printers assigned to this location yet. Click &ldquo;Configure Hardware&rdquo; to add devices.
+                <div className="p-8 text-center text-slate-600 dark:text-slate-300 text-sm border border-dashed border-slate-300 dark:border-white/15 rounded-2xl">
+                  No printers added for this location yet.
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                   {selectedBranch.printers.map((printer) => (
                     <div
                       key={printer.id}
-                      className="p-4 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-[#F6F8FC] dark:bg-white/[0.03] flex items-start gap-3"
+                      className="p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/[0.03] flex items-start gap-3"
                     >
-                      <div className="p-2 bg-[#E8F1FF] dark:bg-blue-500/15 text-blue-700 dark:text-sky-400 rounded-xl shrink-0">
-                        <Printer className="w-4 h-4" />
+                      <div className="p-2.5 bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-sky-400 rounded-xl shrink-0">
+                        <Printer className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-xs text-[#0B0F17] dark:text-white truncate">
+                        <h4 className="font-bold text-sm text-[#0B0F17] dark:text-white truncate">
                           {printer.name}
                         </h4>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-                          Model: {printer.model}
+                        <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 truncate">
+                          {printer.model}
                         </p>
-                        <div className="mt-2 text-[10px] text-slate-400 dark:text-slate-500 flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          <span>{printer.location}</span>
+                        <div className="mt-1.5 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 shrink-0" />
+                          <span className="truncate">{printer.location}</span>
                         </div>
                       </div>
                     </div>

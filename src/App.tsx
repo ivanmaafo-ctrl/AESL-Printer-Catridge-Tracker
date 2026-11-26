@@ -71,33 +71,21 @@ const AppContent: React.FC = () => {
     setLogUsageModalOpen(true);
   };
 
-  // Show branded AESL loading icon while Firebase session initializes
   if (!authReady) {
     return <BrandLoaderScreen label="Verifying AESL Fleet Session..." />;
   }
 
-  // Full-App Login Gate: only signed-in, verified AESL IT team members can enter
   if (!isAuthenticated) {
     return <AdminLoginView fullScreen />;
   }
 
   if (inventoryLoading) {
-    return <BrandLoaderScreen label="Syncing Live AESL Warehouse & 27 Branches..." />;
+    return <BrandLoaderScreen label="Loading AESL Warehouse & Branches..." />;
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#06090F] text-[#0B0F17] dark:text-slate-100 font-sans flex flex-col relative isolate">
-      {/* Lightweight Dark Mode Atmospheric Gradient Layer (zero GPU blur/animation overhead) */}
-      <div
-        aria-hidden="true"
-        className="hidden dark:block fixed inset-0 -z-10 pointer-events-none print:hidden"
-        style={{
-          background:
-            'radial-gradient(680px circle at 8% 4%, rgba(37,99,235,0.16), transparent 60%), radial-gradient(720px circle at 94% 96%, rgba(56,189,248,0.12), transparent 60%), linear-gradient(135deg, #040814 0%, #071226 50%, #080F20 100%)',
-        }}
-      />
-
-      {/* Side Navigation Bar with Integrated Task Bar */}
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#06090F] text-[#0B0F17] dark:text-slate-100 font-sans flex flex-col relative isolate">
+      {/* Side Navigation Bar */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -108,18 +96,18 @@ const AppContent: React.FC = () => {
       />
 
       {/* Main Content Area offset by fixed desktop sidebar */}
-      <div className="lg:pl-64 xl:pl-72 print:pl-0 flex-1 flex flex-col min-w-0">
-        {/* Mobile 1-Tap Scrollable View Switcher (non-sticky to keep sticky chrome under 15%) */}
+      <div className="lg:pl-68 xl:pl-72 print:pl-0 flex-1 flex flex-col min-w-0">
+        {/* Mobile View Switcher */}
         <nav
           aria-label="Mobile view navigation"
-          className="lg:hidden print:hidden border-b border-slate-200/80 dark:border-white/10 bg-[#F8FAFD] dark:bg-[#090E17]/75 px-3 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar"
+          className="lg:hidden print:hidden border-b border-slate-200 dark:border-white/10 bg-white dark:bg-[#090E17] px-3 py-2.5 flex items-center gap-2 overflow-x-auto no-scrollbar"
         >
           {(
             [
               { id: 'dashboard', label: 'Overview', icon: Activity },
               { id: 'inventory', label: 'Stock', icon: Package },
               { id: 'branches', label: 'Branches', icon: Building2 },
-              { id: 'dispatches', label: 'Dispatches', icon: Truck },
+              { id: 'dispatches', label: 'Deliveries', icon: Truck },
               { id: 'usage', label: 'Usage', icon: Send },
               {
                 id: 'reorder',
@@ -136,19 +124,19 @@ const AppContent: React.FC = () => {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`min-h-[38px] px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
+                className={`min-h-[42px] px-3.5 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
                   active
-                    ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F] shadow-2xs'
-                    : 'bg-white dark:bg-white/5 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-white/10'
+                    ? 'bg-[#0B0F17] dark:bg-sky-400 text-white dark:text-[#06090F]'
+                    : 'bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-200'
                 }`}
               >
                 <Icon
-                  className={`w-3.5 h-3.5 shrink-0 ${
+                  className={`w-4 h-4 shrink-0 ${
                     active
                       ? 'text-sky-400 dark:text-[#06090F]'
                       : item.id === 'reorder' && lowStockAlerts.length > 0
                       ? 'text-amber-600 dark:text-amber-400'
-                      : 'text-slate-400 dark:text-slate-400'
+                      : 'text-slate-500 dark:text-slate-400'
                   }`}
                 />
                 <span>{item.label}</span>
@@ -157,8 +145,7 @@ const AppContent: React.FC = () => {
           })}
         </nav>
 
-        <main className="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-8 print:p-0 print:max-w-none">
-          {/* View Switcher */}
+        <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-7 lg:px-10 py-6 sm:py-9 print:p-0 print:max-w-none">
           {activeTab === 'dashboard' && (
             <DashboardView
               setActiveTab={setActiveTab}
@@ -215,17 +202,15 @@ const AppContent: React.FC = () => {
         </main>
 
         {/* Quiet Corporate Footer */}
-        <footer className="border-t border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#070B12]/80 backdrop-blur-sm py-4 pb-safe mt-auto print:hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-2 text-center sm:text-left">
-            <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+        <footer className="border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#070B12] py-5 pb-safe mt-auto print:hidden">
+          <div className="max-w-6xl mx-auto px-4 sm:px-7 lg:px-10 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-600 dark:text-slate-400 gap-2 text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-2.5 flex-wrap">
               <BrandLogo className="w-6 h-6 shrink-0" />
               <span className="font-bold text-slate-800 dark:text-slate-100">Anointed Engineering Services Limited</span>
               <span className="hidden sm:inline" aria-hidden="true">·</span>
-              <span className="hidden sm:inline">IT Department · Multi-Branch Printer Cartridge Logistics</span>
+              <span className="hidden sm:inline">IT Department</span>
             </div>
-            <div>
-              <span>Cloud-Synced IT Warehouse & Site Operations Portal</span>
-            </div>
+            <span>Printer Toner Inventory Portal</span>
           </div>
         </footer>
       </div>

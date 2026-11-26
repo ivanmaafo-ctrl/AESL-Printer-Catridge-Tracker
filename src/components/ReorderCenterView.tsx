@@ -43,7 +43,10 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
     setReorderQuantities((prev) => {
       const next = { ...prev };
       lowStockAlerts.forEach((a) => {
-        if (next[a.cartridge.id] === undefined || (a.cartridge.isBestSeller && next[a.cartridge.id] !== 40 && next[a.cartridge.id] === 15)) {
+        if (
+          next[a.cartridge.id] === undefined ||
+          (a.cartridge.isBestSeller && next[a.cartridge.id] !== 40 && next[a.cartridge.id] === 15)
+        ) {
           next[a.cartridge.id] = a.suggestedReorder;
         }
       });
@@ -131,220 +134,185 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
   };
 
   return (
-    <div className="space-y-5 sm:space-y-6">
-      {/* Modern Blue / Moving Dark Gradient Header */}
-      <section className="bg-blue-hero rounded-3xl p-4 sm:p-8 border border-blue-200/70 dark:border-blue-500/20 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-5">
+    <div className="space-y-7">
+      {/* Clean Flat Header */}
+      <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 border-b border-slate-200 dark:border-white/10">
         <div>
-          <div className="text-xs font-medium text-blue-950/75 dark:text-slate-400 flex items-center gap-2">
-            <span className="font-semibold text-[#0B0F17] dark:text-white">15-Unit Buffer Surveillance</span>
-            <span aria-hidden="true">·</span>
-            <span className="tabular-nums">{lowStockAlerts.length} SKUs Flagged</span>
-          </div>
-          <h1 className="text-xl sm:text-3xl font-bold tracking-tight text-[#0B0F17] dark:text-white mt-1.5">
-            Low Stock Alerts & Top-Up Manager
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0B0F17] dark:text-white">
+            Low Stock Alerts
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-2xl">
-            Automated threshold surveillance, suggested supplier order quantities, and batch warehouse intake.
+          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-1.5">
+            Toners below the 15-unit target level, ready for restocking or purchase orders.
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 shrink-0">
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           {lowStockAlerts.length > 0 && (
             <button
               onClick={handleExportReorderPO}
-              className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 border border-slate-200/90 dark:border-white/15 rounded-full hover:bg-slate-50 dark:hover:bg-white/15 transition-colors cursor-pointer whitespace-nowrap"
+              className="min-h-[46px] inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#0B0F17] dark:text-white bg-white dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl hover:bg-slate-50 dark:hover:bg-white/15 transition-colors cursor-pointer whitespace-nowrap"
             >
               <Download className="w-4 h-4 text-blue-700 dark:text-sky-400" />
-              <span>Export Purchase Order CSV</span>
+              <span>Export Order List</span>
             </button>
           )}
 
           <button
             onClick={() => onOpenRestock()}
-            className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-full hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
+            className="min-h-[46px] inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 rounded-xl hover:bg-slate-800 dark:hover:bg-sky-300 transition-colors cursor-pointer whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
-            <span>Single Restock Intake</span>
+            <span>Top Up One Toner</span>
           </button>
         </div>
-      </section>
+      </header>
 
       {batchSuccess && (
-        <div className="p-4 rounded-2xl bg-[#EFF6FF] dark:bg-blue-500/15 border border-blue-200 dark:border-blue-500/30 text-blue-900 dark:text-sky-200 text-xs flex items-center justify-between animate-in fade-in duration-200">
-          <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="w-5 h-5 text-blue-600 dark:text-sky-400 shrink-0" />
-            <div>
-              <span className="font-bold text-sm block text-blue-950 dark:text-white">
-                Top-Up Completed Successfully
-              </span>
-              <span>All depleted cartridges have been received and credited to central warehouse inventory.</span>
-            </div>
+        <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-500/15 border border-blue-200 dark:border-blue-500/30 text-blue-950 dark:text-sky-200 text-sm flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5 text-blue-600 dark:text-sky-400 shrink-0" />
+          <div>
+            <span className="font-bold block">Restock saved successfully</span>
+            <span>All listed quantities have been added to central warehouse stock.</span>
           </div>
         </div>
       )}
 
-      {/* Stock Health Status Summary */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-        <div className="bg-rose-50/50 dark:bg-rose-500/10 rounded-2xl p-4 sm:p-5 border border-rose-200/80 dark:border-rose-500/25">
-          <div className="flex items-center justify-between gap-1">
-            <span className="text-[11px] sm:text-xs font-semibold text-rose-700 dark:text-rose-400">
-              Critical (≤5 Left)
+      {/* 3 Calm Status Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-rose-50/70 dark:bg-rose-500/10 rounded-2xl p-5 border border-rose-200 dark:border-rose-500/25">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm font-semibold text-rose-800 dark:text-rose-300">
+              Very Low (5 or less)
             </span>
-            <ShieldAlert className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+            <ShieldAlert className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
           </div>
-          <div className="text-2xl sm:text-3xl font-display font-bold tabular-nums text-rose-700 dark:text-rose-300 mt-1.5 sm:mt-2">
-            {criticalCount} <span className="text-xs font-sans font-normal">SKUs</span>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-display font-bold tabular-nums text-rose-700 dark:text-rose-300">
+              {criticalCount}
+            </span>
+            <span className="text-sm text-slate-700 dark:text-slate-300">toners</span>
           </div>
-          <span className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 mt-1 block">
-            High stockout risk
-          </span>
         </div>
 
-        <div className="bg-amber-50/50 dark:bg-amber-500/10 rounded-2xl p-4 sm:p-5 border border-amber-200/80 dark:border-amber-500/25">
-          <div className="flex items-center justify-between gap-1">
-            <span className="text-[11px] sm:text-xs font-semibold text-amber-800 dark:text-amber-300">
-              Low Warning
+        <div className="bg-amber-50/70 dark:bg-amber-500/10 rounded-2xl p-5 border border-amber-200 dark:border-amber-500/25">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm font-semibold text-amber-900 dark:text-amber-300">
+              Below Target
             </span>
-            <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
           </div>
-          <div className="text-2xl sm:text-3xl font-display font-bold tabular-nums text-amber-800 dark:text-amber-300 mt-1.5 sm:mt-2">
-            {warningCount} <span className="text-xs font-sans font-normal">SKUs</span>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-display font-bold tabular-nums text-amber-800 dark:text-amber-300">
+              {warningCount}
+            </span>
+            <span className="text-sm text-slate-700 dark:text-slate-300">toners</span>
           </div>
-          <span className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 mt-1 block">
-            Below safe buffer
-          </span>
         </div>
 
-        <div className="col-span-2 sm:col-span-1 bg-[#F3F8FF] dark:bg-blue-500/10 rounded-2xl p-4 sm:p-5 border border-blue-200/80 dark:border-blue-500/25">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-blue-700 dark:text-sky-300">
-              Adequate Stock
+        <div className="bg-white dark:bg-[#0D131F] rounded-2xl p-5 border border-slate-200 dark:border-white/10">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">
+              Well Stocked
             </span>
-            <CheckCircle2 className="w-4 h-4 text-blue-600 dark:text-sky-400" />
+            <CheckCircle2 className="w-5 h-5 text-blue-600 dark:text-sky-400 shrink-0" />
           </div>
-          <div className="text-2xl sm:text-3xl font-display font-bold tabular-nums text-blue-700 dark:text-sky-400 mt-1.5 sm:mt-2">
-            {cartridges.length - lowStockAlerts.length} <span className="text-xs font-sans font-normal">SKUs</span>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-display font-bold tabular-nums text-blue-700 dark:text-sky-400">
+              {cartridges.length - lowStockAlerts.length}
+            </span>
+            <span className="text-sm text-slate-600 dark:text-slate-300">toners above target</span>
           </div>
-          <span className="text-xs text-slate-600 dark:text-slate-300 mt-1 block">
-            Operating above designated safe threshold
-          </span>
         </div>
       </div>
 
-      {/* Suggested Reorder List & Batch Replenish */}
-      <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden">
-        <div className="px-4 sm:px-5 py-4 border-b border-slate-100 dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-[#F6F8FC] dark:bg-white/[0.03]">
+      {/* Reorder Sheet */}
+      <div className="bg-white dark:bg-[#0D131F] rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+        <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-slate-200 dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2">
-              <PackageCheck className="w-5 h-5 text-blue-700 dark:text-sky-400 shrink-0" />
-              <h2 className="text-sm sm:text-base font-bold text-[#0B0F17] dark:text-white">
-                Purchase Order Requisition & Top-Up Sheet
-              </h2>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Suggests 40 units for Best Sellers below gauge, or pack multiples by SKU threshold
+            <h2 className="text-lg font-bold text-[#0B0F17] dark:text-white">
+              Suggested Restock List
+            </h2>
+            <p className="text-sm text-slate-600 dark:text-slate-300 mt-0.5">
+              Adjust quantities below, then receive individual items or all at once.
             </p>
           </div>
 
           {lowStockAlerts.length > 0 && (
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3">
-              <div className="text-left md:text-right">
-                <span className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 block">Est. PO Total</span>
-                <span className="text-sm font-display font-bold tabular-nums text-[#0B0F17] dark:text-white">
-                  ${totalEstimatedCost.toFixed(2)} <span className="font-sans text-xs font-medium text-slate-500 dark:text-slate-400">({totalSuggestedUnits} units)</span>
-                </span>
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
+              <div className="text-sm text-slate-700 dark:text-slate-200 tabular-nums">
+                Total: <strong className="font-bold">{totalSuggestedUnits} units</strong>
+                {totalEstimatedCost > 0 && (
+                  <span> · ${totalEstimatedCost.toFixed(2)}</span>
+                )}
               </div>
 
               <button
                 onClick={handleBatchReceiveAll}
-                className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 hover:bg-slate-800 dark:hover:bg-sky-300 rounded-full transition-colors whitespace-nowrap cursor-pointer"
+                className="min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white dark:text-[#06090F] bg-[#0B0F17] dark:bg-sky-400 hover:bg-slate-800 dark:hover:bg-sky-300 rounded-xl transition-colors whitespace-nowrap cursor-pointer"
               >
                 <PackageCheck className="w-4 h-4 text-sky-400 dark:text-[#06090F]" />
-                <span>Receive All Into Warehouse</span>
+                <span>Receive All Into Stock</span>
               </button>
             </div>
           )}
         </div>
 
         {lowStockAlerts.length === 0 ? (
-          <div className="p-10 sm:p-12 text-center text-slate-500 dark:text-slate-400">
-            <CheckCircle2 className="w-10 h-10 text-blue-600 dark:text-sky-400 mx-auto mb-2" />
-            <h3 className="text-base font-bold text-[#0B0F17] dark:text-white">All Central Inventory is Healthy</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
-              Every printer cartridge SKU in central warehouse is currently stocked above its configured minimum threshold.
+          <div className="p-10 text-center text-slate-600 dark:text-slate-300">
+            <CheckCircle2 className="w-10 h-10 text-blue-600 dark:text-sky-400 mx-auto mb-2.5" />
+            <h3 className="text-lg font-bold text-[#0B0F17] dark:text-white">
+              All Warehouse Stock Is Healthy
+            </h3>
+            <p className="text-sm mt-1">
+              Every toner is currently at or above its safe target level.
             </p>
           </div>
         ) : (
           <>
-            {/* Mobile Reorder Cards */}
-            <div className="md:hidden divide-y divide-slate-100 dark:divide-white/5">
+            {/* Mobile Cards */}
+            <div className="md:hidden divide-y divide-slate-200 dark:divide-white/10">
               {lowStockAlerts.map((alert) => {
                 const currentQty = reorderQuantities[alert.cartridge.id] ?? alert.suggestedReorder;
-                const lineTotal = currentQty * alert.cartridge.unitCost;
 
                 return (
-                  <div key={alert.cartridge.id} className="p-4 space-y-3">
+                  <div key={alert.cartridge.id} className="p-5 space-y-4">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="font-bold text-sm text-[#0B0F17] dark:text-white">
-                            {alert.cartridge.model}
-                          </span>
-                          {alert.cartridge.isBestSeller && (
-                            <span className="text-[11px] font-semibold text-blue-700 dark:text-sky-400">
-                              · Best Seller
-                            </span>
-                          )}
-                        </div>
-                        <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">
-                          {alert.cartridge.sku} · {alert.cartridge.color} · {alert.cartridge.supplier}
+                        <span className="font-bold text-base text-[#0B0F17] dark:text-white block">
+                          {alert.cartridge.model}
+                        </span>
+                        <span className="font-mono text-xs text-slate-600 dark:text-slate-300 block mt-0.5">
+                          {alert.cartridge.sku} · {alert.cartridge.color}
                         </span>
                       </div>
 
                       <span
-                        className={`text-xs font-semibold shrink-0 ${
+                        className={`text-xs font-bold shrink-0 ${
                           alert.severity === 'CRITICAL'
-                            ? 'text-rose-600 dark:text-rose-400'
+                            ? 'text-rose-700 dark:text-rose-400'
                             : 'text-amber-700 dark:text-amber-400'
                         }`}
                       >
-                        {alert.currentStock === 0 ? 'Out of Stock' : alert.severity === 'CRITICAL' ? 'Critical' : 'Low Stock'}
+                        {alert.currentStock === 0 ? 'Out of Stock' : alert.severity === 'CRITICAL' ? 'Very Low' : 'Low Stock'}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 items-center p-2.5 rounded-xl bg-[#F6F8FC] dark:bg-white/[0.03] border border-slate-200/60 dark:border-white/10">
-                      <div>
-                        <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 block">
-                          In Office Now
-                        </span>
-                        <span
-                          className={`font-display font-bold text-base tabular-nums ${
-                            alert.currentStock === 0
-                              ? 'text-rose-600 dark:text-rose-400'
-                              : 'text-amber-700 dark:text-amber-400'
-                          }`}
-                        >
-                          {alert.currentStock} units
-                        </span>
-                      </div>
-                      <div className="flex justify-end">
-                        <GaugeIndicator
-                          currentStock={alert.currentStock}
-                          gaugeTarget={alert.minThreshold || 15}
-                          compact={true}
-                        />
-                      </div>
-                    </div>
+                    <GaugeIndicator
+                      currentStock={alert.currentStock}
+                      gaugeTarget={alert.minThreshold || 15}
+                      compact={true}
+                      showText={false}
+                    />
 
-                    <div className="flex items-center justify-between gap-2 pt-0.5">
-                      <div className="inline-flex items-center gap-1">
+                    <div className="flex items-center justify-between gap-3 pt-1">
+                      <div className="inline-flex items-center gap-1.5">
                         <button
                           type="button"
                           onClick={() => handleQuantityChange(alert.cartridge.id, currentQty - 1)}
-                          className="w-10 h-10 rounded-xl border border-slate-200 dark:border-white/15 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-200 flex items-center justify-center active:scale-95 cursor-pointer"
-                          aria-label={`Decrease suggested quantity for ${alert.cartridge.sku}`}
+                          className="w-11 h-11 rounded-xl border border-slate-300 dark:border-white/15 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-200 flex items-center justify-center cursor-pointer"
+                          aria-label={`Decrease quantity for ${alert.cartridge.sku}`}
                         >
-                          <Minus className="w-3.5 h-3.5" />
+                          <Minus className="w-4 h-4" />
                         </button>
                         <input
                           type="number"
@@ -353,32 +321,25 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
                           onChange={(e) =>
                             handleQuantityChange(alert.cartridge.id, parseInt(e.target.value) || 1)
                           }
-                          className="w-14 h-10 px-1.5 text-base font-mono font-bold text-center border border-slate-300 dark:border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/25 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white"
+                          className="w-16 h-11 px-2 text-base font-mono font-bold text-center border border-slate-300 dark:border-white/15 rounded-xl bg-slate-50 dark:bg-[#070B12] text-[#0B0F17] dark:text-white"
                         />
                         <button
                           type="button"
                           onClick={() => handleQuantityChange(alert.cartridge.id, currentQty + 1)}
-                          className="w-10 h-10 rounded-xl border border-slate-200 dark:border-white/15 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-200 flex items-center justify-center active:scale-95 cursor-pointer"
-                          aria-label={`Increase suggested quantity for ${alert.cartridge.sku}`}
+                          className="w-11 h-11 rounded-xl border border-slate-300 dark:border-white/15 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-200 flex items-center justify-center cursor-pointer"
+                          aria-label={`Increase quantity for ${alert.cartridge.sku}`}
                         >
-                          <Plus className="w-3.5 h-3.5" />
+                          <Plus className="w-4 h-4" />
                         </button>
                       </div>
 
-                      <div className="flex items-center gap-2.5">
-                        {lineTotal > 0 && (
-                          <span className="font-mono text-xs font-bold text-[#0B0F17] dark:text-white">
-                            ${lineTotal.toFixed(2)}
-                          </span>
-                        )}
-                        <button
-                          onClick={() => onOpenRestock(alert.cartridge.id)}
-                          className="min-h-[42px] inline-flex items-center gap-1 px-3.5 py-2 text-xs font-semibold text-[#0B0F17] dark:text-[#06090F] bg-[#E8F1FF] dark:bg-sky-400 hover:bg-blue-200 dark:hover:bg-sky-300 rounded-full border border-blue-200 dark:border-transparent transition-colors cursor-pointer whitespace-nowrap"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>Top Up</span>
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => onOpenRestock(alert.cartridge.id)}
+                        className="min-h-[44px] inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-[#0B0F17] dark:text-[#06090F] bg-blue-50 dark:bg-sky-400 hover:bg-blue-100 rounded-xl border border-blue-200 dark:border-transparent cursor-pointer whitespace-nowrap"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Top Up</span>
+                      </button>
                     </div>
                   </div>
                 );
@@ -387,79 +348,54 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
 
             {/* Desktop Table */}
             <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-[#F6F8FC] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-slate-50 dark:bg-white/[0.03] border-b border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-xs uppercase font-semibold">
                   <tr>
-                    <th className="py-3 px-4">Cartridge Model & SKU</th>
-                    <th className="py-3 px-4">Supplier</th>
-                    <th className="py-3 px-4 text-center">In Office at the Moment</th>
-                    <th className="py-3 px-4 text-center">Gauge Status</th>
-                    <th className="py-3 px-4 text-center">Suggested Order</th>
-                    <th className="py-3 px-4 text-right">Unit Price</th>
-                    <th className="py-3 px-4 text-right">Estimated Line Total</th>
-                    <th className="py-3 px-4 text-right">Action</th>
+                    <th className="py-3.5 px-5">Toner Model & Code</th>
+                    <th className="py-3.5 px-5 text-center">In Office</th>
+                    <th className="py-3.5 px-5">Stock Level</th>
+                    <th className="py-3.5 px-5 text-center">Order Qty</th>
+                    <th className="py-3.5 px-5 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                <tbody className="divide-y divide-slate-200/80 dark:divide-white/10">
                   {lowStockAlerts.map((alert) => {
                     const currentQty =
                       reorderQuantities[alert.cartridge.id] ?? alert.suggestedReorder;
-                    const lineTotal = currentQty * alert.cartridge.unitCost;
 
                     return (
-                      <tr key={alert.cartridge.id} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
-                        <td className="py-3.5 px-4">
-                          <div>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-bold text-[#0B0F17] dark:text-white text-xs sm:text-sm">
-                                {alert.cartridge.model}
-                              </span>
-                              {alert.cartridge.isBestSeller && (
-                                <span className="text-[11px] font-semibold text-blue-700 dark:text-sky-400">
-                                  · Best Seller
-                                </span>
-                              )}
-                              <span
-                                className={`text-[10px] font-mono font-bold ${
-                                  alert.severity === 'CRITICAL'
-                                    ? 'text-rose-600 dark:text-rose-400'
-                                    : 'text-amber-700 dark:text-amber-400'
-                                }`}
-                              >
-                                · {alert.currentStock === 0 ? 'OUT OF STOCK' : alert.severity}
-                              </span>
-                            </div>
-                            <span className="font-mono text-slate-500 dark:text-slate-400 text-[11px]">
-                              {alert.cartridge.sku} · {alert.cartridge.color} · Pack of {alert.cartridge.reorderPackSize}
-                            </span>
-                          </div>
-                        </td>
-
-                        <td className="py-3.5 px-4 text-slate-700 dark:text-slate-300">
-                          {alert.cartridge.supplier}
-                        </td>
-
-                        <td className="py-3.5 px-4 text-center">
-                          <span
-                            className={`font-mono font-bold text-sm tabular-nums ${
-                              alert.currentStock === 0
-                                ? 'text-rose-600 dark:text-rose-400'
-                                : 'text-amber-700 dark:text-amber-400'
-                            }`}
-                          >
-                            {alert.currentStock} units
+                      <tr key={alert.cartridge.id} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.02] transition-colors">
+                        <td className="py-4 px-5">
+                          <span className="font-bold text-[#0B0F17] dark:text-white text-base block">
+                            {alert.cartridge.model}
+                          </span>
+                          <span className="font-mono text-slate-600 dark:text-slate-300 text-xs">
+                            {alert.cartridge.sku} · {alert.cartridge.color} · {alert.cartridge.supplier}
                           </span>
                         </td>
 
-                        <td className="py-3.5 px-4 text-center">
+                        <td className="py-4 px-5 text-center">
+                          <span
+                            className={`font-mono font-bold text-lg tabular-nums ${
+                              alert.currentStock === 0
+                                ? 'text-rose-700 dark:text-rose-400'
+                                : 'text-amber-700 dark:text-amber-400'
+                            }`}
+                          >
+                            {alert.currentStock}
+                          </span>
+                        </td>
+
+                        <td className="py-4 px-5">
                           <GaugeIndicator
                             currentStock={alert.currentStock}
                             gaugeTarget={alert.minThreshold || 15}
                             compact={true}
+                            showText={false}
                           />
                         </td>
 
-                        <td className="py-3.5 px-4 text-center">
+                        <td className="py-4 px-5 text-center">
                           <div className="inline-flex items-center gap-1.5">
                             <input
                               type="number"
@@ -471,26 +407,18 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
                                   parseInt(e.target.value) || 1
                                 )
                               }
-                              className="w-16 px-2 py-1 text-xs font-mono font-bold text-center border border-slate-300 dark:border-white/15 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 bg-white dark:bg-[#070B12] text-[#0B0F17] dark:text-white"
+                              className="w-20 h-10 px-2.5 text-sm font-mono font-bold text-center border border-slate-300 dark:border-white/15 rounded-xl bg-slate-50 dark:bg-[#070B12] text-[#0B0F17] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600"
                             />
-                            <span className="text-[11px] text-slate-400 dark:text-slate-500">units</span>
+                            <span className="text-xs text-slate-600 dark:text-slate-300">units</span>
                           </div>
                         </td>
 
-                        <td className="py-3.5 px-4 text-right font-mono tabular-nums text-slate-800 dark:text-slate-200">
-                          {alert.cartridge.unitCost > 0 ? `$${alert.cartridge.unitCost.toFixed(2)}` : <span className="text-slate-400 dark:text-slate-600">—</span>}
-                        </td>
-
-                        <td className="py-3.5 px-4 text-right font-mono tabular-nums font-bold text-[#0B0F17] dark:text-white">
-                          {lineTotal > 0 ? `$${lineTotal.toFixed(2)}` : <span className="text-slate-400 dark:text-slate-600">—</span>}
-                        </td>
-
-                        <td className="py-3.5 px-4 text-right">
+                        <td className="py-4 px-5 text-right">
                           <button
                             onClick={() => onOpenRestock(alert.cartridge.id)}
-                            className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-[#0B0F17] dark:text-[#06090F] bg-[#E8F1FF] dark:bg-sky-400 hover:bg-blue-200 dark:hover:bg-sky-300 rounded-full border border-blue-200 dark:border-transparent transition-colors cursor-pointer whitespace-nowrap"
+                            className="min-h-[40px] inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-[#0B0F17] dark:text-[#06090F] bg-blue-50 dark:bg-sky-400 hover:bg-blue-100 dark:hover:bg-sky-300 rounded-xl border border-blue-200 dark:border-transparent transition-colors cursor-pointer whitespace-nowrap"
                           >
-                            <Plus className="w-3 h-3" />
+                            <Plus className="w-4 h-4" />
                             <span>Top Up</span>
                           </button>
                         </td>
@@ -504,85 +432,43 @@ export const ReorderCenterView: React.FC<ReorderCenterViewProps> = ({ onOpenRest
         )}
       </div>
 
-      {/* Past Restock Intake History */}
-      <div className="bg-white dark:bg-[#0B111B]/85 dark:backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden">
-        <div className="px-4 sm:px-5 py-4 border-b border-slate-100 dark:border-white/10 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-blue-700 dark:text-sky-400" />
-            <h3 className="text-sm font-bold text-[#0B0F17] dark:text-white">
-              Recent Warehouse Top-Up Intake Receipts
-            </h3>
+      {/* Past Restock History */}
+      {restocks.length > 0 && (
+        <div className="bg-white dark:bg-[#0D131F] rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+          <div className="px-5 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-blue-700 dark:text-sky-400" />
+              <h3 className="text-base font-bold text-[#0B0F17] dark:text-white">
+                Recent Restock Receipts
+              </h3>
+            </div>
+            <span className="text-sm text-slate-600 dark:text-slate-300">
+              {restocks.length} records
+            </span>
           </div>
-          <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
-            {restocks.length} deliveries
-          </span>
-        </div>
 
-        {/* Mobile History Cards */}
-        <div className="md:hidden divide-y divide-slate-100 dark:divide-white/5">
-          {restocks.map((rst) => (
-            <div key={rst.id} className="p-4 space-y-1.5">
-              <div className="flex items-start justify-between gap-2">
+          <div className="divide-y divide-slate-200/80 dark:divide-white/10">
+            {restocks.slice(0, 8).map((rst) => (
+              <div
+                key={rst.id}
+                className="px-5 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm"
+              >
                 <div className="min-w-0">
-                  <span className="font-mono text-[11px] font-bold text-slate-500 dark:text-slate-400 block">
-                    {rst.poNumber} · {rst.receivedDate}
-                  </span>
-                  <span className="text-sm font-bold text-[#0B0F17] dark:text-white block truncate mt-0.5">
+                  <span className="font-bold text-[#0B0F17] dark:text-white block">
                     {rst.cartridgeModel}
+                  </span>
+                  <span className="text-xs text-slate-600 dark:text-slate-300 block mt-0.5">
+                    <span className="font-mono">{rst.poNumber}</span> · {rst.receivedDate} · {rst.supplier} · By {rst.receivedBy}
                   </span>
                 </div>
-                <span className="font-mono tabular-nums text-sm font-bold text-blue-700 dark:text-sky-400 shrink-0">
-                  +{rst.quantityReceived}
+                <span className="font-mono tabular-nums text-base font-bold text-blue-700 dark:text-sky-400 shrink-0">
+                  +{rst.quantityReceived} units
                 </span>
               </div>
-              <div className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
-                <span className="truncate">{rst.supplier} · By {rst.receivedBy}</span>
-                <span className="font-mono font-semibold text-[#0B0F17] dark:text-white shrink-0">
-                  ${(rst.quantityReceived * rst.unitCost).toFixed(2)}
-                </span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-
-        {/* Desktop Table */}
-        <div className="hidden md:block overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-[#F6F8FC] dark:bg-white/[0.03] border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase font-semibold">
-              <tr>
-                <th className="py-3 px-4">PO / Intake #</th>
-                <th className="py-3 px-4">Cartridge Model</th>
-                <th className="py-3 px-4 text-center">Units Received</th>
-                <th className="py-3 px-4">Vendor</th>
-                <th className="py-3 px-4">Date</th>
-                <th className="py-3 px-4">Receiver</th>
-                <th className="py-3 px-4 text-right">Total Cost</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-              {restocks.map((rst) => (
-                <tr key={rst.id} className="hover:bg-[#F8FAFD] dark:hover:bg-white/[0.03] transition-colors">
-                  <td className="py-3 px-4 font-mono font-bold text-[#0B0F17] dark:text-white">
-                    {rst.poNumber}
-                  </td>
-                  <td className="py-3 px-4 font-semibold text-slate-800 dark:text-slate-200">
-                    {rst.cartridgeModel}
-                  </td>
-                  <td className="py-3 px-4 text-center font-mono tabular-nums font-bold text-blue-700 dark:text-sky-400">
-                    +{rst.quantityReceived}
-                  </td>
-                  <td className="py-3 px-4 text-slate-600 dark:text-slate-300">{rst.supplier}</td>
-                  <td className="py-3 px-4 font-mono text-slate-500 dark:text-slate-400">{rst.receivedDate}</td>
-                  <td className="py-3 px-4 text-slate-600 dark:text-slate-300">{rst.receivedBy}</td>
-                  <td className="py-3 px-4 text-right font-mono tabular-nums text-slate-800 dark:text-slate-200">
-                    ${(rst.quantityReceived * rst.unitCost).toFixed(2)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

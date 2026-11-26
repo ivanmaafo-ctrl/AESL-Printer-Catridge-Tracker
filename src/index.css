@@ -8,11 +8,19 @@
 }
 
 @layer base {
+  html {
+    font-size: 16px;
+  }
+
+  html.text-large {
+    font-size: 18px;
+  }
+
   body {
     font-family: var(--font-sans);
     letter-spacing: 0;
-    line-height: 1.5;
-    background-color: #ffffff;
+    line-height: 1.6;
+    background-color: #f8fafc;
     color: #0b0f17;
     transition: background-color 200ms ease, color 200ms ease;
   }
@@ -60,17 +68,11 @@
 }
 
 .bg-blue-hero {
-  background:
-    radial-gradient(circle at 82% 18%, rgba(37, 99, 235, 0.20) 0%, rgba(37, 99, 235, 0) 48%),
-    radial-gradient(circle at 15% 15%, rgba(147, 197, 253, 0.58) 0%, rgba(239, 246, 255, 0) 55%),
-    linear-gradient(160deg, #dbeafe 0%, #eff6ff 42%, #f8fafc 100%);
+  background: linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%);
 }
 
 .dark .bg-blue-hero {
-  background:
-    radial-gradient(circle at 85% 20%, rgba(56, 189, 248, 0.22) 0%, rgba(56, 189, 248, 0) 50%),
-    radial-gradient(circle at 15% 80%, rgba(37, 99, 235, 0.20) 0%, rgba(37, 99, 235, 0) 52%),
-    linear-gradient(135deg, #070e1c 0%, #0a1936 35%, #0c1f3d 70%, #071021 100%);
+  background: linear-gradient(180deg, #0b1629 0%, #09111f 100%);
 }
 
 @keyframes aesl-spin {
@@ -124,8 +126,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .dark .bg-blue-hero,
-  .dark-ambient-orb-a,
-  .dark-ambient-orb-b,
   .aesl-orbit-ring,
   .aesl-orbit-ring-slow,
   .aesl-orbit-ring-reverse,
@@ -136,8 +136,8 @@
 
 /* Custom scrollbars for data tables */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
