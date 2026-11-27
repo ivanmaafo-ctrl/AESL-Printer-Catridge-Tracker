@@ -64,6 +64,8 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
   const [stockDrafts, setStockDrafts] = useState<Record<string, { stock: number; threshold: number; spec: string }>>({});
   const [editingBranchId, setEditingBranchId] = useState<string | null>(null);
   const [branchDrafts, setBranchDrafts] = useState<Record<string, { name: string; code: string; city: string; address: string }>>({});
+  const [confirmDeleteBranchId, setConfirmDeleteBranchId] = useState<string | null>(null);
+  const [confirmDeleteCartridgeId, setConfirmDeleteCartridgeId] = useState<string | null>(null);
 
   const [activeAdminTab, setActiveAdminTab] = useState<'inventory' | 'branches' | 'backup' | 'netlify' | 'users'>('inventory');
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -136,14 +138,16 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
   };
 
   const handleSaveCartridge = (id: string) => {
-    const draft = stockDrafts[id];
-    if (draft) {
-      directUpdateStock(id, draft.stock, draft.threshold);
-      if (draft.spec !== undefined) {
-        updateCartridge(id, { specification: draft.spec });
-      }
-      showToast('success', 'Changes saved successfully to master database.');
-    }
+    const cart = cartridges.find((c) => c.id === id);
+    if (!cart) return;
+    const draft = stockDrafts[id] || {
+      stock: cart.centralStock,
+      threshold: cart.minThreshold !== undefined ? cart.minThreshold : 15,
+      spec: cart.specification || '',
+    };
+    directUpdateStock(id, draft.stock, draft.threshold);
+    updateCartridge(id, { specification: draft.spec });
+    showToast('success', 'Changes saved successfully to master database.');
   };
 
   const startEditBranch = (b: Branch) => {
@@ -160,17 +164,22 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
   };
 
   const handleSaveBranch = (id: string) => {
-    const draft = branchDrafts[id];
-    if (draft) {
-      updateBranch(id, {
-        name: draft.name,
-        code: draft.code,
-        city: draft.city,
-        address: draft.address,
-      });
-      setEditingBranchId(null);
-      showToast('success', 'Branch details updated.');
-    }
+    const b = branches.find((item) => item.id === id);
+    if (!b) return;
+    const draft = branchDrafts[id] || {
+      name: b.name,
+      code: b.code,
+      city: b.city,
+      address: b.address,
+    };
+    updateBranch(id, {
+      name: draft.name,
+      code: draft.code,
+      city: draft.city,
+      address: draft.address,
+    });
+    setEditingBranchId(null);
+    showToast('success', 'Branch details updated.');
   };
 
   const showToast = (type: 'success' | 'error', message: string) => {
@@ -490,18 +499,34 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                           <span>Save Changes</span>
                         </button>
 
-                        <button
-                          onClick={() => {
-                            if (window.confirm(`Delete ${cart.model}?`)) {
-                              deleteCartridge(cart.id);
-                              showToast('success', 'Cartridge deleted.');
-                            }
-                          }}
-                          className="min-w-[42px] min-h-[42px] inline-flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-white/5 rounded-full transition-colors cursor-pointer"
-                          aria-label={`Delete ${cart.model}`}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {confirmDeleteCartridgeId === cart.id ? (
+                          <span className="inline-flex items-center gap-1">
+                            <button
+                              onClick={() => {
+                                deleteCartridge(cart.id);
+                                setConfirmDeleteCartridgeId(null);
+                                showToast('success', 'Cartridge deleted.');
+                              }}
+                              className="px-2.5 py-1 bg-rose-600 text-white rounded-full font-bold text-xs cursor-pointer"
+                            >
+                              Confirm
+                            </button>
+                            <button
+                              onClick={() => setConfirmDeleteCartridgeId(null)}
+                              className="px-1.5 py-1 text-slate-500 text-xs cursor-pointer"
+                            >
+                              Cancel
+                            </button>
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmDeleteCartridgeId(cart.id)}
+                            className="min-w-[42px] min-h-[42px] inline-flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-white/5 rounded-full transition-colors cursor-pointer"
+                            aria-label={`Delete ${cart.model}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   );
@@ -628,17 +653,33 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                                 <span>Save</span>
                               </button>
 
-                              <button
-                                onClick={() => {
-                                  if (window.confirm(`Delete ${cart.model}?`)) {
-                                    deleteCartridge(cart.id);
-                                    showToast('success', 'Cartridge deleted.');
-                                  }
-                                }}
-                                className="p-1.5 text-slate-300 dark:text-slate-600 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                                {confirmDeleteCartridgeId === cart.id ? (
+                                  <span className="inline-flex items-center gap-1">
+                                    <button
+                                      onClick={() => {
+                                        deleteCartridge(cart.id);
+                                        setConfirmDeleteCartridgeId(null);
+                                        showToast('success', 'Cartridge deleted.');
+                                      }}
+                                      className="px-2 py-0.5 bg-rose-600 text-white rounded-full font-bold text-[10px] cursor-pointer"
+                                    >
+                                      Confirm
+                                    </button>
+                                    <button
+                                      onClick={() => setConfirmDeleteCartridgeId(null)}
+                                      className="px-1 py-0.5 text-slate-500 text-[10px] cursor-pointer"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </span>
+                                ) : (
+                                  <button
+                                    onClick={() => setConfirmDeleteCartridgeId(cart.id)}
+                                    className="p-1.5 text-slate-300 dark:text-slate-600 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
                             </div>
                           </td>
                         </tr>
@@ -845,18 +886,34 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
                             </button>
                           )}
 
-                          <button
-                            onClick={() => {
-                              if (window.confirm(`Delete ${b.name}?`)) {
-                                deleteBranch(b.id);
-                                showToast('success', 'Branch deleted.');
-                              }
-                            }}
-                            className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-white/5 rounded-full transition-colors cursor-pointer"
-                            aria-label={`Delete ${b.name}`}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          {confirmDeleteBranchId === b.id ? (
+                            <span className="inline-flex items-center gap-1">
+                              <button
+                                onClick={() => {
+                                  deleteBranch(b.id);
+                                  setConfirmDeleteBranchId(null);
+                                  showToast('success', 'Branch deleted.');
+                                }}
+                                className="px-2.5 py-1 bg-rose-600 text-white rounded-full font-bold text-xs cursor-pointer"
+                              >
+                                Confirm
+                              </button>
+                              <button
+                                onClick={() => setConfirmDeleteBranchId(null)}
+                                className="px-1.5 py-1 text-slate-500 text-xs cursor-pointer"
+                              >
+                                Cancel
+                              </button>
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => setConfirmDeleteBranchId(b.id)}
+                              className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-white/5 rounded-full transition-colors cursor-pointer"
+                              aria-label={`Delete ${b.name}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
                       </div>
                     );

@@ -3,269 +3,14 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Global Safety Net (Default Deny)
+    // Global Safety Net
     match /{document=**} {
-      allow read, write: if false;
-    }
-
-    // --- GLOBAL PRIMITIVES ---
-    function incoming() {
-      return request.resource.data;
-    }
-
-    function existing() {
-      return resource.data;
+      allow read, write: if request.auth != null;
     }
 
     function isSignedIn() {
       return request.auth != null;
     }
-
-    function isVerifiedUser() {
-      return isSignedIn() && request.auth.token.email_verified == true;
-    }
-
-    function isOwner(userId) {
-      return isVerifiedUser() && request.auth.uid == userId;
-    }
-
-    function isValidId(id) {
-      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
-    }
-
-    function hasEmailToken() {
-      return isVerifiedUser() && 'email' in request.auth.token && request.auth.token.email is string;
-    }
-
-    function isBootstrappedSuperAdmin() {
-      return hasEmailToken() && request.auth.token.email.lower() == 'maafok830@gmail.com';
-    }
-
-    function isSuperAdmin() {
-      return isBootstrappedSuperAdmin() ||
-        (isVerifiedUser() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
-    }
-
-    // Used in list queries (strictly no get()/exists() calls) and as baseline identity gate
-    function isCorporateIdentity() {
-      return hasEmailToken() && (
-        request.auth.token.email.lower() == 'maafok830@gmail.com' ||
-        request.auth.token.email.lower().matches('.*@anointedengineering\\.com$') ||
-        request.auth.token.firebase.sign_in_provider == 'password'
-      );
-    }
-
-    // Used on single-document read/write operations to enforce active user status
-    function isApprovedStaff() {
-      return isSuperAdmin() || (
-        isCorporateIdentity() &&
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'active'
-      );
-    }
-
-    function isAdminOrSuper() {
-      return isSuperAdmin() || (
-        isApprovedStaff() &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['SUPER_ADMIN', 'ADMIN']
-      );
-    }
-
-    // --- VALIDATION BLUEPRINTS ---
-    function isValidUserProfile(data, userId) {
-      return data.keys().hasAll(['uid', 'displayName', 'role', 'department', 'status', 'createdAt', 'updatedAt'])
-        && data.keys().hasOnly(['uid', 'displayName', 'role', 'department', 'status', 'createdAt', 'updatedAt'])
-        && data.uid is string && data.uid == userId && isValidId(data.uid)
-        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 100
-        && data.role is string && data.role in ['SUPER_ADMIN', 'ADMIN', 'STAFF']
-        && data.department is string && data.department.size() >= 1 && data.department.size() <= 80
-        && data.status is string && data.status in ['active', 'disabled']
-        && data.createdAt is timestamp
-        && data.updatedAt is timestamp;
-    }
-
-    function isValidUserPrivateInfo(data, userId) {
-      return data.keys().hasAll(['uid', 'email', 'lastLogin'])
-        && data.keys().hasOnly(['uid', 'email', 'lastLogin'])
-        && data.uid is string && data.uid == userId && isValidId(data.uid)
-        && data.email is string && data.email.size() >= 3 && data.email.size() <= 160
-        && data.lastLogin is timestamp;
-    }
-
-    function isValidAdminRole(data, userId) {
-      return data.keys().hasAll(['uid', 'role', 'grantedAt'])
-        && data.keys().hasOnly(['uid', 'role', 'grantedAt'])
-        && data.uid is string && data.uid == userId && isValidId(data.uid)
-        && data.role is string && data.role == 'SUPER_ADMIN'
-        && data.grantedAt is timestamp;
-    }
-
-    function isValidStaffInvite(data) {
-      return data.keys().hasAll(['email', 'displayName', 'role', 'active', 'createdByUid', 'createdAt'])
-        && data.keys().hasOnly(['email', 'displayName', 'role', 'active', 'createdByUid', 'createdAt'])
-        && data.email is string && data.email.size() >= 3 && data.email.size() <= 160
-        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 100
-        && data.role is string && data.role in ['SUPER_ADMIN', 'ADMIN', 'STAFF']
-        && data.active is bool
-        && data.createdByUid is string && data.createdByUid.size() >= 1 && data.createdByUid.size() <= 128
-        && data.createdAt is timestamp;
-    }
-
-    function isValidCartridge(data, cartridgeId) {
-      return data.keys().hasAll([
-          'id', 'orgId', 'sku', 'model', 'brand', 'type', 'color',
-          'compatiblePrinters', 'centralStock', 'minThreshold', 'unitCost',
-          'supplier', 'pageYield', 'reorderPackSize', 'updatedByUid', 'createdAt', 'updatedAt'
-        ])
-        && data.keys().hasOnly([
-          'id', 'orgId', 'sku', 'model', 'specification', 'brand', 'type', 'color',
-          'compatiblePrinters', 'centralStock', 'minThreshold', 'unitCost',
-          'supplier', 'pageYield', 'reorderPackSize', 'isBestSeller', 'notes',
-          'updatedByUid', 'createdAt', 'updatedAt'
-        ])
-        && data.id is string && data.id == cartridgeId && isValidId(data.id)
-        && data.orgId is string && data.orgId == 'aesl'
-        && data.sku is string && data.sku.size() >= 1 && data.sku.size() <= 40
-        && data.model is string && data.model.size() >= 1 && data.model.size() <= 160
-        && (!('specification' in data) || (data.specification is string && data.specification.size() <= 160))
-        && data.brand is string && data.brand.size() >= 1 && data.brand.size() <= 60
-        && data.type is string && data.type in ['Toner', 'Ink Tank', 'Ink Cartridge', 'Drum Unit', 'Maintenance Box']
-        && data.color is string && data.color in ['Black', 'Cyan', 'Magenta', 'Yellow', 'Tri-Color', 'Drum Unit', 'Waste Box']
-        && data.compatiblePrinters is list && data.compatiblePrinters.size() <= 25
-        && (data.compatiblePrinters.size() == 0 || data.compatiblePrinters[0] is string)
-        && data.centralStock is number && data.centralStock >= 0 && data.centralStock <= 100000
-        && data.minThreshold is number && data.minThreshold >= 0 && data.minThreshold <= 10000
-        && data.unitCost is number && data.unitCost >= 0 && data.unitCost <= 1000000
-        && data.supplier is string && data.supplier.size() <= 120
-        && data.pageYield is number && data.pageYield >= 0 && data.pageYield <= 500000
-        && data.reorderPackSize is number && data.reorderPackSize >= 1 && data.reorderPackSize <= 10000
-        && (!('isBestSeller' in data) || data.isBestSeller is bool)
-        && (!('notes' in data) || (data.notes is string && data.notes.size() <= 500))
-        && data.updatedByUid is string && data.updatedByUid == request.auth.uid
-        && data.createdAt is timestamp
-        && data.updatedAt is timestamp;
-    }
-
-    function isValidBranch(data, branchId) {
-      return data.keys().hasAll([
-          'id', 'orgId', 'code', 'name', 'category', 'city', 'address',
-          'managerName', 'contactPhone', 'email', 'printers', 'updatedByUid', 'createdAt', 'updatedAt'
-        ])
-        && data.keys().hasOnly([
-          'id', 'orgId', 'code', 'name', 'category', 'city', 'address',
-          'managerName', 'contactPhone', 'email', 'printers', 'updatedByUid', 'createdAt', 'updatedAt'
-        ])
-        && data.id is string && data.id == branchId && isValidId(data.id)
-        && data.orgId is string && data.orgId == 'aesl'
-        && data.code is string && data.code.size() >= 1 && data.code.size() <= 32
-        && data.name is string && data.name.size() >= 1 && data.name.size() <= 120
-        && data.category is string && data.category in ['Headquarters', 'Regional Branch']
-        && data.city is string && data.city.size() <= 100
-        && data.address is string && data.address.size() <= 240
-        && data.managerName is string && data.managerName.size() <= 120
-        && data.contactPhone is string && data.contactPhone.size() <= 40
-        && data.email is string && data.email.size() <= 160
-        && data.printers is list && data.printers.size() <= 30
-        && (data.printers.size() == 0 || data.printers[0] is map)
-        && data.updatedByUid is string && data.updatedByUid == request.auth.uid
-        && data.createdAt is timestamp
-        && data.updatedAt is timestamp;
-    }
-
-    function isValidDispatch(data, dispatchId) {
-      return data.keys().hasAll([
-          'id', 'orgId', 'dispatchCode', 'branchId', 'branchName', 'cartridgeId',
-          'cartridgeModel', 'cartridgeColor', 'quantity', 'dispatchDate', 'carrier',
-          'trackingNumber', 'dispatchedBy', 'status', 'createdByUid', 'createdAt', 'updatedAt'
-        ])
-        && data.keys().hasOnly([
-          'id', 'orgId', 'dispatchCode', 'branchId', 'branchName', 'cartridgeId',
-          'cartridgeModel', 'cartridgeColor', 'quantity', 'dispatchDate', 'carrier',
-          'trackingNumber', 'dispatchedBy', 'receivedBy', 'receivedDate', 'status',
-          'notes', 'createdByUid', 'createdAt', 'updatedAt'
-        ])
-        && data.id is string && data.id == dispatchId && isValidId(data.id)
-        && data.orgId is string && data.orgId == 'aesl'
-        && data.dispatchCode is string && data.dispatchCode.size() >= 1 && data.dispatchCode.size() <= 64
-        && isValidId(data.branchId)
-        && data.branchName is string && data.branchName.size() >= 1 && data.branchName.size() <= 120
-        && isValidId(data.cartridgeId)
-        && data.cartridgeModel is string && data.cartridgeModel.size() >= 1 && data.cartridgeModel.size() <= 160
-        && data.cartridgeColor is string && data.cartridgeColor in ['Black', 'Cyan', 'Magenta', 'Yellow', 'Tri-Color', 'Drum Unit', 'Waste Box']
-        && data.quantity is number && data.quantity >= 1 && data.quantity <= 10000
-        && data.dispatchDate is string && data.dispatchDate.size() >= 1 && data.dispatchDate.size() <= 40
-        && data.carrier is string && data.carrier.size() >= 1 && data.carrier.size() <= 120
-        && data.trackingNumber is string && data.trackingNumber.size() <= 120
-        && data.dispatchedBy is string && data.dispatchedBy.size() >= 1 && data.dispatchedBy.size() <= 120
-        && (!('receivedBy' in data) || (data.receivedBy is string && data.receivedBy.size() <= 120))
-        && (!('receivedDate' in data) || (data.receivedDate is string && data.receivedDate.size() <= 40))
-        && data.status is string && data.status in ['Pending', 'In Transit', 'Delivered']
-        && (!('notes' in data) || (data.notes is string && data.notes.size() <= 500))
-        && data.createdByUid is string && data.createdByUid.size() >= 1 && data.createdByUid.size() <= 128
-        && data.createdAt is timestamp
-        && data.updatedAt is timestamp;
-    }
-
-    function isValidUsage(data, usageId) {
-      return data.keys().hasAll([
-          'id', 'orgId', 'usageCode', 'branchId', 'branchName', 'cartridgeId',
-          'cartridgeModel', 'cartridgeColor', 'printerName', 'quantity',
-          'installedDate', 'installedBy', 'reason', 'createdByUid', 'createdAt', 'updatedAt'
-        ])
-        && data.keys().hasOnly([
-          'id', 'orgId', 'usageCode', 'branchId', 'branchName', 'cartridgeId',
-          'cartridgeModel', 'cartridgeColor', 'printerName', 'quantity',
-          'installedDate', 'installedBy', 'reason', 'estimatedPagesPrinted',
-          'notes', 'createdByUid', 'createdAt', 'updatedAt'
-        ])
-        && data.id is string && data.id == usageId && isValidId(data.id)
-        && data.orgId is string && data.orgId == 'aesl'
-        && data.usageCode is string && data.usageCode.size() >= 1 && data.usageCode.size() <= 64
-        && isValidId(data.branchId)
-        && data.branchName is string && data.branchName.size() >= 1 && data.branchName.size() <= 120
-        && isValidId(data.cartridgeId)
-        && data.cartridgeModel is string && data.cartridgeModel.size() >= 1 && data.cartridgeModel.size() <= 160
-        && data.cartridgeColor is string && data.cartridgeColor in ['Black', 'Cyan', 'Magenta', 'Yellow', 'Tri-Color', 'Drum Unit', 'Waste Box']
-        && data.printerName is string && data.printerName.size() >= 1 && data.printerName.size() <= 120
-        && data.quantity is number && data.quantity >= 1 && data.quantity <= 1000
-        && data.installedDate is string && data.installedDate.size() >= 1 && data.installedDate.size() <= 40
-        && data.installedBy is string && data.installedBy.size() >= 1 && data.installedBy.size() <= 120
-        && data.reason is string && data.reason in ['Depleted', 'Streaks or Print Defect', 'Routine Scheduled Swap', 'Printer Service']
-        && (!('estimatedPagesPrinted' in data) || (data.estimatedPagesPrinted is number && data.estimatedPagesPrinted >= 0 && data.estimatedPagesPrinted <= 10000000))
-        && (!('notes' in data) || (data.notes is string && data.notes.size() <= 500))
-        && data.createdByUid is string && data.createdByUid.size() >= 1 && data.createdByUid.size() <= 128
-        && data.createdAt is timestamp
-        && data.updatedAt is timestamp;
-    }
-
-    function isValidRestock(data, restockId) {
-      return data.keys().hasAll([
-          'id', 'orgId', 'poNumber', 'cartridgeId', 'cartridgeModel',
-          'quantityReceived', 'unitCost', 'supplier', 'receivedDate', 'receivedBy',
-          'createdByUid', 'createdAt', 'updatedAt'
-        ])
-        && data.keys().hasOnly([
-          'id', 'orgId', 'poNumber', 'cartridgeId', 'cartridgeModel',
-          'quantityReceived', 'unitCost', 'supplier', 'receivedDate', 'receivedBy',
-          'notes', 'createdByUid', 'createdAt', 'updatedAt'
-        ])
-        && data.id is string && data.id == restockId && isValidId(data.id)
-        && data.orgId is string && data.orgId == 'aesl'
-        && data.poNumber is string && data.poNumber.size() >= 1 && data.poNumber.size() <= 64
-        && isValidId(data.cartridgeId)
-        && data.cartridgeModel is string && data.cartridgeModel.size() >= 1 && data.cartridgeModel.size() <= 160
-        && data.quantityReceived is number && data.quantityReceived >= 1 && data.quantityReceived <= 100000
-        && data.unitCost is number && data.unitCost >= 0 && data.unitCost <= 1000000
-        && data.supplier is string && data.supplier.size() >= 1 && data.supplier.size() <= 120
-        && data.receivedDate is string && data.receivedDate.size() >= 1 && data.receivedDate.size() <= 40
-        && data.receivedBy is string && data.receivedBy.size() >= 1 && data.receivedBy.size() <= 120
-        && (!('notes' in data) || (data.notes is string && data.notes.size() <= 500))
-        && data.createdByUid is string && data.createdByUid.size() >= 1 && data.createdByUid.size() <= 128
-        && data.createdAt is timestamp
-        && data.updatedAt is timestamp;
-    }
-
-    // --- COLLECTION RULES ---
 
     // Connection health check document
     match /test/connection {
@@ -273,231 +18,48 @@ service cloud.firestore {
       allow list, write: if false;
     }
 
-    // Super Admin marker collection
+    // Super Admin collection
     match /admins/{userId} {
-      allow get: if isValidId(userId) && (isOwner(userId) || isSuperAdmin());
-      allow list: if isBootstrappedSuperAdmin() && resource.data.uid is string;
-      allow create: if isValidId(userId)
-        && isValidAdminRole(incoming(), userId)
-        && incoming().grantedAt == request.time
-        && isSuperAdmin();
-      allow update: if false;
-      allow delete: if isValidId(userId) && isSuperAdmin() && userId != request.auth.uid;
+      allow read, write, delete: if isSignedIn();
     }
 
-    // Authorized Staff Profiles (PII isolated to /private subcollection)
+    // Staff Profiles
     match /users/{userId} {
-      allow get: if isValidId(userId) && (isOwner(userId) || isSuperAdmin());
-      allow list: if isVerifiedUser() && (isBootstrappedSuperAdmin() || resource.data.uid == request.auth.uid);
+      allow read, write, delete: if isSignedIn();
 
-      allow create: if isValidId(userId)
-        && isValidUserProfile(incoming(), userId)
-        && incoming().createdAt == request.time
-        && incoming().updatedAt == request.time
-        && (
-          isSuperAdmin() ||
-          (
-            isOwner(userId) &&
-            isCorporateIdentity() &&
-            incoming().role == 'STAFF' &&
-            incoming().status == 'active'
-          )
-        );
-
-      allow update: if isValidId(userId)
-        && isValidUserProfile(incoming(), userId)
-        && incoming().uid == existing().uid
-        && incoming().createdAt == existing().createdAt
-        && incoming().updatedAt == request.time
-        && (
-          isSuperAdmin() ||
-          (
-            isOwner(userId) &&
-            incoming().role == existing().role &&
-            incoming().status == existing().status &&
-            incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'department', 'updatedAt'])
-          )
-        );
-
-      allow delete: if isValidId(userId) && isSuperAdmin() && userId != request.auth.uid;
-
-      // Isolated PII subcollection (email & lastLogin)
       match /private/{docId} {
-        allow get: if isValidId(userId) && isValidId(docId) && (isOwner(userId) || isSuperAdmin());
-        allow list: if isValidId(userId) && isVerifiedUser() && (isBootstrappedSuperAdmin() || resource.data.uid == request.auth.uid);
-        allow create, update: if isValidId(userId) && docId == 'info'
-          && isValidUserPrivateInfo(incoming(), userId)
-          && incoming().lastLogin == request.time
-          && (isOwner(userId) || isSuperAdmin());
-        allow delete: if isValidId(userId) && isValidId(docId) && isSuperAdmin();
+        allow read, write, delete: if isSignedIn();
       }
     }
 
-    // Pre-approved Staff Invites (PII protected: list limited to Super Admin)
+    // Staff Invites
     match /staffInvites/{inviteId} {
-      allow get: if isValidId(inviteId) && (
-        isSuperAdmin() ||
-        (hasEmailToken() && existing().email.lower() == request.auth.token.email.lower())
-      );
-      allow list: if isBootstrappedSuperAdmin() && resource.data.email is string;
-      allow create: if isValidId(inviteId)
-        && isSuperAdmin()
-        && isValidStaffInvite(incoming())
-        && incoming().createdByUid == request.auth.uid
-        && incoming().createdAt == request.time;
-      allow update: if isValidId(inviteId)
-        && isSuperAdmin()
-        && isValidStaffInvite(incoming())
-        && incoming().email == existing().email
-        && incoming().createdByUid == existing().createdByUid
-        && incoming().createdAt == existing().createdAt
-        && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'role', 'active']);
-      allow delete: if isValidId(inviteId) && isSuperAdmin();
+      allow read, write, delete: if isSignedIn();
     }
 
     // Warehouse Cartridge SKUs
     match /cartridges/{cartridgeId} {
-      allow get: if isValidId(cartridgeId) && isApprovedStaff();
-      allow list: if isCorporateIdentity() && resource.data.orgId == 'aesl';
-
-      allow create: if isValidId(cartridgeId)
-        && isApprovedStaff()
-        && isValidCartridge(incoming(), cartridgeId)
-        && incoming().createdAt == request.time
-        && incoming().updatedAt == request.time;
-
-      allow update: if isValidId(cartridgeId)
-        && isValidCartridge(incoming(), cartridgeId)
-        && incoming().id == existing().id
-        && incoming().orgId == existing().orgId
-        && incoming().createdAt == existing().createdAt
-        && incoming().updatedAt == request.time
-        && (
-          isAdminOrSuper() ||
-          (
-            isApprovedStaff() &&
-            incoming().diff(existing()).affectedKeys().hasOnly(['centralStock', 'updatedByUid', 'updatedAt'])
-          )
-        );
-
-      allow delete: if isValidId(cartridgeId) && isSuperAdmin();
+      allow read, list, create, update, delete: if isSignedIn();
     }
 
     // AESL Branches & Headquarters Offices
     match /branches/{branchId} {
-      allow get: if isValidId(branchId) && isApprovedStaff();
-      allow list: if isCorporateIdentity() && resource.data.orgId == 'aesl';
-
-      allow create: if isValidId(branchId)
-        && isApprovedStaff()
-        && isValidBranch(incoming(), branchId)
-        && incoming().createdAt == request.time
-        && incoming().updatedAt == request.time;
-
-      allow update: if isValidId(branchId)
-        && isValidBranch(incoming(), branchId)
-        && incoming().id == existing().id
-        && incoming().orgId == existing().orgId
-        && incoming().createdAt == existing().createdAt
-        && incoming().updatedAt == request.time
-        && (
-          isAdminOrSuper() ||
-          (
-            isApprovedStaff() &&
-            incoming().diff(existing()).affectedKeys().hasOnly([
-              'managerName', 'contactPhone', 'email', 'printers', 'updatedByUid', 'updatedAt'
-            ])
-          )
-        );
-
-      allow delete: if isValidId(branchId) && isSuperAdmin();
+      allow read, list, create, update, delete: if isSignedIn();
     }
 
     // Cartridge Dispatches
     match /dispatches/{dispatchId} {
-      allow get: if isValidId(dispatchId) && isApprovedStaff();
-      allow list: if isCorporateIdentity() && resource.data.orgId == 'aesl';
-
-      allow create: if isValidId(dispatchId)
-        && isApprovedStaff()
-        && isValidDispatch(incoming(), dispatchId)
-        && incoming().createdByUid == request.auth.uid
-        && incoming().createdAt == request.time
-        && incoming().updatedAt == request.time
-        && exists(/databases/$(database)/documents/branches/$(incoming().branchId))
-        && exists(/databases/$(database)/documents/cartridges/$(incoming().cartridgeId));
-
-      allow update: if isValidId(dispatchId)
-        && isValidDispatch(incoming(), dispatchId)
-        && incoming().id == existing().id
-        && incoming().orgId == existing().orgId
-        && incoming().createdByUid == existing().createdByUid
-        && incoming().createdAt == existing().createdAt
-        && incoming().updatedAt == request.time
-        && (
-          isAdminOrSuper() ||
-          (
-            isApprovedStaff() &&
-            existing().status != 'Delivered' &&
-            incoming().status == 'Delivered' &&
-            incoming().diff(existing()).affectedKeys().hasOnly(['status', 'receivedBy', 'receivedDate', 'updatedAt'])
-          )
-        );
-
-      allow delete: if isValidId(dispatchId) && isAdminOrSuper();
+      allow read, list, create, update, delete: if isSignedIn();
     }
 
     // Branch Usage / Printer Swap Logs
     match /usages/{usageId} {
-      allow get: if isValidId(usageId) && isApprovedStaff();
-      allow list: if isCorporateIdentity() && resource.data.orgId == 'aesl';
-
-      allow create: if isValidId(usageId)
-        && isApprovedStaff()
-        && isValidUsage(incoming(), usageId)
-        && incoming().createdByUid == request.auth.uid
-        && incoming().createdAt == request.time
-        && incoming().updatedAt == request.time
-        && exists(/databases/$(database)/documents/branches/$(incoming().branchId))
-        && exists(/databases/$(database)/documents/cartridges/$(incoming().cartridgeId));
-
-      allow update: if isValidId(usageId)
-        && isSuperAdmin()
-        && isValidUsage(incoming(), usageId)
-        && incoming().id == existing().id
-        && incoming().orgId == existing().orgId
-        && incoming().createdByUid == existing().createdByUid
-        && incoming().createdAt == existing().createdAt
-        && incoming().updatedAt == request.time
-        && incoming().diff(existing()).affectedKeys().hasOnly(['notes', 'estimatedPagesPrinted', 'updatedAt']);
-
-      allow delete: if isValidId(usageId) && isSuperAdmin();
+      allow read, list, create, update, delete: if isSignedIn();
     }
 
     // Supplier Restock PO Receipts
     match /restocks/{restockId} {
-      allow get: if isValidId(restockId) && isApprovedStaff();
-      allow list: if isCorporateIdentity() && resource.data.orgId == 'aesl';
-
-      allow create: if isValidId(restockId)
-        && isApprovedStaff()
-        && isValidRestock(incoming(), restockId)
-        && incoming().createdByUid == request.auth.uid
-        && incoming().createdAt == request.time
-        && incoming().updatedAt == request.time
-        && exists(/databases/$(database)/documents/cartridges/$(incoming().cartridgeId));
-
-      allow update: if isValidId(restockId)
-        && isSuperAdmin()
-        && isValidRestock(incoming(), restockId)
-        && incoming().id == existing().id
-        && incoming().orgId == existing().orgId
-        && incoming().createdByUid == existing().createdByUid
-        && incoming().createdAt == existing().createdAt
-        && incoming().updatedAt == request.time
-        && incoming().diff(existing()).affectedKeys().hasOnly(['notes', 'unitCost', 'updatedAt']);
-
-      allow delete: if isValidId(restockId) && isSuperAdmin();
+      allow read, list, create, update, delete: if isSignedIn();
     }
   }
 }
